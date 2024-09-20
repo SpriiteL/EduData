@@ -24,7 +24,4 @@
 /assets/vendor/
 ###< symfony/asset-mapper ###
 
-
-docker/db/data/mysql.sock
-
-docker/
+docker/*

@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\InventoryRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -40,6 +42,24 @@ class Inventory
 
     #[ORM\Column(length: 255)]
     private ?string $numInvoice = null;
+
+    /**
+     * @var Collection<int, ExportLogs>
+     */
+    #[ORM\OneToMany(targetEntity: ExportLogs::class, mappedBy: 'inventory')]
+    private Collection $exportLogs;
+
+    /**
+     * @var Collection<int, ImportLogs>
+     */
+    #[ORM\OneToMany(targetEntity: ImportLogs::class, mappedBy: 'inventory')]
+    private Collection $importLogs;
+
+    public function __construct()
+    {
+        $this->exportLogs = new ArrayCollection();
+        $this->importLogs = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -150,6 +170,66 @@ class Inventory
     public function setNumInvoice(string $numInvoice): static
     {
         $this->numInvoice = $numInvoice;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ExportLogs>
+     */
+    public function getExportLogs(): Collection
+    {
+        return $this->exportLogs;
+    }
+
+    public function addExportLog(ExportLogs $exportLog): static
+    {
+        if (!$this->exportLogs->contains($exportLog)) {
+            $this->exportLogs->add($exportLog);
+            $exportLog->setInventory($this);
+        }
+
+        return $this;
+    }
+
+    public function removeExportLog(ExportLogs $exportLog): static
+    {
+        if ($this->exportLogs->removeElement($exportLog)) {
+            // set the owning side to null (unless already changed)
+            if ($exportLog->getInventory() === $this) {
+                $exportLog->setInventory(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ImportLogs>
+     */
+    public function getImportLogs(): Collection
+    {
+        return $this->importLogs;
+    }
+
+    public function addImportLog(ImportLogs $importLog): static
+    {
+        if (!$this->importLogs->contains($importLog)) {
+            $this->importLogs->add($importLog);
+            $importLog->setInventory($this);
+        }
+
+        return $this;
+    }
+
+    public function removeImportLog(ImportLogs $importLog): static
+    {
+        if ($this->importLogs->removeElement($importLog)) {
+            // set the owning side to null (unless already changed)
+            if ($importLog->getInventory() === $this) {
+                $importLog->setInventory(null);
+            }
+        }
 
         return $this;
     }

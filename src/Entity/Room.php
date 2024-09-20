@@ -16,6 +16,9 @@ class Room
     #[ORM\Column(length: 255)]
     private ?string $roomName = null;
 
+    #[ORM\ManyToOne(inversedBy: 'room')]
+    private ?Etablishment $etablishment = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -29,6 +32,18 @@ class Room
     public function setRoomName(string $roomName): static
     {
         $this->roomName = $roomName;
+
+        return $this;
+    }
+
+    public function getEtablishment(): ?Etablishment
+    {
+        return $this->etablishment;
+    }
+
+    public function setEtablishment(?Etablishment $etablishment): static
+    {
+        $this->etablishment = $etablishment;
 
         return $this;
     }

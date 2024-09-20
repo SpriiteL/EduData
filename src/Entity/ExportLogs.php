@@ -23,6 +23,12 @@ class ExportLogs
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $dateExport = null;
 
+    #[ORM\ManyToOne(inversedBy: 'exportsLogs')]
+    private ?User $user = null;
+
+    #[ORM\ManyToOne(inversedBy: 'exportLogs')]
+    private ?Inventory $inventory = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -60,6 +66,30 @@ class ExportLogs
     public function setDateExport(\DateTimeInterface $dateExport): static
     {
         $this->dateExport = $dateExport;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    public function getInventory(): ?Inventory
+    {
+        return $this->inventory;
+    }
+
+    public function setInventory(?Inventory $inventory): static
+    {
+        $this->inventory = $inventory;
 
         return $this;
     }

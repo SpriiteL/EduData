@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -33,6 +35,27 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column]
     private ?bool $languagePreference = null;
+
+    /**
+     * @var Collection<int, ImportLogs>
+     */
+    #[ORM\OneToMany(targetEntity: ImportLogs::class, mappedBy: 'user')]
+    private Collection $ImportLogs;
+
+    /**
+     * @var Collection<int, ExportLogs>
+     */
+    #[ORM\OneToMany(targetEntity: ExportLogs::class, mappedBy: 'user')]
+    private Collection $exportsLogs;
+
+    #[ORM\ManyToOne(inversedBy: 'user')]
+    private ?Etablishment $etablishment = null;
+
+    public function __construct()
+    {
+        $this->ImportLogs = new ArrayCollection();
+        $this->exportsLogs = new ArrayCollection();
+    }
 
     public function __toString(): string
         {
@@ -122,6 +145,78 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setLanguagePreference(bool $languagePreference): static
     {
         $this->languagePreference = $languagePreference;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ImportLogs>
+     */
+    public function getImportLogs(): Collection
+    {
+        return $this->ImportLogs;
+    }
+
+    public function addImportLog(ImportLogs $importLog): static
+    {
+        if (!$this->ImportLogs->contains($importLog)) {
+            $this->ImportLogs->add($importLog);
+            $importLog->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeImportLog(ImportLogs $importLog): static
+    {
+        if ($this->ImportLogs->removeElement($importLog)) {
+            // set the owning side to null (unless already changed)
+            if ($importLog->getUser() === $this) {
+                $importLog->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ExportLogs>
+     */
+    public function getExportsLogs(): Collection
+    {
+        return $this->exportsLogs;
+    }
+
+    public function addExportsLog(ExportLogs $exportsLog): static
+    {
+        if (!$this->exportsLogs->contains($exportsLog)) {
+            $this->exportsLogs->add($exportsLog);
+            $exportsLog->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeExportsLog(ExportLogs $exportsLog): static
+    {
+        if ($this->exportsLogs->removeElement($exportsLog)) {
+            // set the owning side to null (unless already changed)
+            if ($exportsLog->getUser() === $this) {
+                $exportsLog->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getEtablishment(): ?Etablishment
+    {
+        return $this->etablishment;
+    }
+
+    public function setEtablishment(?Etablishment $etablishment): static
+    {
+        $this->etablishment = $etablishment;
 
         return $this;
     }

@@ -6,11 +6,13 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_USERNAME', fields: ['username'])]
+#[UniqueEntity(fields: ['username'], message: 'There is already an account with this username')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -33,9 +35,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
-    #[ORM\Column]
-    private ?bool $languagePreference = null;
-
+   
     /**
      * @var Collection<int, ImportLogs>
      */
@@ -137,17 +137,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // $this->plainPassword = null;
     }
 
-    public function isLanguagePreference(): ?bool
-    {
-        return $this->languagePreference;
-    }
+    
 
-    public function setLanguagePreference(bool $languagePreference): static
-    {
-        $this->languagePreference = $languagePreference;
-
-        return $this;
-    }
 
     /**
      * @return Collection<int, ImportLogs>

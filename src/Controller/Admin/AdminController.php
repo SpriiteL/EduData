@@ -7,6 +7,9 @@ use App\Entity\User;
 use App\Entity\Etablishment;
 use App\Entity\Inventory;
 use App\Entity\Room;
+use App\Entity\ExportLogs;
+use App\Entity\ImportLogs;
+use App\Entity\Statistics;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
@@ -52,7 +55,7 @@ class AdminController extends AbstractDashboardController
     public function configureDashboard(): Dashboard
     {
         return Dashboard::new()
-            ->setTitle('App');
+            ->setTitle('EduData');
     }
 
     public function configureMenuItems(): iterable
@@ -63,5 +66,8 @@ class AdminController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Etablishment', 'fa-solid fa-building-columns', Etablishment::class);
         yield MenuItem::linkToCrud('Inventory', 'fa-solid fa-cart-flatbed', Inventory::class);
         yield MenuItem::linkToCrud('Room', 'fa-solid fa-chair', Room::class);
+        yield MenuItem::linkToCrud('ImportsLogs', 'fa-solid fa-file-import', ImportLogs::class);
+        yield MenuItem::linkToCrud('ExportLogs', 'fa-solid fa-file-export', ExportLogs::class);
+        yield MenuItem::linkToCrud('Statistics', 'fa-solid fa-chart-simple', Statistics::class);
     }
 }

@@ -4,6 +4,9 @@ namespace App\Controller\Admin;
 
 
 use App\Entity\User;
+use App\Entity\Etablishment;
+use App\Entity\Inventory;
+use App\Entity\Room;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
@@ -56,7 +59,9 @@ class AdminController extends AbstractDashboardController
     {
         yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
         yield MenuItem::linktoRoute('Back to the website', 'fa-solid fa-gear', 'homepage');
-+        yield MenuItem::linkToCrud('User', 'fa-solid fa-user', User::class);
-        // yield MenuItem::linkToCrud('The Label', 'fas fa-list', EntityClass::class);
+        yield MenuItem::linkToCrud('User', 'fa-solid fa-user', User::class);
+        yield MenuItem::linkToCrud('Etablishment', 'fa-solid fa-building-columns', Etablishment::class);
+        yield MenuItem::linkToCrud('Inventory', 'fa-solid fa-cart-flatbed', Inventory::class);
+        yield MenuItem::linkToCrud('Room', 'fa-solid fa-chair', Room::class);
     }
 }

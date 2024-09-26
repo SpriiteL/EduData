@@ -12,6 +12,20 @@
 </style>
 <div class="example-wrapper">
     <h1>Inventaire</h1>
+    
+    <form action="{{ path('app_inventaire_import') }}" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".csv">
+        <button type="submit">Importer</button>
+    </form>
+
+    {% for label, messages in app.flashes %}
+        <div class="alert alert-{{ label }}">
+            {% for message in messages %}
+                <p>{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endfor %}
+
     <table>
         <thead>
             <tr>
@@ -24,6 +38,7 @@
                 <th>Date Entry</th>
                 <th>Num Serie</th>
                 <th>Num Invoice Intern</th>
+                <th>Num Invoice</th>
             </tr>
         </thead>
         <tbody>
@@ -38,6 +53,7 @@
                     <td>{{ inventory.dateEntry ? inventory.dateEntry|date('Y-m-d') : '' }}</td>
                     <td>{{ inventory.numSerie }}</td>
                     <td>{{ inventory.numInvoiceIntern }}</td>
+                    <td>{{ inventory.numInvoice }}</td>
                 </tr>
             {% endfor %}
         </tbody>

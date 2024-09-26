@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@dbml/cli": "^3.9.0"
+  }
+}

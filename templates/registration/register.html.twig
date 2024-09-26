@@ -96,6 +96,11 @@
                 </div>
 
                 <div class="form-group">
+                    {{ form_label(registrationForm.etablishment) }}
+                    {{ form_widget(registrationForm.etablishment, {'attr': {'class': 'form-control'}}) }}
+                </div>
+
+                <div class="form-group">
                     {{ form_widget(registrationForm.agreeTerms) }}
                     {{ form_label(registrationForm.agreeTerms) }}
                 </div>

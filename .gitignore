@@ -24,4 +24,5 @@
 /assets/vendor/
 ###< symfony/asset-mapper ###
 
-docker/*
+node_modules/*
+/docker/db/data/*

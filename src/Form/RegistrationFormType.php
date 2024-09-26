@@ -3,7 +3,9 @@
 namespace App\Form;
 
 use App\Entity\User;
+use App\Entity\Etablishment;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -42,6 +44,11 @@ class RegistrationFormType extends AbstractType
                         'max' => 4096,
                     ]),
                 ],
+            ])
+            ->add('etablishment', EntityType::class, [
+                'class' => Etablishment::class,
+                'choice_label' => 'name', // Assuming 'name' is the property holding the name of the establishment
+                'label' => 'Etablishment',
             ])
         ;
     }

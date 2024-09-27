@@ -4,9 +4,8 @@ namespace App\Controller;
 
 use App\Entity\Inventory;
 use Doctrine\Persistence\ManagerRegistry;
-use League\Csv\Reader;
+use League\Csv\Writer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -35,19 +34,6 @@ class InventaireController extends AbstractController
             $entityManager = $doctrine->getManager();
 
             foreach ($records as $row) {
-                // Debugging: Log the row data
-                dump($row);
-
-                // Check if all required keys exist in the row
-                $requiredKeys = ['activeType', 'price', 'numProductSerie', 'totalProductLot', 'provider', 'dateEntry', 'numSerie', 'numInvoiceIntern'];
-                $missingKeys = array_diff($requiredKeys, array_keys($row));
-
-                if (!empty($missingKeys)) {
-                    // Log the missing keys and skip this row
-                    dump('Missing keys: ' . implode(', ', $missingKeys));
-                    continue;
-                }
-
                 $inventory = new Inventory();
                 $inventory->setActiveType($row['activeType']);
                 $inventory->setPrice($row['price']);
@@ -60,9 +46,6 @@ class InventaireController extends AbstractController
                 $inventory->setNumInvoice($row['numInvoice']);
 
                 $entityManager->persist($inventory);
-
-                // Debugging: Log the inventory entity
-                dump($inventory);
             }
 
             $entityManager->flush();
@@ -73,5 +56,35 @@ class InventaireController extends AbstractController
         }
 
         return $this->redirectToRoute('app_inventaire');
+    }
+
+    #[Route('/inventaire/export', name: 'app_inventaire_export', methods: ['GET'])]
+    public function export(ManagerRegistry $doctrine): Response
+    {
+        $inventories = $doctrine->getRepository(Inventory::class)->findAll();
+
+        $csv = Writer::createFromString('');
+        $csv->insertOne(['ID', 'Type Actif', 'Prix', 'Numéro de Série Produit', 'Total Lot Produit', 'Fournisseur', 'Date d\'Entrée', 'Numéro de Série', 'Numéro de Facture Interne', 'Numéro de Facture']);
+
+        foreach ($inventories as $inventory) {
+            $csv->insertOne([
+                $inventory->getId(),
+                $inventory->getActiveType(),
+                $inventory->getPrice(),
+                $inventory->getNumProductSerie(),
+                $inventory->getTotalProductLot(),
+                $inventory->getProvider(),
+                $inventory->getDateEntry()->format('Y-m-d'),
+                $inventory->getNumSerie(),
+                $inventory->getNumInvoiceIntern(),
+                $inventory->getNumInvoice(),
+            ]);
+        }
+
+        $response = new Response("\xEF\xBB\xBF" . $csv->toString());
+        $response->headers->set('Content-Type', 'text/csv');
+        $response->headers->set('Content-Disposition', 'attachment; filename="inventaire.csv"');
+
+        return $response;
     }
 }

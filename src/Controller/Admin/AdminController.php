@@ -32,8 +32,8 @@ class AdminController extends AbstractDashboardController
 
         return $this->redirect($url);
 
-        // if(in_array('ROLE_ADMIN', $this->getUser()->getRoles(), true)) {
-        //     return new RedirectResponse($this->urlGenerator->generate('admin'));
+        // if(in_array('ROLE_ADMIN', $this->getUser()->getRoles(), false)) {
+        //     return new RedirectResponse($this->urlGenerator->generate('login'));
         // }
         // Option 1. You can make your dashboard redirect to some common page of your backend
         //

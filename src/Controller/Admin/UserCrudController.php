@@ -32,12 +32,7 @@ class UserCrudController extends AbstractCrudController
         return [
             IdField::new('id'),
             TextField::new('username'),
-            AssociationField::new('etablishment')
-                ->setCrudController(EtablishmentCrudController::class)
-                ->setLabel('Etablishment')
-                ->setFormTypeOptions([
-                    'choice_label' => 'name', // Assuming 'name' is the property holding the name of the establishment
-                ]),
+            AssociationField::new('etablishment','etablishment'),
         ];
     }
 }

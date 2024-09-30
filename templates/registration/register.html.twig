@@ -1,112 +1,48 @@
-{% extends 'base.html.twig' %}
+{# {% extends 'base.html.twig' %}
 
-{% block title %}Register{% endblock %}
+{% block title %}Register{% endblock %} #}
 
 {% block stylesheets %}
-    {{ parent() }}
-    <style>
-        .register-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background-color: #f3f4f6;
-        }
-        .register-form {
-            background-color: white;
-            padding: 2rem;
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 400px;
-        }
-        .register-form h1 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 1.5rem;
-        }
-        .form-group {
-            margin-bottom: 1rem;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: #4b5563;
-        }
-        .form-group input[type="text"],
-        .form-group input[type="password"] {
-            width: 100%;
-            padding: 0.5rem;
-            border: 1px solid #d1d5db;
-            border-radius: 0.25rem;
-        }
-        .form-group input[type="text"]:focus,
-        .form-group input[type="password"]:focus {
-            outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-        .form-group input[type="checkbox"] {
-            margin-right: 0.5rem;
-        }
-        .submit-button {
-            width: 100%;
-            padding: 0.75rem;
-            background-color: #3b82f6;
-            color: white;
-            border: none;
-            border-radius: 0.25rem;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        .submit-button:hover {
-            background-color: #2563eb;
-        }
-        .alert {
-            padding: 1rem;
-            border-radius: 0.25rem;
-            margin-bottom: 1rem;
-            background-color: #fee2e2;
-            color: #b91c1c;
-        }
-    </style>
+    <link rel="stylesheet" href="{{asset('css/styleRegister.css')}}" type="text/css">
 {% endblock %}
 
 {% block body %}
     <div class="register-container">
-        <div class="register-form">
-            <h1>Register</h1>
+        <div class="left-side"></div>
+        <div class="right-side">
+            <div class="register-form">
+                <h1>Register</h1>
 
-            {% if form_errors(registrationForm) %}
-                <div class="alert">
-                    {{ form_errors(registrationForm) }}
-                </div>
-            {% endif %}
+                {% if form_errors(registrationForm) %}
+                    <div class="alert">
+                        {{ form_errors(registrationForm) }}
+                    </div>
+                {% endif %}
 
-            {{ form_start(registrationForm) }}
-                <div class="form-group">
-                    {{ form_label(registrationForm.username) }}
-                    {{ form_widget(registrationForm.username, {'attr': {'class': 'form-control'}}) }}
-                </div>
+                {{ form_start(registrationForm) }}
+                    <div class="form-group">
+                        {{ form_label(registrationForm.username) }}
+                        {{ form_widget(registrationForm.username, {'attr': {'class': 'form-control'}}) }}
+                    </div>
 
-                <div class="form-group">
-                    {{ form_label(registrationForm.plainPassword, 'Password') }}
-                    {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-control'}}) }}
-                </div>
+                    <div class="form-group">
+                        {{ form_label(registrationForm.plainPassword, 'Password') }}
+                        {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-control'}}) }}
+                    </div>
 
-                <div class="form-group">
-                    {{ form_label(registrationForm.etablishment) }}
-                    {{ form_widget(registrationForm.etablishment, {'attr': {'class': 'form-control'}}) }}
-                </div>
+                    <div class="form-group">
+                        {{ form_label(registrationForm.etablishment) }}
+                        {{ form_widget(registrationForm.etablishment, {'attr': {'class': 'form-control'}}) }}
+                    </div>
 
-                <div class="form-group">
-                    {{ form_widget(registrationForm.agreeTerms) }}
-                    {{ form_label(registrationForm.agreeTerms) }}
-                </div>
+                    <div class="form-group">
+                        {{ form_widget(registrationForm.agreeTerms) }}
+                        {{ form_label(registrationForm.agreeTerms) }}
+                    </div>
 
-                <button type="submit" class="submit-button">Register</button>
-            {{ form_end(registrationForm) }}
+                    <button type="submit" class="btn btn-primary btn-block">Register</button>
+                {{ form_end(registrationForm) }}
+            </div>
         </div>
     </div>
 {% endblock %}

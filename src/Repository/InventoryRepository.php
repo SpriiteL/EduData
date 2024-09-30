@@ -16,6 +16,23 @@ class InventoryRepository extends ServiceEntityRepository
         parent::__construct($registry, Inventory::class);
     }
 
+    public function findByFilters(string $search = '', string $status = ''): array
+    {
+        $queryBuilder = $this->createQueryBuilder('i');
+
+        if ($search) {
+            $queryBuilder->andWhere('i.name LIKE :search')
+                ->setParameter('search', '%' . $search . '%');
+        }
+
+        if ($status !== '') {
+            $queryBuilder->andWhere('i.statut = :status')
+                ->setParameter('status', $status);
+        }
+
+        return $queryBuilder->getQuery()->getResult();
+    }
+
 //    /**
 //     * @return Inventory[] Returns an array of Inventory objects
 //     */

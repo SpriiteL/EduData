@@ -10,18 +10,27 @@ security:
                 class: App\Entity\User
                 property: username
     firewalls:
-        dev:
-            pattern: ^/(_(profiler|wdt)|css|images|js)/
-            security: false
+        api:
+            pattern: ^/api/
+            stateless: true
+            provider: app_user_provider
         main:
             lazy: true
             provider: app_user_provider
+            entry_point: form_login
             form_login:
                 login_path: app_login
                 check_path: app_login
                 enable_csrf: true
             logout:
                 path: app_logout
+            json_login:
+                check_path: /auth
+                username_path: username
+                password_path: password
+                success_handler: lexik_jwt_authentication.handler.authentication_success
+                failure_handler: lexik_jwt_authentication.handler.authentication_failure
+            jwt: ~
                 # where to redirect after logout
                 # target: app_any_route
 
@@ -35,6 +44,7 @@ security:
     # Note: Only the *first* access control that matches will be used
     access_control:
         - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/api, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
 
 when@test:

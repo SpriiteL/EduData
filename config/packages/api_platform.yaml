@@ -1,5 +1,10 @@
 api_platform:
-    title: Hello API Platform
+    swagger:
+         api_keys:
+             JWT:
+                name: Authorization
+                type: header
+    title: EduData API
     version: 1.0.0
     formats:
         jsonld: ['application/ld+json']

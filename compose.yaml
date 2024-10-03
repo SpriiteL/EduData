@@ -55,6 +55,14 @@ services:
       - ./docker/db/data:/var/lib/mysql:rw
 ###< doctrine/doctrine-bundle ###
 
+###> Redis container ###
+  redis:
+      image: redis:alpine
+      ports:
+        - "6379:6379"
+      volumes:
+        - redis_data:/data
+
 volumes:
   caddy_data:
   caddy_config:
@@ -64,3 +72,4 @@ volumes:
 ###> doctrine/doctrine-bundle ###
   database_data:
 ###< doctrine/doctrine-bundle ###
+  redis_data:

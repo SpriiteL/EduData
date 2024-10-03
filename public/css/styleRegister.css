@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap');
 /* Suppression des marges et du padding par défaut */
 * {
     margin: 0;
@@ -7,12 +8,13 @@
 
 /* Container en pleine largeur et hauteur */
 html, body {
+    font-family: "Hind Siliguri", sans-serif;
     height: 100%;
     overflow: hidden; /* Désactive la barre de scroll */
 }
 
 /* Divise l'écran en deux moitiés, aucune bordure */
-.register-container {
+.container {
     display: flex;
     height: 100vh;
     width: 100vw; /* Utilise toute la largeur de la fenêtre */
@@ -21,7 +23,7 @@ html, body {
 /* Partie gauche avec fond noir qui colle au bord de la page */
 .left-side {
     flex: 1;
-    background-image: url('../asset/decolog.jpg'); /* Image de fond */
+    background-image: url('../asset/decoreg.jpg'); /* Image de fond */
     background-size: cover; /* Couvre toute la zone */
     background-position: center; /* Centrer l'image */
     background-repeat: no-repeat; /* Pas de répétition de l'image */
@@ -30,7 +32,7 @@ html, body {
 /* Partie droite avec fond blanc */
 .right-side {
     flex: 1;
-    background-color: white;
+    background-color: rgb(0, 0, 0);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -38,10 +40,10 @@ html, body {
 }
 
 /* Style du formulaire centré */
-.register-form {
+.login-form {
     width: 100%;
     max-width: 400px;
-    background-color: #f9f9f9; /* Couleur d'arrière-plan du formulaire */
+    background-color: #ffffff; /* Couleur d'arrière-plan du formulaire */
     padding: 30px;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Effet d'ombre pour le cadre */
@@ -74,12 +76,12 @@ html, body {
 }
 
 .form-control:focus {
-    border-color: #007bff; /* Bordure bleue au focus */
+    border-color: #000000; /* Bordure bleue au focus */
     outline: none;
 }
 
 .btn-primary {
-    background-color: #007bff;
+    background-color: #000000;
     color: white;
     padding: 10px;
     width: 100%;
@@ -91,11 +93,33 @@ html, body {
 }
 
 .btn-primary:hover {
-    background-color: #0056b3;
+    background-color: #535353;
 }
 
 .btn-block {
     display: block;
     width: 100%;
     margin-top: 20px;
+}
+
+/* Container pour centrer le logo */
+.logo-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+/* Taille du logo */
+.logo {
+    max-width: 150px; /* Ajuste la taille du logo si nécessaire */
+    height: auto;
+}
+
+.form-check {
+    display: flex;
+    align-items: center;
+}
+
+.form-check-input {
+    margin-right: 0.5rem;
 }

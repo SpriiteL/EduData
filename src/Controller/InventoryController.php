@@ -35,7 +35,7 @@ class InventoryController extends AbstractController
 
         $inventories = $queryBuilder->getQuery()->getResult();
 
-        return $this->render('inventory/index.html.twig', [
+        return $this->render('inventory/inventory.html.twig', [
             'controller_name' => 'InventoryController',
             'inventories' => $inventories,
         ]);

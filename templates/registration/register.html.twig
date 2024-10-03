@@ -1,48 +1,52 @@
-{# {% extends 'base.html.twig' %}
+{# {% extends 'base.html.twig' %} #}
 
-{% block title %}Register{% endblock %} #}
+{# {% block title %}Log in!{% endblock %} #}
 
 {% block stylesheets %}
     <link rel="stylesheet" href="{{asset('css/styleRegister.css')}}" type="text/css">
 {% endblock %}
 
 {% block body %}
-    <div class="register-container">
-        <div class="left-side"></div>
-        <div class="right-side">
-            <div class="register-form">
-                <h1>Register</h1>
+<div class="container">
+    <div class="left-side"></div>
+    <div class="right-side">
+        <form method="post" class="login-form">
+            <div class="logo-container">
+                <img src="{{ asset('asset/logo.png') }}" alt="Logo" class="logo">
+            </div>
 
-                {% if form_errors(registrationForm) %}
-                    <div class="alert">
-                        {{ form_errors(registrationForm) }}
-                    </div>
-                {% endif %}
+            {% if form_errors(registrationForm) %}
+                <div class="alert">
+                    {{ form_errors(registrationForm) }}
+                </div>
+            {% endif %}
 
-                {{ form_start(registrationForm) }}
+            {{ form_start(registrationForm) }}
                     <div class="form-group">
-                        {{ form_label(registrationForm.username) }}
+                        {{ form_label(registrationForm.username, 'Nom d\'Utilisateur :') }}
                         {{ form_widget(registrationForm.username, {'attr': {'class': 'form-control'}}) }}
                     </div>
 
                     <div class="form-group">
-                        {{ form_label(registrationForm.plainPassword, 'Password') }}
+                        {{ form_label(registrationForm.plainPassword, 'Mot de Passe :') }}
                         {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-control'}}) }}
                     </div>
 
                     <div class="form-group">
-                        {{ form_label(registrationForm.etablishment) }}
+                        {{ form_label(registrationForm.etablishment, 'Etablissement :') }}
                         {{ form_widget(registrationForm.etablishment, {'attr': {'class': 'form-control'}}) }}
                     </div>
 
                     <div class="form-group">
-                        {{ form_widget(registrationForm.agreeTerms) }}
-                        {{ form_label(registrationForm.agreeTerms) }}
+                        <div class="form-check">
+                            {{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'form-check-input'}}) }}
+                            {{ form_label(registrationForm.agreeTerms, null, {'label_attr': {'class': 'form-check-label'}}) }}
+                        </div>
                     </div>
 
-                    <button type="submit" class="btn btn-primary btn-block">Register</button>
-                {{ form_end(registrationForm) }}
-            </div>
-        </div>
+            <button type="submit" class="btn btn-primary btn-block">Inscription</button>
+            {{ form_end(registrationForm) }}
+        </form>
     </div>
+</div>
 {% endblock %}

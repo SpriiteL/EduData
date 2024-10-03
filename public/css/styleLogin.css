@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap');
+
 /* Suppression des marges et du padding par défaut */
 * {
     margin: 0;
@@ -7,6 +9,7 @@
 
 /* Container en pleine largeur et hauteur */
 html, body {
+    font-family: "Hind Siliguri", sans-serif;
     height: 100%;
     overflow: hidden; /* Désactive la barre de scroll */
 }

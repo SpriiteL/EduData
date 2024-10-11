@@ -41,7 +41,7 @@ class InventoryController extends AbstractController
 
             foreach ($records as $row) {
                 $inventory = new Inventory();
-                $inventory->setName($row['name']);
+                // $inventory->setName($row['name']);
                 $inventory->setActiveType($row['activeType']);
                 $inventory->setProvider($row['provider']);
                 $inventory->setDateEntry(new \DateTime($row['dateEntry']));
@@ -78,7 +78,7 @@ class InventoryController extends AbstractController
         foreach ($inventories as $inventory) {
             $csv->insertOne([
                 $inventory->getId(),
-                $inventory->getName(),
+                // $inventory->getName(),
                 $inventory->getActiveType(),
                 $inventory->getProvider(),
                 $inventory->getDateEntry()->format('Y-m-d'),

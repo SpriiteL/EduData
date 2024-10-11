@@ -1,47 +1,66 @@
-{# {% extends 'base.html.twig' %} #}
 
-{# {% block title %}Log in!{% endblock %} #}
 
 {% block stylesheets %}
-    <link rel="stylesheet" href="{{asset('css/styleRegister.css')}}" type="text/css">
+    <link rel="shortcut icon" type="image/png" href="{{ asset('assets/images/logos/favicon.png') }}" />
+    <link rel="stylesheet" href="{{ asset('css/styles.min.css') }}" />
 {% endblock %}
 
 {% block body %}
-<div class="container">
-    <div class="left-side"></div>
-    <div class="right-side">
-        <form method="post" class="login-form">
-            <div class="logo-container">
-                <img src="{{ asset('asset/logo.png') }}" alt="Logo" class="logo">
-            </div>
+<div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
+    data-sidebar-position="fixed" data-header-position="fixed">
+    <div class="position-relative overflow-hidden radial-gradient min-vh-100 d-flex align-items-center justify-content-center">
+        <div class="d-flex align-items-center justify-content-center w-100">
+            <div class="row justify-content-center w-100">
+                <div class="col-md-8 col-lg-6 col-xxl-3">
+                    <div class="card mb-0">
+                        <div class="card-body">
+                            <a href="{{ path('homepage') }}" class="text-nowrap logo-img text-center d-block py-3 w-100">
+                                <img src="{{ asset('asset/edu3.png') }}" width="180" alt="Logo">
+                            </a>
+                            <p class="text-center">Your Social Campaigns</p>
 
-            {% if form_errors(registrationForm) %}
-                <div class="alert">
-                    {{ form_errors(registrationForm) }}
-                </div>
-            {% endif %}
+                            {% if form_errors(registrationForm) %}
+                                <div class="alert alert-danger">
+                                    {{ form_errors(registrationForm) }}
+                                </div>
+                            {% endif %}
 
-            {{ form_start(registrationForm) }}
-                    <div class="form-group">
-                        {{ form_label(registrationForm.username, 'Nom d\'Utilisateur :') }}
-                        {{ form_widget(registrationForm.username, {'attr': {'class': 'form-control'}}) }}
-                    </div>
+                            {{ form_start(registrationForm) }}
+                                <div class="form-group mb-3">
+                                    {{ form_label(registrationForm.username, 'Nom d\'Utilisateur :', {'attr': {'class': 'form-label'}}) }}
+                                    {{ form_widget(registrationForm.username, {'attr': {'class': 'form-control', 'id': 'exampleInputtext1'}}) }}
+                                </div>
 
-                    <div class="form-group">
-                        {{ form_label(registrationForm.plainPassword, 'Mot de Passe :') }}
-                        {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-control'}}) }}
-                    </div>
+                                <div class="form-group mb-4">
+                                    {{ form_label(registrationForm.plainPassword, 'Mot de Passe :', {'attr': {'class': 'form-label'}}) }}
+                                    {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-control', 'id': 'exampleInputPassword1'}}) }}
+                                </div>
 
-                    <div class="form-group">
-                        <div class="form-check">
-                            {{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'form-check-input'}}) }}
-                            {{ form_label(registrationForm.agreeTerms, null, {'label_attr': {'class': 'form-check-label'}}) }}
+                                <div class="form-group mb-4">
+                                    <div class="form-check">
+                                        {{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'form-check-input'}}) }}
+                                        {{ form_label(registrationForm.agreeTerms, null, {'label_attr': {'class': 'form-check-label'}}) }}
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary w-100 py-8 fs-4 mb-4 rounded-2">S'Inscrire</button>
+                            {{ form_end(registrationForm) }}
+
+                            <div class="d-flex align-items-center justify-content-center">
+                                <p class="fs-4 mb-0 fw-bold">Vous avez deja un compte ?</p>
+                                <a class="text-primary fw-bold ms-2" href="{{ path('app_login') }}">Se Connecter</a>
+                            </div>
+
                         </div>
                     </div>
-
-            <button type="submit" class="btn btn-primary btn-block">Inscription</button>
-            {{ form_end(registrationForm) }}
-        </form>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('libs/jquery/dist/jquery.min.js') }}"></script>
+    <script src="{{ asset('libs/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
 {% endblock %}

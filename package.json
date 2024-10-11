@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "@dbml/cli": "^3.9.0"
+    "@dbml/cli": "^3.9.0",
+    "bootstrap": "^5.3.3"
   }
 }

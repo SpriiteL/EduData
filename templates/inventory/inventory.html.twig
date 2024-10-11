@@ -1,74 +1,76 @@
-{% extends './base.html.twig' %}
+{% extends 'base.html.twig' %}
 
-{% block title %}inventory{% endblock %}
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{asset('css/styleInventory.css')}}" type="text/css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css">
+{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-    table { width: 100%; border-collapse: collapse; }
-    th, td { border: 1px solid #ddd; padding: 8px; }
-    th { background-color: #f2f2f2; }
-</style>
-<div class="example-wrapper">
-    <h1>inventory</h1>
-    
-    <form method="get" action="{{ path('app_inventory') }}">
-        <input type="text" name="search" placeholder="Rechercher..." value="{{ app.request.query.get('search') }}">
-        <button type="submit">Filtrer</button>
-    </form>
+<div class="container">
+    <div class="row" style="margin-left: 200px">
 
-    <form action="{{ path('app_inventory_import') }}" method="post" enctype="multipart/form-data">
-        <input type="file" name="file" accept=".csv">
-        <button type="submit">Importer</button>
-    </form>
+        <!-- Inventory table section -->
+        <div class="col-lg-12 d-flex align-items-stretch">
+            <div class="card w-100">
+                <div class="card-body p-4">
+                    <h5 class="card-title fw-semibold mb-4">Gestion de l'inventaire</h5>
+                    
+                    <!-- Formulaire de recherche -->
+                    <form method="get" action="{{ path('app_inventory') }}" class="form-inline mb-4">
+                        <input type="text" name="search" placeholder="Rechercher..." value="{{ app.request.query.get('search') }}" class="form-control">
+                        </br>
+                        <button type="submit" class="btn btn-primary ms-2"><i class="fas fa-search"></i> Filtrer</button>
+                    </form>
 
-    {% for label, messages in app.flashes %}
-        <div class="alert alert-{{ label }}">
-            {% for message in messages %}
-                <p>{{ message }}</p>
-            {% endfor %}
+                    <!-- Formulaire d'import -->
+                    <form action="{{ path('app_inventory_import') }}" method="post" enctype="multipart/form-data" class="form-inline mb-4">
+                        <input type="file" name="file" accept=".csv" class="form-control">
+                        </br>
+                        <button type="submit" class="btn btn-success ms-2"><i class="fas fa-file-import"></i> Importer</button>
+                    </form>
+
+                    <!-- Tableau d'inventaire -->
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered text-nowrap align-middle">
+                            <thead class="text-dark fs-4">
+                                <tr>
+                                    <th>Nom</th>
+                                    <th>Type Actif</th>
+                                    <th>Prix</th>
+                                    <th>Numéro de Série Produit</th>
+                                    <th>Nombre Total de Lots</th>
+                                    <th>Fournisseur</th>
+                                    <th>Date d'Entrée</th>
+                                    <th>Numéro de Série</th>
+                                    <th>Numéro Facture Interne</th>
+                                    <th>Numéro Facture</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for inventory in inventories %}
+                                    <tr>
+                                        <td>{{ inventory.name }}</td>
+                                        <td>{{ inventory.activeType }}</td>
+                                        <td>{{ inventory.price }}</td>
+                                        <td>{{ inventory.numProductSerie }}</td>
+                                        <td>{{ inventory.totalProductLot }}</td>
+                                        <td>{{ inventory.provider }}</td>
+                                        <td>{{ inventory.dateEntry ? inventory.dateEntry|date('Y-m-d') : '' }}</td>
+                                        <td>{{ inventory.numSerie }}</td>
+                                        <td>{{ inventory.numInvoiceIntern }}</td>
+                                        <td>{{ inventory.numInvoice }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Bouton d'export CSV -->
+                    <a href="{{ path('app_inventory_export') }}" class="btn btn-primary mt-4"><i class="fas fa-file-export"></i> Exporter en CSV</a>
+                </div>
+            </div>
         </div>
-    {% endfor %}
-
-    <a href="{{ path('app_inventory_export') }}" class="btn btn-primary">Exporter en CSV</a>
-
-
-    <table>
-        <thead>
-            <tr>
-                {# <th>ID</th> #}
-                {# <th></td> #}
-                <th>Name</th>
-                <th>Active Type</th>
-                <th>Price</th>
-                <th>Num Product Serie</th>
-                <th>Total Product Lot</th>
-                <th>Provider</th>
-                <th>Date Entry</th>
-                <th>Num Serie</th>
-                <th>Num Invoice Intern</th>
-                <th>Num Invoice</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for inventory in inventories %}
-                <tr>
-                    {# <td>{{ inventory.id }}</td> #}
-                    {# <td><input type="checkbox" name="selected[]" value="{{ inventory.id }}"></td> #}
-                    <td>{{inventory.name}}</td>
-                    <td>{{ inventory.activeType }}</td>
-                    <td>{{ inventory.price }}</td>
-                    <td>{{ inventory.numProductSerie }}</td>
-                    <td>{{ inventory.totalProductLot }}</td>
-                    <td>{{ inventory.provider }}</td>
-                    <td>{{ inventory.dateEntry ? inventory.dateEntry|date('Y-m-d') : '' }}</td>
-                    <td>{{ inventory.numSerie }}</td>
-                    <td>{{ inventory.numInvoiceIntern }}</td>
-                    <td>{{ inventory.numInvoice }}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    </div>
 </div>
 {% endblock %}

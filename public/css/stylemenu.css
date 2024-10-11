@@ -1,101 +1,110 @@
+:root {
+    --sidebar-bg: #151A2B;
+    --sidebar-hover: #1E2439;
+    --text-color: #a8a8b1;
+    --text-hover: #ffffff;
+    --accent-color: #16c813;
+    --logo-max-width: 80%;
+    --sidebar-width: 250px; /* Ajoutez cette ligne */
+}
 
-    /* Reset et styles de base */
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-    body {
-        font-family: Arial, sans-serif;
-        line-height: 1.5;
-    }
-    a {
-        text-decoration: none;
-        color: inherit;
-    }
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-    /* Layout */
-    .layout {
-        display: flex;
-        height: 100vh;
-    }
+html, body {
+    width: 100%;
+    height: 100%;
+    font-family: 'Nunito Sans', sans-serif;
+    display: flex;
+    flex-direction: row;
+}
 
-    /* Sidebar */
+.sidebar {
+    width: var(--sidebar-width); /* Utilisez la variable */
+    background-color: var(--sidebar-bg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 0;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+}
+
+.logo {
+    margin-bottom: 3rem;
+    text-align: center;
+}
+
+.logo-img {
+    max-width: 70%;
+    height: auto;
+}
+
+.menu {
+    list-style: none;
+    width: 100%;
+    padding: 0;
+}
+
+.menu li {
+    width: 100%;
+}
+
+.menu a {
+    text-decoration: none;
+    color: var(--text-color);
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    transition: all 0.3s ease;
+    border-radius: 0.5rem;
+    width: calc(100% - 3rem);
+    margin: 0 auto 1rem;
+}
+
+.menu a:hover {
+    background-color: var(--sidebar-hover);
+    color: var(--text-hover);
+}
+
+.menu a i {
+    margin-right: 1rem;
+    font-size: 1.5rem;
+    transition: color 0.3s ease;
+}
+
+.menu a:hover i {
+    color: var(--accent-color);
+}
+
+/* Ajoutez cette règle pour coller le menu Admin en bas */
+.menu li.admin {
+    margin-top: auto;
+}
+
+@media (max-width: 768px) {
     .sidebar {
-        width: 250px;
-        background-color: #1a202c;
-        color: white;
-        display: flex;
-        flex-direction: column;
-    }
-    .sidebar-logo {
-        padding: 1rem;
-        border-bottom: 1px solid #4a5568;
-    }
-    .sidebar-logo a {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    .sidebar-nav {
-        flex: 1;
-        padding: 1rem;
-    }
-    .sidebar-nav ul {
-        list-style-type: none;
-    }
-    .sidebar-nav li:not(:last-child) {
-        margin-bottom: 0.5rem;
-    }
-    .sidebar-nav a {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        color: #cbd5e0;
-        transition: color 0.3s;
-    }
-    .sidebar-nav a:hover {
-        color: #63b3ed;
-    }
-    .sidebar-footer {
-        padding: 1rem;
-        border-top: 1px solid #4a5568;
+        width: 80px;
+        padding: 1rem 0;
+        display: block;
     }
 
-    /* Main content */
-    .main-content {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-    }
-    .top-bar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 1rem;
-        background-color: #f7fafc;
-        border-bottom: 1px solid #e2e8f0;
-    }
-    .search-bar {
-        display: flex;
-        align-items: center;
-        flex: 1;
-        max-width: 300px;
-    }
-    .search-bar input {
-        width: 100%;
-        padding: 0.5rem;
-        border: 1px solid #e2e8f0;
-        border-radius: 0.25rem;
-    }
-    .user-icon {
-        background: none;
-        border: none;
-        cursor: pointer;
+    .logo-img {
+        max-width: 50%;
     }
 
-    /* Icons */
-    .icon {
-        width: 20px;
-        height: 20px;
+    .menu a span {
+        display: none;
     }
+
+    .menu a i {
+        margin-right: 0;
+        font-size: 1.5rem;
+    }
+}

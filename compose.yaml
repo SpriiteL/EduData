@@ -63,6 +63,44 @@ services:
       volumes:
         - redis_data:/data
 
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.10
+    environment:
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - xpack.security.enabled=false
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+
+  # Ajout de Kibana
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.17.10
+    environment:
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+
+  # Ajout de Logstash
+  logstash:
+    image: docker.elastic.co/logstash/logstash:7.17.10
+    volumes:
+      - ./logstash/pipeline:/usr/share/logstash/pipeline:ro
+    ports:
+      - "5044:5044"
+      - "9600:9600"
+    depends_on:
+      - elasticsearch
+
 volumes:
   caddy_data:
   caddy_config:
@@ -73,3 +111,4 @@ volumes:
   database_data:
 ###< doctrine/doctrine-bundle ###
   redis_data:
+  es_data:

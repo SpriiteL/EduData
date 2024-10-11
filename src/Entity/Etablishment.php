@@ -35,10 +35,14 @@ class Etablishment
     #[ORM\OneToMany(targetEntity: Room::class, mappedBy: 'etablishment')]
     private Collection $room;
 
+    #[ORM\OneToMany(mappedBy: 'etablishment', targetEntity: Inventory::class)]
+    private Collection $inventories;
+
     public function __construct()
     {
         $this->user = new ArrayCollection();
         $this->room = new ArrayCollection();
+        $this->inventories = new ArrayCollection();
     }
 
     public function __toString(): string
@@ -129,6 +133,36 @@ class Etablishment
             // set the owning side to null (unless already changed)
             if ($room->getEtablishment() === $this) {
                 $room->setEtablishment(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Inventory>
+     */
+    public function getInventories(): Collection
+    {
+        return $this->inventories;
+    }
+
+    public function addInventory(Inventory $inventory): static
+    {
+        if (!$this->inventories->contains($inventory)) {
+            $this->inventories->add($inventory);
+            $inventory->setEtablishment($this);
+        }
+
+        return $this;
+    }
+
+    public function removeInventory(Inventory $inventory): static
+    {
+        if ($this->inventories->removeElement($inventory)) {
+            // set the owning side to null (unless already changed)
+            if ($inventory->getEtablishment() === $this) {
+                $inventory->setEtablishment(null);
             }
         }
 

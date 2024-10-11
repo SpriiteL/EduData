@@ -45,14 +45,9 @@ class RegistrationFormType extends AbstractType
                         'max' => 4096,
                     ]),
                 ],
-            ])
-            ->add('etablishment', EntityType::class, [
-                'class' => Etablishment::class,
-                'choice_label' => 'name', // Assuming 'name' is the property holding the name of the establishment
-                'label' => 'Etablishment',
-            ])
-        ;
+            ]);
     }
+    
 
     public function configureOptions(OptionsResolver $resolver): void
     {

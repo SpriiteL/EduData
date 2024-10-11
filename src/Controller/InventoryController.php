@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Inventory;
 use App\Entity\User;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use League\Csv\Writer;
 use League\Csv\Reader;
@@ -15,28 +16,14 @@ use Symfony\Component\Routing\Annotation\Route;
 class InventoryController extends AbstractController
 {
     #[Route('/inventory', name: 'app_inventory')]
-    public function index(ManagerRegistry $doctrine, Request $request): Response
+    public function index(EntityManagerInterface $entityManager): Response
     {
-        $search = $request->query->get('search', '');
-        $status = $request->query->get('status', '');
+        $user = $this->getUser();
+        $etablishment = $user->getEtablishment();
 
-        $repository = $doctrine->getRepository(Inventory::class);
-        $queryBuilder = $repository->createQueryBuilder('i');
-
-        if ($search) {
-            $queryBuilder->andWhere('i.name LIKE :search')
-                ->setParameter('search', '%' . $search . '%');
-        }
-
-        if ($status !== '') {
-            $queryBuilder->andWhere('i.statut = :status')
-                ->setParameter('status', $status);
-        }
-
-        $inventories = $queryBuilder->getQuery()->getResult();
+        $inventories = $entityManager->getRepository(Inventory::class)->findBy(['etablishment' => $etablishment]);
 
         return $this->render('inventory/inventory.html.twig', [
-            'controller_name' => 'InventoryController',
             'inventories' => $inventories,
         ]);
     }
@@ -56,14 +43,14 @@ class InventoryController extends AbstractController
                 $inventory = new Inventory();
                 $inventory->setName($row['name']);
                 $inventory->setActiveType($row['activeType']);
-                $inventory->setPrice($row['price']);
-                $inventory->setNumProductSerie($row['numProductSerie']);
-                $inventory->setTotalProductLot($row['totalProductLot']);
                 $inventory->setProvider($row['provider']);
                 $inventory->setDateEntry(new \DateTime($row['dateEntry']));
                 $inventory->setNumSerie($row['numSerie']);
                 $inventory->setNumInvoiceIntern($row['numInvoiceIntern']);
                 $inventory->setNumInvoice($row['numInvoice']);
+                $inventory->setPrice($row['price']);
+                $inventory->setNumProductSerie($row['numProductSerie']);
+                $inventory->setTotalProductLot($row['totalProductLot']);
 
                 $entityManager->persist($inventory);
             }
@@ -87,20 +74,20 @@ class InventoryController extends AbstractController
     {
         $inventories = $doctrine->getRepository(Inventory::class)->findAll();
         $csv = Writer::createFromString('');
-        $csv->insertOne(['ID', 'Nom', 'Type Actif', 'Prix', 'Numéro de Série Produit', 'Total Lot Produit', 'Fournisseur', 'Date d\'Entrée', 'Numéro de Série', 'Numéro de Facture Interne', 'Numéro de Facture']);
+        $csv->insertOne(['ID', 'Nom', 'Type Actif', 'Fournisseur', 'Date d\'Entrée', 'Numéro de Série', 'Numéro Facture Interne', 'Numéro de Facture', 'Prix', 'Numéro de Produit Série', 'Total de Produit Lot']);
         foreach ($inventories as $inventory) {
             $csv->insertOne([
                 $inventory->getId(),
                 $inventory->getName(),
                 $inventory->getActiveType(),
-                $inventory->getPrice(),
-                $inventory->getNumProductSerie(),
-                $inventory->getTotalProductLot(),
                 $inventory->getProvider(),
                 $inventory->getDateEntry()->format('Y-m-d'),
                 $inventory->getNumSerie(),
                 $inventory->getNumInvoiceIntern(),
                 $inventory->getNumInvoice(),
+                $inventory->getPrice(),
+                $inventory->getNumProductSerie(),
+                $inventory->getTotalProductLot(),
             ]);
         }
         $response = new Response("\xEF\xBB\xBF" . $csv->toString());

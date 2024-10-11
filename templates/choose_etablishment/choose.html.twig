@@ -1,0 +1,25 @@
+{% block body %}
+<div class="container">
+    <h1>Choisissez ou créez un établissement</h1>
+    <form method="post">
+        <div>
+            <label for="etablishment_id">Choisir un établissement existant :</label>
+            <select name="etablishment_id" id="etablishment_id">
+                {% for etablishment in etablishments %}
+                    <option value="{{ etablishment.id }}">{{ etablishment.name }}</option>
+                {% endfor %}
+                <option value="new">Créer un nouvel établissement</option>
+            </select>
+        </div>
+        <button type="submit">Valider</button>
+    </form>
+</div>
+<script>
+    document.getElementById('etablishment_id').addEventListener('change', function() {
+        var newEtablishment = document.getElementById('new-etablishment');
+        if (this.value === 'new') {
+            window.location.href = "{{ path('app_create_etablishment') }}";
+        }
+    });
+</script>
+{% endblock %}

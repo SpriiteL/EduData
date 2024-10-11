@@ -57,6 +57,10 @@ class Inventory
     #[ORM\OneToMany(targetEntity: ImportLogs::class, mappedBy: 'inventory')]
     private Collection $importLogs;
 
+    #[ORM\ManyToOne(inversedBy: 'inventories')]
+    private ?Etablishment $etablishment = null;
+
+
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
@@ -248,6 +252,17 @@ class Inventory
     {
         $this->name = $name;
 
+        return $this;
+    }
+
+    public function getEtablishment(): ?Etablishment
+    {
+        return $this->etablishment;
+    }
+
+    public function setEtablishment(?Etablishment $etablishment): static
+    {
+        $this->etablishment = $etablishment;
         return $this;
     }
 }

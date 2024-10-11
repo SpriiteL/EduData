@@ -38,6 +38,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $password = null;
 
    
+    
+    #[ORM\ManyToOne(targetEntity: Etablishment::class, inversedBy: 'user')]
+    private ?Etablishment $etablishment = null;
+
     /**
      * @var Collection<int, ImportLogs>
      */
@@ -50,8 +54,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: ExportLogs::class, mappedBy: 'user')]
     private Collection $exportsLogs;
 
-    #[ORM\ManyToOne(inversedBy: 'user')]
-    private ?Etablishment $etablishment = null;
 
     public function __construct()
     {
@@ -213,4 +215,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
+    // public function getEtablishment(): ?Etablishment
+    // {
+    //     return $this->etablishment;
+    // }
+
+    // public function setEtablishment(?Etablishment $etablishment): self
+    // {
+    //     $this->etablishment = $etablishment;
+    //     return $this;
+    // }
 }

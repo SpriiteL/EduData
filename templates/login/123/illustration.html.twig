@@ -1,0 +1,13 @@
+{% set image = image|replace({'.svg': ''}) %}
+{% set height = height|default(128) %}
+{% set src = "/free-illustrations/autodark/" ~ image %}
+{% set illustration = site['free-illustrations']|filter(i => i.id == src)|first %}
+{% set replace_to = '<svg class="img' %}
+{% if class is defined %}
+    {% set replace_to = replace_to ~ ' ' ~ class %}
+{% endif %}
+{% set replace_to = replace_to ~ '" ' %}
+{% set illustration = illustration|replace('<svg ', replace_to) %}
+{% set replace_to_height = 'height="' ~ height ~ '"' %}
+{% set illustration = illustration|replace('width="800" height="600"', replace_to_height) %}
+{{ illustration|raw }}

@@ -35,30 +35,78 @@ class InventoryController extends AbstractController
         $file = $request->files->get('file');
         if ($file) {
             try {
-                $csv = Reader::createFromPath($file->getPathname(), 'r');
-                $csv->setDelimiter(';'); // Spécifie le séparateur
+                // Lire le contenu du fichier
+                $content = file_get_contents($file->getPathname());
+
+                // Convertir le contenu en UTF-8 si nécessaire
+                if (mb_detect_encoding($content, 'UTF-8', true) === false) {
+                    $content = mb_convert_encoding($content, 'UTF-8', 'ISO-8859-1');
+                }
+
+                // Créer le lecteur CSV à partir du contenu
+                $csv = Reader::createFromString($content);
+                $csv->setDelimiter(';');
                 $csv->setHeaderOffset(0);
+
                 $records = $csv->getRecords();
+
+                // Normaliser les en-têtes en UTF-8 et enlever les espaces
+                $headers = array_map(fn($header) => trim($header), $csv->getHeader());
+                $this->addFlash('info', 'Colonnes trouvées dans le fichier : ' . implode(', ', $headers));
 
                 $entityManager = $doctrine->getManager();
 
-                foreach ($records as $row) {
-                    $inventory = new Inventory();
-                    $inventory->setActiveType($row["Type d'Actif"]);
-                    $inventory->setProvider($row['Fournisseur']);
-                    $inventory->setDateEntry(new \DateTime($row["Date d'arrivée"]));
-                    $inventory->setNumSerie($row['Numéro de Série']);
-                    $inventory->setNumInvoiceIntern($row['Numéro Facture Interne']);
-                    $inventory->setNumInvoice($row['Numéro de Facture']);
-                    $inventory->setPrice($row['Prix Neuf']);
-                    $inventory->setNumProductSerie($row['Numero de produit de la série']);
-                    $inventory->setTotalProductLot($row['Nombre total de produits dans le lot']);
+                $requiredColumns = [
+                    "Type d'Actif", "Fournisseur", "Date d'arrivée",
+                    "Numéro de Série", "Numéro Facture Interne",
+                    "Numéro de Facture", "Prix Neuf",
+                    "Numero de produit de la série",
+                    "Nombre total de produits dans le lot"
+                ];
 
-                    $entityManager->persist($inventory);
+                $count = 0;
+                foreach ($records as $row) {
+                    // Normaliser les valeurs des lignes
+                    $normalizedRow = array_map(fn($value) => trim($value), $row);
+                    $missingColumns = [];
+                    foreach ($requiredColumns as $column) {
+                        if (!isset($normalizedRow[$column])) {
+                            $missingColumns[] = $column;
+                        }
+                    }
+
+                    // Si des colonnes sont manquantes, affiche un message d'erreur spécifique
+                    if (!empty($missingColumns)) {
+                        $this->addFlash('error', 'Colonnes manquantes pour un enregistrement : ' . implode(', ', $missingColumns));
+                        continue;
+                    }
+
+                    // Création de l'objet Inventory et ajout des valeurs
+                    $inventory = new Inventory();
+                    try {
+                        $inventory->setActiveType($normalizedRow["Type d'Actif"]);
+                        $inventory->setProvider($normalizedRow['Fournisseur']);
+                        $inventory->setDateEntry(new \DateTime($normalizedRow["Date d'arrivée"]));
+                        $inventory->setNumSerie($normalizedRow['Numéro de Série']);
+                        $inventory->setNumInvoiceIntern($normalizedRow['Numéro Facture Interne']);
+                        $inventory->setNumInvoice($normalizedRow['Numéro de Facture']);
+                        $inventory->setPrice(floatval($normalizedRow['Prix Neuf']));
+                        $inventory->setNumProductSerie($normalizedRow['Numero de produit de la série']);
+                        $inventory->setTotalProductLot(intval($normalizedRow['Nombre total de produits dans le lot']));
+
+                        $entityManager->persist($inventory);
+                        $count++;
+                    } catch (\Exception $e) {
+                        $this->addFlash('error', 'Erreur lors de l\'ajout de l\'enregistrement : ' . $e->getMessage());
+                    }
                 }
 
-                $entityManager->flush();
-                $this->addFlash('success', 'Données importées avec succès.');
+                if ($count > 0) {
+                    $entityManager->flush();
+                    $this->addFlash('success', $count . ' enregistrement(s) importé(s) avec succès.');
+                } else {
+                    $this->addFlash('error', 'Aucun enregistrement valide trouvé dans le fichier.');
+                }
             } catch (Exception $e) {
                 $this->addFlash('error', 'Erreur lors de l\'import : ' . $e->getMessage());
             }
@@ -68,6 +116,11 @@ class InventoryController extends AbstractController
 
         return $this->redirectToRoute('app_inventory');
     }
+
+
+
+
+
 
     #[Route('/inventory/export', name: 'app_inventory_export', methods: ['GET'])]
     public function export(ManagerRegistry $doctrine): Response

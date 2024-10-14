@@ -36,14 +36,14 @@
                             <thead class="text-dark fs-4">
                                 <tr>
                                     <th>Type Actif</th>
-                                    <th>Prix</th>
-                                    <th>Numéro de Série Produit</th>
-                                    <th>Nombre Total de Lots</th>
                                     <th>Fournisseur</th>
-                                    <th>Date d'Entrée</th>
+                                    <th>Date d'arrivée</th>
                                     <th>Numéro de Série</th>
+                                    <th>Numéro de Facture</th>
                                     <th>Numéro Facture Interne</th>
-                                    <th>Numéro Facture</th>
+                                    <th>Prix Neuf</th>
+                                    <th>Numéro de produit de la série</th>
+                                    <th>Nombre total de produits dans le lot</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -51,14 +51,14 @@
                                 {% for inventory in inventories %}
                                     <tr>
                                         <td>{{ inventory.activeType }}</td>
+                                        <td>{{ inventory.provider }}</td>
+                                        <td>{{ inventory.dateEntry ? inventory.dateEntry|date('Y-m-d') }}</td>
+                                        <td>{{ inventory.numSerie }}</td>
+                                        <td>{{ inventory.numInvoice }}</td>
+                                        <td>{{ inventory.numInvoiceIntern }}</td>
                                         <td>{{ inventory.price }}</td>
                                         <td>{{ inventory.numProductSerie }}</td>
                                         <td>{{ inventory.totalProductLot }}</td>
-                                        <td>{{ inventory.provider }}</td>
-                                        <td>{{ inventory.dateEntry ? inventory.dateEntry|date('Y-m-d') : '' }}</td>
-                                        <td>{{ inventory.numSerie }}</td>
-                                        <td>{{ inventory.numInvoiceIntern }}</td>
-                                        <td>{{ inventory.numInvoice }}</td>
                                         <td>
                                             <form action="{{ path('app_inventory_delete', {'id': inventory.id}) }}" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');">
                                                 <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ inventory.id) }}">

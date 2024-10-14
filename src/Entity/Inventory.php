@@ -33,8 +33,8 @@ class Inventory
     #[ORM\Column(length: 255)]
     private ?string $provider = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTimeInterface $dateEntry = null;
+    #[ORM\Column(type: 'datetime')]
+    private $dateEntry;
 
     #[ORM\Column(length: 255)]
     private ?string $numSerie = null;

@@ -7,6 +7,7 @@ use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use League\Csv\Writer;
+use League\Csv\Exception;
 use League\Csv\Reader;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -33,40 +34,39 @@ class InventoryController extends AbstractController
     {
         $file = $request->files->get('file');
         if ($file) {
-            $csv = Reader::createFromPath($file->getPathname(), 'r');
-            $csv->setHeaderOffset(0);
-            $records = $csv->getRecords();
+            try {
+                $csv = Reader::createFromPath($file->getPathname(), 'r');
+                $csv->setDelimiter(';'); // Spécifie le séparateur
+                $csv->setHeaderOffset(0);
+                $records = $csv->getRecords();
 
-            $entityManager = $doctrine->getManager();
+                $entityManager = $doctrine->getManager();
 
-            foreach ($records as $row) {
-                $inventory = new Inventory();
-                // $inventory->setName($row['name']);
-                $inventory->setActiveType($row['activeType']);
-                $inventory->setProvider($row['provider']);
-                $inventory->setDateEntry(new \DateTime($row['dateEntry']));
-                $inventory->setNumSerie($row['numSerie']);
-                $inventory->setNumInvoiceIntern($row['numInvoiceIntern']);
-                $inventory->setNumInvoice($row['numInvoice']);
-                $inventory->setPrice($row['price']);
-                $inventory->setNumProductSerie($row['numProductSerie']);
-                $inventory->setTotalProductLot($row['totalProductLot']);
+                foreach ($records as $row) {
+                    $inventory = new Inventory();
+                    $inventory->setActiveType($row["Type d'Actif"]);
+                    $inventory->setProvider($row['Fournisseur']);
+                    $inventory->setDateEntry(new \DateTime($row["Date d'arrivée"]));
+                    $inventory->setNumSerie($row['Numéro de Série']);
+                    $inventory->setNumInvoiceIntern($row['Numéro Facture Interne']);
+                    $inventory->setNumInvoice($row['Numéro de Facture']);
+                    $inventory->setPrice($row['Prix Neuf']);
+                    $inventory->setNumProductSerie($row['Numero de produit de la série']);
+                    $inventory->setTotalProductLot($row['Nombre total de produits dans le lot']);
 
-                $entityManager->persist($inventory);
+                    $entityManager->persist($inventory);
+                }
+
+                $entityManager->flush();
+                $this->addFlash('success', 'Données importées avec succès.');
+            } catch (Exception $e) {
+                $this->addFlash('error', 'Erreur lors de l\'import : ' . $e->getMessage());
             }
-
-            $entityManager->flush();
-
-            $this->addFlash('success', 'Données importées avec succès.');
         } else {
             $this->addFlash('error', 'Veuillez télécharger un fichier.');
         }
 
         return $this->redirectToRoute('app_inventory');
-
-        if (!$this->getUser()) {
-            return $this->redirectToRoute('app_login');
-        }
     }
 
     #[Route('/inventory/export', name: 'app_inventory_export', methods: ['GET'])]
@@ -99,5 +99,20 @@ class InventoryController extends AbstractController
             return $this->redirectToRoute('app_login');
         }
 
+    }
+
+    #[Route('/inventory/delete/{id}', name: 'app_inventory_delete', methods: ['POST'])]
+    public function delete(Request $request, Inventory $inventory, EntityManagerInterface $entityManager): Response
+    {
+        if ($this->isCsrfTokenValid('delete'.$inventory->getId(), $request->request->get('_token'))) {
+            $entityManager->remove($inventory);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'L\'élément a été supprimé avec succès.');
+        } else {
+            $this->addFlash('error', 'Token CSRF invalide.');
+        }
+
+        return $this->redirectToRoute('app_inventory');
     }
 }

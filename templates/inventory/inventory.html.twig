@@ -44,6 +44,7 @@
                                     <th>Prix Neuf</th>
                                     <th>Numéro de produit de la série</th>
                                     <th>Nombre total de produits dans le lot</th>
+                                    <th>Nom de la Salle</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -59,6 +60,7 @@
                                         <td>{{ inventory.price }}</td>
                                         <td>{{ inventory.numProductSerie }}</td>
                                         <td>{{ inventory.totalProductLot }}</td>
+                                        <td>{{ inventory.nameRoom }}</td>
                                         <td>
                                             <form action="{{ path('app_inventory_delete', {'id': inventory.id}) }}" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');">
                                                 <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ inventory.id) }}">

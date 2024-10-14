@@ -61,7 +61,8 @@ class InventoryController extends AbstractController
                     "Numéro de Série", "Numéro Facture Interne",
                     "Numéro de Facture", "Prix Neuf",
                     "Numero de produit de la série",
-                    "Nombre total de produits dans le lot"
+                    "Nombre total de produits dans le lot",
+                    "Nom de la Salle",
                 ];
 
                 $count = 0;
@@ -93,6 +94,7 @@ class InventoryController extends AbstractController
                         $inventory->setPrice(floatval($normalizedRow['Prix Neuf']));
                         $inventory->setNumProductSerie($normalizedRow['Numero de produit de la série']);
                         $inventory->setTotalProductLot(intval($normalizedRow['Nombre total de produits dans le lot']));
+                        $inventory->setNameRoom($normalizedRow['Nom de la Salle']);
 
                         $entityManager->persist($inventory);
                         $count++;
@@ -146,7 +148,8 @@ class InventoryController extends AbstractController
             "Numéro de Facture", 
             "Prix Neuf", 
             "Numero de produit de la série", 
-            "Nombre total de produits dans le lot"
+            "Nombre total de produits dans le lot",
+            "Nom de la Salle"
         ], ';'); // Utiliser le point-virgule comme séparateur
 
         // Écrire les données
@@ -160,7 +163,8 @@ class InventoryController extends AbstractController
                 $inventory->getNumInvoice(),
                 $inventory->getPrice(),
                 $inventory->getNumProductSerie(),
-                $inventory->getTotalProductLot()
+                $inventory->getTotalProductLot(),
+                $inventory->getNameRoom()
             ], ';'); // Utiliser le point-virgule comme séparateur
         }
 

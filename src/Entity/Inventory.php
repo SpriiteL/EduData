@@ -60,6 +60,9 @@ class Inventory
     #[ORM\ManyToOne(inversedBy: 'inventories')]
     private ?Etablishment $etablishment = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $nameRoom = null;
+
 
     // #[ORM\Column(length: 255)]
     // private ?string $name = null;
@@ -263,6 +266,18 @@ class Inventory
     public function setEtablishment(?Etablishment $etablishment): static
     {
         $this->etablishment = $etablishment;
+        return $this;
+    }
+
+    public function getNameRoom(): ?string
+    {
+        return $this->nameRoom;
+    }
+
+    public function setNameRoom(string $nameRoom): static
+    {
+        $this->nameRoom = $nameRoom;
+
         return $this;
     }
 }

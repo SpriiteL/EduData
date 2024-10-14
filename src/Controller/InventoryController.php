@@ -125,34 +125,61 @@ class InventoryController extends AbstractController
     #[Route('/inventory/export', name: 'app_inventory_export', methods: ['GET'])]
     public function export(ManagerRegistry $doctrine): Response
     {
-        $inventories = $doctrine->getRepository(Inventory::class)->findAll();
-        $csv = Writer::createFromString('');
-        $csv->insertOne(['ID', 'Nom', 'Type Actif', 'Fournisseur', 'Date d\'Entrée', 'Numéro de Série', 'Numéro Facture Interne', 'Numéro de Facture', 'Prix', 'Numéro de Produit Série', 'Total de Produit Lot']);
+        $entityManager = $doctrine->getManager();
+        $inventoryRepository = $entityManager->getRepository(Inventory::class);
+        $inventories = $inventoryRepository->findAll();
+
+        // Créer un flux de sortie pour le CSV en mémoire
+        $csvFileName = 'inventaire_' . date('Ymd') . '.csv';
+        $outputBuffer = fopen('php://temp', 'r+');
+
+        // Écrire l'en-tête de l'encodage UTF-8 pour Excel
+        fwrite($outputBuffer, "\xEF\xBB\xBF"); // Ajouter BOM pour UTF-8
+
+        // Écrire les en-têtes
+        fputcsv($outputBuffer, [
+            "Type d'Actif", 
+            "Fournisseur", 
+            "Date d'arrivée", 
+            "Numéro de Série", 
+            "Numéro Facture Interne", 
+            "Numéro de Facture", 
+            "Prix Neuf", 
+            "Numero de produit de la série", 
+            "Nombre total de produits dans le lot"
+        ], ';'); // Utiliser le point-virgule comme séparateur
+
+        // Écrire les données
         foreach ($inventories as $inventory) {
-            $csv->insertOne([
-                $inventory->getId(),
-                // $inventory->getName(),
+            fputcsv($outputBuffer, [
                 $inventory->getActiveType(),
                 $inventory->getProvider(),
-                $inventory->getDateEntry()->format('Y-m-d'),
+                $inventory->getDateEntry()->format('Y-m-d'), // Formater la date si nécessaire
                 $inventory->getNumSerie(),
                 $inventory->getNumInvoiceIntern(),
                 $inventory->getNumInvoice(),
                 $inventory->getPrice(),
                 $inventory->getNumProductSerie(),
-                $inventory->getTotalProductLot(),
-            ]);
+                $inventory->getTotalProductLot()
+            ], ';'); // Utiliser le point-virgule comme séparateur
         }
-        $response = new Response("\xEF\xBB\xBF" . $csv->toString());
-        $response->headers->set('Content-Type', 'text/csv');
-        $response->headers->set('Content-Disposition', 'attachment; filename="inventory.csv"');
+
+        // Rewind le flux pour pouvoir lire son contenu
+        rewind($outputBuffer);
+
+        // Créer la réponse avec le contenu du CSV
+        $response = new Response(stream_get_contents($outputBuffer));
+        fclose($outputBuffer); // Fermer le flux
+
+        // Définir les en-têtes de réponse
+        $response->headers->set('Content-Type', 'text/csv; charset=UTF-8');
+        $response->headers->set('Content-Disposition', 'attachment;filename="' . $csvFileName . '"');
+
         return $response;
-
-        if (!$this->getUser()) {
-            return $this->redirectToRoute('app_login');
-        }
-
     }
+
+
+
 
     #[Route('/inventory/delete/{id}', name: 'app_inventory_delete', methods: ['POST'])]
     public function delete(Request $request, Inventory $inventory, EntityManagerInterface $entityManager): Response
@@ -168,4 +195,5 @@ class InventoryController extends AbstractController
 
         return $this->redirectToRoute('app_inventory');
     }
+
 }

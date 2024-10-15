@@ -1,3 +1,8 @@
+body{
+    background-color: #E0DCDC;
+}
+
+
 /* Structure Flexbox pour séparer le menu et le contenu */
 .container {
     display: flex;
@@ -18,7 +23,6 @@
 }
 
 .content {
-    margin-left: 250px; /* Espace pour laisser le menu sur la gauche */
     flex-grow: 1; /* Le contenu occupe le reste de l'espace */
     padding: 20px;
     background-color: #f4f4f4;
@@ -83,11 +87,15 @@ h1 {
 }
 
 /* Formulaires (Recherche et Import) */
-form.form-inline {
+/* form.form-inline {
     display: flex;
-    flex-wrap: wrap;
     gap: 10px;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
+} */
+
+/* form.form-inline .form-group {
+    display: flex;
+    flex-direction: column;
 }
 
 input[type="text"],
@@ -96,7 +104,7 @@ input[type="file"] {
     border: 1px solid #ddd;
     border-radius: 4px;
     flex-grow: 1;
-}
+} */
 
 button {
     padding: 10px 15px;
@@ -110,6 +118,11 @@ button {
 
 button:hover {
     background-color: #2980b9;
+}
+
+/* Boutons additionnels */
+.btn-filter, .btn-sort {
+    margin-top: 5px;
 }
 
 /* Alert Styles */
@@ -182,13 +195,6 @@ tr:hover {
     background-color: #27ae60;
 }
 
-/* Espacement supplémentaire pour éviter les chevauchements */
-td {
-    white-space: nowrap; /* Empêche les contenus trop longs de casser la mise en page */
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
 /* Responsive Design */
 @media (max-width: 768px) {
     .container {
@@ -217,4 +223,20 @@ td {
     th, td {
         padding: 8px 10px;
     }
+}
+
+
+form.form-inline .form-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+form.form-inline .form-group input[type="text"],
+form.form-inline .form-group input[type="file"] {
+    width: 00px; /* Réduit la taille des champs */
+}
+
+.main-content {
+    background-color: #E0DCDC   ;
 }

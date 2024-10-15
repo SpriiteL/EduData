@@ -7,74 +7,74 @@
 {% endblock %}
 
 {% block body %}
-<div class="container">
-    <div class="row" style="margin-left: 200px">
+<div class="main-content">
+    <div class="container">
+        <div class="row">
+            <!-- Inventory table section -->
+            <div class="col-lg-12 d-flex align-items-stretch">
+                <div class="card w-100">
+                    <div class="card-body p-4">
+                        <h5 class="card-title fw-semibold mb-4 custom-title" style="font-size: 30px">Inventaire</h5>
+                        
+                        <!-- Formulaire de recherche et d'import -->
+                        <form method="get" action="{{ path('app_inventory') }}" class="form-inline mb-4">
+                            <div class="form-group">
+                                <input type="text" name="search" placeholder="Rechercher..." value="{{ app.request.query.get('search') }}" class="form-control">
+                                <input type="file" name="file" accept=".csv" class="form-control ms-2">
+                            </div>
+                            <div class="form-group mt-2">
+                                <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Filtrer</button>
+                                <button type="button" class="btn btn-secondary ms-2"><i class="fas fa-sort"></i> Trier</button>
+                                <button type="submit" formaction="{{ path('app_inventory_import') }}" formmethod="post" class="btn btn-success ms-2"><i class="fas fa-file-import"></i> Importer</button>
+                                <a href="{{ path('app_inventory_export') }}" class="btn btn-primary ms-2"><i class="fas fa-file-export"></i> Exporter en CSV</a>
+                            </div>
+                        </form>
 
-        <!-- Inventory table section -->
-        <div class="col-lg-12 d-flex align-items-stretch">
-            <div class="card w-100">
-                <div class="card-body p-4">
-                    <h5 class="card-title fw-semibold mb-4">Gestion de l'inventaire</h5>
-                    
-                    <!-- Formulaire de recherche -->
-                    <form method="get" action="{{ path('app_inventory') }}" class="form-inline mb-4">
-                        <input type="text" name="search" placeholder="Rechercher..." value="{{ app.request.query.get('search') }}" class="form-control">
-                        </br>
-                        <button type="submit" class="btn btn-primary ms-2"><i class="fas fa-search"></i> Filtrer</button>
-                    </form>
 
-                    <!-- Formulaire d'import -->
-                    <form action="{{ path('app_inventory_import') }}" method="post" enctype="multipart/form-data" class="form-inline mb-4">
-                        <input type="file" name="file" accept=".csv" class="form-control">
-                        </br>
-                        <button type="submit" class="btn btn-success ms-2"><i class="fas fa-file-import"></i> Importer</button>
-                    </form>
 
-                    <!-- Tableau d'inventaire -->
-                    <div class="table-responsive">
-                        <table class="table table-striped table-bordered text-nowrap align-middle">
-                            <thead class="text-dark fs-4">
-                                <tr>
-                                    <th>Type Actif</th>
-                                    <th>Fournisseur</th>
-                                    <th>Date d'arrivée</th>
-                                    <th>Numéro de Série</th>
-                                    <th>Numéro de Facture</th>
-                                    <th>Numéro Facture Interne</th>
-                                    <th>Prix Neuf</th>
-                                    <th>Numéro de produit de la série</th>
-                                    <th>Nombre total de produits dans le lot</th>
-                                    <th>Nom de la Salle</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for inventory in inventories %}
+                        <!-- Tableau d'inventaire -->
+                        <div class="table-responsive">
+                            <table class="table table-striped table-bordered text-nowrap align-middle">
+                                <thead class="text-dark fs-4">
                                     <tr>
-                                        <td>{{ inventory.activeType }}</td>
-                                        <td>{{ inventory.provider }}</td>
-                                        <td>{{ inventory.dateEntry ? inventory.dateEntry|date('Y-m-d') }}</td>
-                                        <td>{{ inventory.numSerie }}</td>
-                                        <td>{{ inventory.numInvoice }}</td>
-                                        <td>{{ inventory.numInvoiceIntern }}</td>
-                                        <td>{{ inventory.price }}</td>
-                                        <td>{{ inventory.numProductSerie }}</td>
-                                        <td>{{ inventory.totalProductLot }}</td>
-                                        <td>{{ inventory.nameRoom }}</td>
-                                        <td>
-                                            <form action="{{ path('app_inventory_delete', {'id': inventory.id}) }}" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');">
-                                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ inventory.id) }}">
-                                                <button class="btn btn-danger btn-sm"><i class="fas fa-trash-alt"></i></button>
-                                            </form>
-                                          </td>
+                                        <th>Type Actif</th>
+                                        <th>Fournisseur</th>
+                                        <th>Date d'arrivée</th>
+                                        <th>Numéro de Série</th>
+                                        <th>Numéro de Facture</th>
+                                        <th>Numéro Facture Interne</th>
+                                        <th>Prix Neuf</th>
+                                        <th>Numéro de produit de la série</th>
+                                        <th>Nombre total de produits dans le lot</th>
+                                        <th>Nom de la Salle</th>
+                                        <th>Actions</th>
                                     </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {% for inventory in inventories %}
+                                        <tr>
+                                            <td>{{ inventory.activeType }}</td>
+                                            <td>{{ inventory.provider }}</td>
+                                            <td>{{ inventory.dateEntry ? inventory.dateEntry|date('Y-m-d') }}</td>
+                                            <td>{{ inventory.numSerie }}</td>
+                                            <td>{{ inventory.numInvoice }}</td>
+                                            <td>{{ inventory.numInvoiceIntern }}</td>
+                                            <td>{{ inventory.price }}</td>
+                                            <td>{{ inventory.numProductSerie }}</td>
+                                            <td>{{ inventory.totalProductLot }}</td>
+                                            <td>{{ inventory.nameRoom }}</td>
+                                            <td>
+                                                <form action="{{ path('app_inventory_delete', {'id': inventory.id}) }}" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');">
+                                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ inventory.id) }}">
+                                                    <button class="btn btn-danger btn-sm"><i class="fas fa-trash-alt"></i></button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                    
-                    <!-- Bouton d'export CSV -->
-                    <a href="{{ path('app_inventory_export') }}" class="btn btn-primary mt-4"><i class="fas fa-file-export"></i> Exporter en CSV</a>
                 </div>
             </div>
         </div>

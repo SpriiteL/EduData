@@ -21,7 +21,7 @@ class LoginController extends AbstractController
                 return $this->redirectToRoute('admin'); // Remplacez par votre route d'administration
             } elseif ($security->isGranted('ROLE_USER')) {
                 // Redirigez vers la page utilisateur
-                return $this->redirectToRoute('app_inventory'); // Remplacez par votre route utilisateur
+                return $this->redirectToRoute('app_dashboard'); // Remplacez par votre route utilisateur
             }
         }
         // get the login error if there is one

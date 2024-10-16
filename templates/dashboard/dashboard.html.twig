@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des Utilisateurs{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/styleDashboard.css') }}">
+{% endblock %}
+
+{% block body %}
+
+<div class="divcontainer">
+    <h1>Utilisateurs <span><img src="{{ asset('asset/icons/userblack.png') }}" class="ti icon"></span></h1>
+    <div class="user-list-table">
+        <div class="user-list-header">
+            <button class="view-more">En Voir ⓘ</button>
+        </div>
+
+        <div class="user-list">
+            {% for user in users %}
+                <div class="user-row">
+                    <span class="user-info">{{ user.username }}</span>
+                    <div class="actions">
+                        <button class="btn settings"><img src="{{ asset('asset/icons/manager.png') }}" class="ti icon"></button>
+                        <button class="btn email"><img src="{{ asset('asset/icons/message.png') }}" class="ti icon"></button>
+                    </div>
+                </div>
+            {% else %}
+                <p>Aucun utilisateur trouvé.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

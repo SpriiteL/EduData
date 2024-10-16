@@ -85,14 +85,22 @@ h1 {
 }
 
 .btn.email {
-    background-color: #007bff;
+    background-color: #516BEB;
 }
 
 .btn.settings {
-    background-color: #ff9800;
+    background-color: #EC763A;
 }
 
-.user-list-table {
+.btn.notif {
+    background-color: #EB5151;
+}
+
+.btn.check {
+    background-color: #91D15F;
+}
+
+.list-table {
     width: 90%;
     margin: 0 auto; /* Centre la table */
     margin-bottom: 20px;

@@ -9,8 +9,43 @@
 {% block body %}
 
 <div class="divcontainer">
+    <h1>Notifications <span><img src="{{ asset('asset/icons/blackbell.png') }}" class="ti icon"></span></h1>
+    <div class="list-table">
+        <div class="user-list-header">
+            <button class="view-more">En Voir ⓘ</button>
+        </div>
+
+        <div class="user-list">
+            
+                <div class="user-row">
+                    <span class="user-info"></span>
+                    <div class="actions">
+                        <button class="btn notif"><img src="{{ asset('asset/icons/trash.png') }}" class="ti icon"></button>
+                    </div>
+                </div>
+                <p>Aucune Notification.</p>
+        </div>
+    </div>
+    <h1>Demandes <span><img src="{{ asset('asset/icons/demande.png') }}" class="ti icon"></span></h1>
+    <div class="list-table">
+        <div class="user-list-header">
+            <button class="view-more">En Voir ⓘ</button>
+        </div>
+
+        <div class="user-list">
+            
+                <div class="user-row">
+                    <span class="user-info"></span>
+                    <div class="actions">
+                        <button class="btn check"><img src="{{ asset('asset/icons/check.png') }}" class="ti icon"></button>
+                        <button class="btn notif"><img src="{{ asset('asset/icons/trash.png') }}" class="ti icon"></button>
+                    </div>
+                </div>
+                <p>Aucune Demandes.</p>
+        </div>
+    </div>
     <h1>Utilisateurs <span><img src="{{ asset('asset/icons/userblack.png') }}" class="ti icon"></span></h1>
-    <div class="user-list-table">
+    <div class="list-table">
         <div class="user-list-header">
             <button class="view-more">En Voir ⓘ</button>
         </div>

@@ -11,13 +11,13 @@
     <div class="position-relative overflow-hidden radial-gradient min-vh-100 d-flex align-items-center justify-content-center">
         <div class="d-flex align-items-center justify-content-center w-100">
             <div class="row justify-content-center w-100">
-                <div class="col-md-8 col-lg-6 col-xxl-3">
+                <div class="col-md-8 col-lg-6 col-xxl-4 custom-width">
                     <div class="card mb-0">
                         <div class="card-body">
                             <a href="{{ path('homepage') }}" class="text-nowrap logo-img text-center d-block py-3 w-100">
                                 <img src="{{ asset('asset/edu3.png') }}" width="180" alt="Logo">
                             </a>
-                            <p class="text-center">Your Social Campaigns</p>
+                            <p class="text-center">Recenser votre matériel éducatif</p>
 
                             {% if form_errors(registrationForm) %}
                                 <div class="alert alert-danger">
@@ -28,12 +28,12 @@
                             {{ form_start(registrationForm) }}
 
                                 <div class="form-group mb-3">
-                                    {{ form_label(registrationForm.lastname, 'Prenom :', {'attr': {'class': 'form-label'}}) }}
-                                    {{ form_widget(registrationForm.lastname, {'attr': {'class': 'form-control', 'id': 'exampleInputtext1'}}) }}
+                                    {{ form_label(registrationForm.firstname, 'Prenom :', {'attr': {'class': 'form-label'}}) }}
+                                    {{ form_widget(registrationForm.firstname, {'attr': {'class': 'form-control', 'id': 'exampleInputtext1'}}) }}
                                 </div>
                                 <div class="form-group mb-3">
-                                    {{ form_label(registrationForm.firstname, 'Nom :', {'attr': {'class': 'form-label'}}) }}
-                                    {{ form_widget(registrationForm.firstname, {'attr': {'class': 'form-control', 'id': 'exampleInputtext1'}}) }}
+                                    {{ form_label(registrationForm.lastname, 'Nom :', {'attr': {'class': 'form-label'}}) }}
+                                    {{ form_widget(registrationForm.lastname, {'attr': {'class': 'form-control', 'id': 'exampleInputtext1'}}) }}
                                 </div>
 
                                 <div class="form-group mb-3">

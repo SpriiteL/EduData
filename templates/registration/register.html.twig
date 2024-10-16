@@ -26,6 +26,21 @@
                             {% endif %}
 
                             {{ form_start(registrationForm) }}
+
+                                <div class="form-group mb-3">
+                                    {{ form_label(registrationForm.lastname, 'Prenom :', {'attr': {'class': 'form-label'}}) }}
+                                    {{ form_widget(registrationForm.lastname, {'attr': {'class': 'form-control', 'id': 'exampleInputtext1'}}) }}
+                                </div>
+                                <div class="form-group mb-3">
+                                    {{ form_label(registrationForm.firstname, 'Nom :', {'attr': {'class': 'form-label'}}) }}
+                                    {{ form_widget(registrationForm.firstname, {'attr': {'class': 'form-control', 'id': 'exampleInputtext1'}}) }}
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    {{ form_label(registrationForm.email, 'Adresse Email :', {'attr': {'class': 'form-label'}}) }}
+                                    {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control', 'id': 'exampleInputEmail1'}}) }}
+                                </div>
+
                                 <div class="form-group mb-3">
                                     {{ form_label(registrationForm.username, 'Nom d\'Utilisateur :', {'attr': {'class': 'form-label'}}) }}
                                     {{ form_widget(registrationForm.username, {'attr': {'class': 'form-control', 'id': 'exampleInputtext1'}}) }}

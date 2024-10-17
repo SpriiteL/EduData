@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EduData</title>
-    <link rel="icon" href="{{ asset('asset/favicon-removebg-preview.png') }}" type="image/x-icon">
+    <link id="favicon-theme" rel="icon" href="{{ asset('asset/favicon-removebg-preview.png') }}" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
@@ -12,11 +12,43 @@
     <link rel="stylesheet" href="{{ asset('css/styleheader.css') }}">
     <link rel="stylesheet" href="{{ asset('css/styleDashboard.css') }}">
 </head>
-<body>
-  {% include 'structure/header.html.twig' %}
-  {% include 'structure/sidebar.html.twig' %}
-  {% block body %}{% endblock %}
-  {% include 'structure/footer.html.twig' %}
-  {% block footer %}{% endblock %}
+<body class="{{ app.session.get('theme', 'theme1') }}">
+    <header class="header {{ app.session.get('theme', 'theme1') }}-header">
+        {% include 'structure/header.html.twig' %}
+    </header>
+
+    <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
+         data-sidebar-position="fixed" data-header-position="fixed">
+        <aside class="left-sidebar custom-sidebar {{ app.session.get('theme', 'theme1') }}-sidebar">
+            {% include 'structure/sidebar.html.twig' %}
+        </aside>
+    </div>
+
+    <main>
+        {% block body %}{% endblock %}
+    </main>
+
+    <footer class="footer {{ app.session.get('theme', 'theme1') }}-footer">
+        {% include 'structure/footer.html.twig' %}
+        {% block footer %}{% endblock %}
+    </footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const theme = '{{ app.session.get('theme', 'theme1') }}';
+            const logo = document.getElementById('sidebar-logo');
+
+            if (theme === 'theme1') {
+                logo.src = '{{ asset('../asset/edu3.png') }}';
+            } else if (theme === 'theme2') {
+                logo.src = '{{ asset('../asset/edu2.png') }}';
+            } else if (theme === 'theme3') {
+                logo.src = '{{ asset('../asset/edured.png') }}';
+            } else if (theme === 'theme4') {
+                logo.src = '{{ asset('../asset/edugreen.png') }}';
+            }
+        });
+    </script>
+    {% block javascripts %}
+    {% endblock %}
 </body>
 </html>

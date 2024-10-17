@@ -1,12 +1,10 @@
-<div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
-    data-sidebar-position="fixed" data-header-position="fixed">
-    <!-- Sidebar Start -->
-    <aside class="left-sidebar custom-sidebar">
+
     <!-- Sidebar scroll-->
     <div>
       <div class="brand-logo d-flex align-items-center justify-content-between">
         <a href="inventory/inventory.html.twig" class="text-nowrap logo-img">
-          <img src="../asset/edu3.png" width="180" alt="" />
+          {# <img src="../asset/edu3.png" width="180" alt="" /> #}
+          <img id="sidebar-logo" src="{{ asset('../asset/edu3.png') }}" width="180" alt="Logo">
         </a>
         <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
           <i class="ti ti-x fs-8"></i>
@@ -72,7 +70,7 @@
             </a>
           </li>
           <li class="sidebar-item">
-            <a class="sidebar-link" href="#" aria-expanded="false">
+            <a class="sidebar-link" href="{{path('app_setting')}}" aria-expanded="false">
               <span>
                 <img src="{{ asset('asset/icons/setting.png') }}" class="ti icon">
               </span>
@@ -104,4 +102,3 @@
       <!-- End Sidebar navigation -->
     </div>
     <!-- End Sidebar scroll-->
-  </aside>

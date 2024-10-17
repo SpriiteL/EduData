@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Réglages{% endblock %}
+
+{% block body %}
+<style>
+    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+</style>
+
+<div class="example-wrapper">
+    <h1>Réglages du thème</h1>
+
+    <form action="{{ path('change_theme') }}" method="POST">
+        <label for="theme">Choisir un thème :</label>
+        <select name="theme" id="theme">
+            <option value="theme1" {% if current_theme == 'theme1' %}selected{% endif %}>Ocean</option>
+            <option value="theme2" {% if current_theme == 'theme2' %}selected{% endif %}>Sombre</option>
+            <option value="theme3" {% if current_theme == 'theme3' %}selected{% endif %}>Peps</option>
+            <option value="theme4" {% if current_theme == 'theme4' %}selected{% endif %}>Naturel</option>
+        </select>
+        <button type="submit">Changer le thème</button>
+    </form>
+</div>
+{% endblock %}

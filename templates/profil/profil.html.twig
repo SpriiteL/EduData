@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Profil de {{ users.username }}{% endblock %}
+
+{% block body %}
+<style>
+    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+</style>
+
+<div class="divcontainer">
+    <h1>Profil de {{ users.username }}</h1>
+    <div class="profile-container">
+        <div class="avatar-and-button">
+            <img src="{{ asset('asset/icons/avatar.jpg') }}" class="avatarprofil">
+            <button type="button" class="modifybtn">Modifier<span><img src="{{ asset('asset/icons/modify.png') }}" class="ti iconplus"></span></button>
+        </div>
+        <div class="info">
+            <h2 class="profiltitle">Informations Personnelles</h2>
+            <p><span class="info-title">Nom:</span> {{ users.lastname }}</p>
+            <p><span class="info-title">Prénom:</span> {{ users.firstname }}</p>
+            <p><span class="info-title">Email:</span> {{ users.email }}</p>
+            <p><span class="info-title">Rôle:</span> Comptable</p>
+            <p><span class="info-title">Etablissement</span> Beaupeyrat</p>
+        </div>
+    </div>
+    <h1>Dernières Activités <span><img src="{{ asset('asset/icons/blackbell.png') }}" class="ti icon"></span></h1>
+    <div class="list-table">
+        <div class="user-list-header">
+            <button class="view-more">En Voir <img src="{{ asset('asset/icons/plus.png') }}" class="ti iconplus"></button>
+        </div>
+        <div class="user-list">
+            <div class="user-row">
+                <span class="user-info"></span>
+                <div class="actions">
+                    <button class="btn notif"><img src="{{ asset('asset/icons/trash.png') }}" class="ti icon"></button>
+                </div>
+            </div>
+            <p>Aucune Activité.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

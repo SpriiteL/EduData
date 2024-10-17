@@ -113,9 +113,15 @@
 .theme3-header { background-color: #191919; }
 
 .theme4-sidebar { background-color: #0E5600; }
-.theme4-footer { background-color: #157F00; }
+.theme4-footer { background-color: #0E5600; }
 .theme4-header { background-color: #282828; }
 
 .theme5-sidebar { background-color: #460056; }
 .theme5-footer { background-color: #460056; }
 .theme5-header { background-color: #282828; }
+
+.theme6-sidebar { background-color: #505050; }
+.theme6-footer { background-color: #365b9e; }
+.theme6-header { background-color: #365b9e; }
+
+

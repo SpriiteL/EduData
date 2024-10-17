@@ -12,7 +12,7 @@
     <h1>Notifications <span><img src="{{ asset('asset/icons/blackbell.png') }}" class="ti icon"></span></h1>
     <div class="list-table">
         <div class="user-list-header">
-            <button class="view-more">En Voir <img src="{{ asset('asset/icons/plus.png') }}" class="ti iconplus"></button>
+            <button class="view-more {{ app.session.get('theme', 'theme1') }}-button">En Voir <img src="{{ asset('asset/icons/plus.png') }}" class="ti iconplus"></button>
         </div>
 
         <div class="user-list">
@@ -29,7 +29,7 @@
     <h1>Demandes <span><img src="{{ asset('asset/icons/demande.png') }}" class="ti icon"></span></h1>
     <div class="list-table">
         <div class="user-list-header">
-            <button class="view-more">En Voir <img src="{{ asset('asset/icons/plus.png') }}" class="ti iconplus"></button>
+            <button class="view-more {{ app.session.get('theme', 'theme1') }}-button">En Voir <img src="{{ asset('asset/icons/plus.png') }}" class="ti iconplus"></button>
         </div>
 
         <div class="user-list">
@@ -47,7 +47,7 @@
     <h1>Utilisateurs <span><img src="{{ asset('asset/icons/userblack.png') }}" class="ti icon"></span></h1>
     <div class="list-table">
         <div class="user-list-header">
-            <button class="view-more">En Voir <img src="{{ asset('asset/icons/plus.png') }}" class="ti iconplus"></button>
+            <button class="view-more {{ app.session.get('theme', 'theme1') }}-button">En Voir <img src="{{ asset('asset/icons/plus.png') }}" class="ti iconplus"></button>
         </div>
 
         <div class="user-list">

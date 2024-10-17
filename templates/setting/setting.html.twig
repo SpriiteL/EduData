@@ -3,6 +3,81 @@
 {% block title %}Réglages{% endblock %}
 
 {% block body %}
+</head>
+<body>
+    <div class="divcontainer">
+        <h1>Paramètres</h1>
+        <div class="grid">
+            <div class="card">
+                <h2 class="card-title">Langue</h2>
+                <p class="card-description">Choisissez la langue de l'interface</p>
+                <select id="language">
+                    <option value="fr">Français</option>
+                    <option value="en">English</option>
+                    <option value="es">Español</option>
+                    <option value="de">Deutsch</option>
+                </select>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">Thème</h2>
+                <p class="card-description">Choisissez le thème de couleur</p>
+                <form action="{{ path('change_theme') }}" method="POST">
+                    <select name="theme" id="theme">
+                        <option value="theme1" {% if current_theme == 'theme1' %}selected{% endif %}>Ocean</option>
+                        <option value="theme2" {% if current_theme == 'theme2' %}selected{% endif %}>Sombre</option>
+                        <option value="theme3" {% if current_theme == 'theme3' %}selected{% endif %}>Peps</option>
+                        <option value="theme4" {% if current_theme == 'theme4' %}selected{% endif %}>Naturel</option>
+                        <option value="theme5" {% if current_theme == 'theme5' %}selected{% endif %}>Purple</option>
+                        <option value="theme6" {% if current_theme == 'theme6' %}selected{% endif %}>Clair</option>
+                    </select>
+                    <button type="submit">Changer le thème</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">Notifications</h2>
+                <p class="card-description">Gérez vos préférences de notification</p>
+                <label class="switch">
+                    <input type="checkbox" checked>
+                    <span class="slider"></span>
+                </label>
+                <span>Activer les notifications</span>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">Supprimer le compte</h2>
+                <p class="card-description">Supprimez définitivement votre compte et toutes vos données</p>
+                <button class="delete-button">Supprimer le compte</button>
+            </div>
+        </div>
+    </div>
+</body>
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{# {% extends 'base.html.twig' %}
+
+{% block title %}Réglages{% endblock %}
+
+{% block body %}
 <style>
     .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
     .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
@@ -23,4 +98,4 @@
         <button type="submit">Changer le thème</button>
     </form>
 </div>
-{% endblock %}
+{% endblock %} #}

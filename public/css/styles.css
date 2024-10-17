@@ -178,3 +178,67 @@ h1 {
     width: 150px;
     height: 50px;
 }
+
+.btn-export{
+    background-color: black;
+    color: white;
+    width: 260px;
+}
+
+.btn-export:hover{
+    background-color: #333;
+    color: #008cba;
+}
+
+.btn-success{
+    background-color: black;
+    color: white;
+    width: 260px;
+}
+
+.btn-success:hover{
+    background-color: #333;
+    color: #008cba;
+}
+
+.form-control{
+    width: 50%;
+    margin-bottom: 20px;
+    margin-left: 8px;
+}
+
+.divtable{
+    max-width: 1200px;
+    margin: 20px auto;
+    background-color: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.nomcolonne{
+    background-color: #303030;
+    color: white;
+    padding: 10px;
+    text-align: center;
+}
+
+.btn-danger{
+    width: 50px;
+    background-color: #EB5151;
+}
+
+.btn-danger:hover{
+    background-color: #E31010;
+    color: black;
+}
+
+.btn-modify{
+    width: 50px;
+    background-color: #EC763A;
+}
+
+.btn-modify:hover{
+    background-color: #EE5F18;
+    color: black;
+}

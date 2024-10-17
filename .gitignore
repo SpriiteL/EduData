@@ -25,7 +25,7 @@
 ###< symfony/asset-mapper ###
 
 node_modules/*
-/docker/db/data/*
+docker/*
 
 ###> lexik/jwt-authentication-bundle ###
 /config/jwt/*.pem

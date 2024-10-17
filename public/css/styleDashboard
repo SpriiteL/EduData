@@ -64,15 +64,7 @@ h1 {
     gap: 10px;
 }
 
-.btn {
-    background-color: #ff5722;
-    border: none;
-    padding: 8px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 18px;
-    color: white;
-}
+
 
 .btn.email {
     background-color: #007bff;

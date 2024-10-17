@@ -18,7 +18,7 @@ body {
     color: #a0aec0;
     padding: 4rem 0 2rem;
     position: relative;
-    margin-left: 200px; /* Supprime la marge supérieure du footer */
+    margin-left: 200px; 
     padding-left: 0;
 }
 
@@ -163,14 +163,14 @@ button:hover {
 }
 
 
- /* styles.css */
+
  .custom-sidebar {
-    background-color: #1a202c; /* Couleur d'arrière-plan souhaitée */
-    color: white; /* Couleur du texte pour un meilleur contraste */
+    background-color: #1a202c; 
+    color: white;
 }
 
 .hide-menu {
-    color: white; /* Couleur du texte pour un meilleur contraste */
+    color: white;
 }
 
 .ti{
@@ -178,10 +178,10 @@ button:hover {
 }
 
 .menu {
-  margin-right: 0; /* Supprime la marge inférieure du menu */
-  padding-right: 0; /* Supprime le padding inférieur du menu */
+  margin-right: 0; 
+  padding-right: 0; 
 }
 
 .icon {
-  width: 25px; /* Supprime le padding inférieur de l'image */
+  width: 25px;
 }

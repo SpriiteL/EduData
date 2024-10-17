@@ -11,18 +11,17 @@
                         <h5 class="card-title fw-semibold mb-4 custom-title" style="font-size: 30px">Inventaire</h5>
                         
                         <!-- Formulaire de recherche et d'import -->
-                        <form method="get" action="{{ path('app_inventory') }}" class="form-inline mb-4">
+                        <form method="post" action="{{ path('app_inventory_import') }}" enctype="multipart/form-data" class="form-inline mb-4">
                             <div class="form-group">
                                 <input type="text" name="search" placeholder="Rechercher..." value="{{ app.request.query.get('search') }}" class="form-control">
-                                <input type="file" name="file" accept=".csv" class="form-control ms-2">
+                                <input type="file" name="file" accept=".csv" class="form-control ms-2" required>
                             </div>
                             <div class="form-group mt-2">
-                                <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Filtrer</button>
-                                <button type="button" class="btn btn-secondary ms-2"><i class="fas fa-sort"></i> Trier</button>
                                 <button type="submit" formaction="{{ path('app_inventory_import') }}" formmethod="post" class="btn btn-success ms-2"><i class="fas fa-file-import"></i> Importer</button>
-                                <a href="{{ path('app_inventory_export') }}" class="btn btn-primary ms-2"><i class="fas fa-file-export"></i> Exporter en CSV</a>
+                                <a href="{{ path('app_inventory_export') }}" class="btn btn-primary ms-2"><i class="fas fa-file-export"></i> Exporter</a>
                             </div>
                         </form>
+
 
 
 

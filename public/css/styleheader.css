@@ -88,15 +88,15 @@
 }
 
 .left-sidebar {
-    position: fixed; /* Fixe la sidebar à gauche */
+    position: fixed;
     top: 0;
     left: 0;
-    border: none; /* Enlève les bordures */
+    border: none;
 }
 
 .main-content {
-    margin-left: 200px; /* Marge à gauche pour éviter la sidebar */
-    padding: 20px; /* Espacement interne */
+    margin-left: 200px; 
+    padding: 20px;
 }
 
 

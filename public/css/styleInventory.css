@@ -3,33 +3,33 @@ body{
 }
 
 
-/* Structure Flexbox pour séparer le menu et le contenu */
+
 .container {
     display: flex;
-    height: 100vh; /* S'assure que le menu et le contenu occupent toute la hauteur */
+    height: 100vh; 
 }
 
 .sidebar {
-    width: 250px; /* Largeur fixe pour le menu */
+    width: 250px; 
     background-color: var(--sidebar-bg);
     padding: 2rem 1rem;
     display: flex;
     flex-direction: column;
-    position: fixed; /* Garde le menu en position fixe à gauche */
+    position: fixed; 
     top: 0;
     left: 0;
     bottom: 0;
-    overflow-y: auto; /* Permet le défilement si nécessaire */
+    overflow-y: auto; 
 }
 
 .content {
-    flex-grow: 1; /* Le contenu occupe le reste de l'espace */
+    flex-grow: 1; 
     padding: 20px;
     background-color: #f4f4f4;
-    overflow-y: auto; /* Permet au contenu de défiler */
+    overflow-y: auto; 
 }
 
-/* Logo et Menu */
+
 .logo {
     text-align: center;
     margin-bottom: 2rem;
@@ -70,7 +70,7 @@ body{
     font-size: 1.2rem;
 }
 
-/* Améliorations pour le contenu */
+
 .example-wrapper {
     max-width: 1200px;
     margin: 0 auto;
@@ -86,26 +86,6 @@ h1 {
     text-align: center;
 }
 
-/* Formulaires (Recherche et Import) */
-/* form.form-inline {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 10px;
-} */
-
-/* form.form-inline .form-group {
-    display: flex;
-    flex-direction: column;
-}
-
-input[type="text"],
-input[type="file"] {
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    flex-grow: 1;
-} */
-
 button {
     padding: 10px 15px;
     background-color: #3498db;
@@ -120,12 +100,11 @@ button:hover {
     background-color: #2980b9;
 }
 
-/* Boutons additionnels */
 .btn-filter, .btn-sort {
     margin-top: 5px;
 }
 
-/* Alert Styles */
+
 .alert {
     padding: 15px;
     margin-bottom: 20px;
@@ -144,7 +123,7 @@ button:hover {
     border: 1px solid #f5c6cb;
 }
 
-/* Table Styles */
+
 .table-inventory {
     width: 100%;
     border-collapse: separate;
@@ -153,14 +132,14 @@ button:hover {
     background-color: #fff;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
-    table-layout: auto; /* Pour s'assurer que les colonnes ne se chevauchent pas */
+    table-layout: auto; 
 }
 
 th, td {
     padding: 12px 15px;
     text-align: left;
     border-bottom: 1px solid #e0e0e0;
-    word-wrap: break-word; /* Pour éviter que les longs mots débordent */
+    word-wrap: break-word;
 }
 
 th {
@@ -180,7 +159,7 @@ tr:hover {
     background-color: #f5f5f5;
 }
 
-/* Export Button */
+
 .btn-primary {
     padding: 10px 15px;
     background-color: #2ecc71;
@@ -195,20 +174,20 @@ tr:hover {
     background-color: #27ae60;
 }
 
-/* Responsive Design */
+
 @media (max-width: 768px) {
     .container {
-        flex-direction: column; /* Flex en colonne pour petits écrans */
+        flex-direction: column; 
     }
 
     .sidebar {
-        position: relative; /* Relâche le menu du côté gauche */
+        position: relative; 
         width: 100%;
-        margin-bottom: 20px; /* Laisse un espace entre le menu et le contenu */
+        margin-bottom: 20px; 
     }
 
     .content {
-        margin-left: 0; /* Supprime l'espace pour le menu */
+        margin-left: 0; 
         width: 100%;
     }
 
@@ -234,7 +213,7 @@ form.form-inline .form-group {
 
 form.form-inline .form-group input[type="text"],
 form.form-inline .form-group input[type="file"] {
-    width: 00px; /* Réduit la taille des champs */
+    width: 00px; 
 }
 
 .main-content {

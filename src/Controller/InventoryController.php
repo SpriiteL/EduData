@@ -17,12 +17,11 @@ use Symfony\Component\Routing\Annotation\Route;
 class InventoryController extends AbstractController
 {
     #[Route('/inventory', name: 'app_inventory')]
-    public function index(EntityManagerInterface $entityManager): Response
+    public function index(ManagerRegistry $doctrine): Response
     {
         $user = $this->getUser();
-        $etablishment = $user->getEtablishment();
 
-        $inventories = $entityManager->getRepository(Inventory::class)->findBy(['etablishment' => $etablishment]);
+        $inventories = $doctrine->getRepository(Inventory::class)->findAll();
 
         return $this->render('inventory/inventory.html.twig', [
             'inventories' => $inventories,
@@ -33,7 +32,7 @@ class InventoryController extends AbstractController
     public function import(Request $request, ManagerRegistry $doctrine): Response
     {
         $file = $request->files->get('file');
-        if ($file) {
+        if ($file && $file->isValid()) {
             try {
                 // Lire le contenu du fichier
                 $content = file_get_contents($file->getPathname());
@@ -61,8 +60,7 @@ class InventoryController extends AbstractController
                     "Numéro de Série", "Numéro Facture Interne",
                     "Numéro de Facture", "Prix Neuf",
                     "Numero de produit de la série",
-                    "Nombre total de produits dans le lot",
-                    "Nom de la Salle",
+                    "Nombre total de produits dans le lot", "Nom de la Salle"
                 ];
 
                 $count = 0;
@@ -113,11 +111,12 @@ class InventoryController extends AbstractController
                 $this->addFlash('error', 'Erreur lors de l\'import : ' . $e->getMessage());
             }
         } else {
-            $this->addFlash('error', 'Veuillez télécharger un fichier.');
+            $this->addFlash('error', 'Veuillez télécharger un fichier valide.');
         }
 
         return $this->redirectToRoute('app_inventory');
     }
+
 
 
 
@@ -154,18 +153,24 @@ class InventoryController extends AbstractController
 
         // Écrire les données
         foreach ($inventories as $inventory) {
-            fputcsv($outputBuffer, [
-                $inventory->getActiveType(),
-                $inventory->getProvider(),
-                $inventory->getDateEntry()->format('Y-m-d'), // Formater la date si nécessaire
-                $inventory->getNumSerie(),
-                $inventory->getNumInvoiceIntern(),
-                $inventory->getNumInvoice(),
-                $inventory->getPrice(),
-                $inventory->getNumProductSerie(),
-                $inventory->getTotalProductLot(),
-                $inventory->getNameRoom()
-            ], ';'); // Utiliser le point-virgule comme séparateur
+            $totalProducts = $inventory->getTotalProductLot();
+            $numProductSerieBase = $inventory->getNumProductSerie();
+
+            // Vérifier si le total des produits dans le lot est supérieur à 1
+            for ($i = 0; $i < $totalProducts; $i++) {
+                fputcsv($outputBuffer, [
+                    $inventory->getActiveType(),
+                    $inventory->getProvider(),
+                    $inventory->getDateEntry()->format('Y-m-d'), // Formater la date si nécessaire
+                    $inventory->getNumSerie(),
+                    $inventory->getNumInvoiceIntern(),
+                    $inventory->getNumInvoice(),
+                    $inventory->getPrice(),
+                    $numProductSerieBase + $i, // Incrémenter numProductSerie
+                    1, // Chaque ligne représente une unité, donc 1
+                    $inventory->getNameRoom()
+                ], ';'); // Utiliser le point-virgule comme séparateur
+            }
         }
 
         // Rewind le flux pour pouvoir lire son contenu
@@ -181,6 +186,7 @@ class InventoryController extends AbstractController
 
         return $response;
     }
+
 
 
 

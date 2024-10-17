@@ -156,7 +156,7 @@ class InventoryController extends AbstractController
             $totalProducts = $inventory->getTotalProductLot();
             $numProductSerieBase = $inventory->getNumProductSerie();
 
-            // Vérifier si le total des produits dans le lot est supérieur à 1
+            // Écrire une ligne pour chaque produit dans le lot
             for ($i = 0; $i < $totalProducts; $i++) {
                 fputcsv($outputBuffer, [
                     $inventory->getActiveType(),
@@ -167,7 +167,7 @@ class InventoryController extends AbstractController
                     $inventory->getNumInvoice(),
                     $inventory->getPrice(),
                     $numProductSerieBase + $i, // Incrémenter numProductSerie
-                    1, // Chaque ligne représente une unité, donc 1
+                    $totalProducts, // Utiliser le total des produits dans le lot
                     $inventory->getNameRoom()
                 ], ';'); // Utiliser le point-virgule comme séparateur
             }
@@ -186,6 +186,7 @@ class InventoryController extends AbstractController
 
         return $response;
     }
+
 
 
 

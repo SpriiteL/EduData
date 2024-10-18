@@ -13,13 +13,17 @@
                         <!-- Formulaire de recherche et d'import -->
                         <form method="post" action="{{ path('app_inventory_import') }}" enctype="multipart/form-data" class="form-inline mb-4">
                             <div class="form-group">
-                                <input type="text" name="search" placeholder="Rechercher..." value="{{ app.request.query.get('search') }}" class="form-control">
                                 <input type="file" name="file" accept=".csv" class="form-control ms-2" required>
                             </div>
                             <div class="form-group mt-2">
-                                <button type="submit" formaction="{{ path('app_inventory_import') }}" formmethod="post" class="btn btn-success ms-2"><i class="fas fa-file-import"></i> Importer</button>
-                                <button type="submit" formaction="{{ path('app_inventory_export') }}" formmethod="post" class="btn btn-export ms-2"><i class="fas fa-file-export"></i> Exporter</button>
-                                {# <a href="{{ path('app_inventory_export') }}" class="btn btn-primary ms-2"><i class="fas fa-file-export"></i> Exporter</a> #}
+                                <button type="submit" class="btn btn-success ms-2"><i class="fas fa-file-import"></i> Importer</button>
+                            </div>
+                        </form>
+
+                        <!-- Formulaire d'export -->
+                        <form method="post" action="{{ path('app_inventory_export') }}" class="form-inline mb-4">
+                            <div class="form-group mt-2">
+                                <button type="submit" class="btn btn-export ms-2"><i class="fas fa-file-export"></i> Exporter</button>
                             </div>
                         </form>
 

@@ -6,3 +6,8 @@ controllers:
 auth:
     path: /auth
     methods: ['POST']
+
+app_inventory_export:
+    path: /inventory/export
+    controller: App\Controller\InventoryController::export
+    methods: [GET, POST]

@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello StatisticsController!{% endblock %}
+
+{% block body %}
+    <div class="divcontainer">
+        <h1>Statistiques</h1>
+        <div class="grid">
+            <div class="card">
+                <h2 class="card-title">Utilisateurs</h2>
+                <canvas id="userRolesChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ctx = document.getElementById('roles').getContext('2d');
+        const roles = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Admin', 'User'],
+                datasets: [{
+                    label: 'User Roles',
+                    data: [ROLE_ADMIN, /* Nombre d'utilisateurs */],
+                    backgroundColor: ['#FF6384', '#36A2EB'],
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                return tooltipItem.label + ': ' + tooltipItem.raw;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+{% endblock %}

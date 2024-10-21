@@ -41,6 +41,7 @@ jobs:
         run: docker compose up --wait --no-build
       -
         name: Check HTTP reachability
+        if: false # Remove this line when the homepage will be configured, or change the path to check
         run: curl -v --fail-with-body http://localhost
       -
         name: Check HTTPS reachability

@@ -45,6 +45,14 @@
               <span class="hide-menu">Statistiques</span>
             </a>
           </li>
+          <li class="sidebar-item">
+            <a class="sidebar-link" href="{{path('app_badge')}}" aria-expanded="false">
+              <span>
+                <img src="{{ asset('asset/icons/card.png') }}" class="ti icon">
+              </span>
+              <span class="hide-menu">Badge</span>
+            </a>
+          </li>
           {% if is_granted('ROLE_ADMIN') %}
             <li class="nav-small-cap">
               <i class="ti ti-dots nav-small-cap-icon fs-4"></i>

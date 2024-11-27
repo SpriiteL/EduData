@@ -1,0 +1,147 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="main-content">
+    <div class="container">
+        <div class="row">
+            <!-- Inventory table section -->
+            <div class="col-lg-12 d-flex align-items-stretch">
+                <div class="card w-100">
+                    <div class="card-body p-4">
+                        <h5 class="card-title fw-semibold mb-4 custom-title" style="font-size: 30px">Badge</h5>
+
+                        <!-- Formulaire -->
+                        <form id="badge-form" class="mb-4">
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <label for="nom" class="form-label">Nom</label>
+                                    <input type="text" class="form-control" id="nom" name="nom" placeholder="Nom">
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="prenom" class="form-label">Prénom</label>
+                                    <input type="text" class="form-control" id="prenom" name="prenom" placeholder="Prénom">
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="dateTraitement" class="form-label">Date Traitement</label>
+                                    <input type="date" class="form-control" id="dateTraitement" name="dateTraitement">
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="classe" class="form-label">Classe</label>
+                                    <select class="form-select" id="classe" name="classe">
+                                        <option value="6ème">6ème</option>
+                                        <option value="5ème">5ème</option>
+                                        <option value="4ème">4ème</option>
+                                        <option value="3ème">3ème</option>
+                                        <option value="Seconde">Seconde</option>
+                                        <option value="Premiere">Première</option>
+                                        <option value="Terminale">Terminal</option>
+                                        <option value="BTS">BTS</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="etatTraitement" class="form-label">État du Traitement</label>
+                                    <select class="form-select" id="etatTraitement" name="etatTraitement">
+                                        <option value="En attente">En attente</option>
+                                        <option value="Traitée">Traitée</option>
+                                        <option value="Refusée">Refusée</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2 d-flex align-items-end">
+                                    <button type="button" id="add-badge" class="btn btn-primary w-100">Ajouter</button>
+                                </div>
+                            </div>
+                        </form>
+
+                        <!-- Tableau badge -->
+                        <div class="divtable">
+                            <div class="table-test">
+                                <table id="badge-table" class="test">
+                                    <thead class="text-dark fs-4">
+                                        <tr class="colonne">
+                                            <th>Nom</th>
+                                            <th>Prénom</th>
+                                            <th>Date Traitement</th>
+                                            <th>Classe</th>
+                                            <th>État du Traitement</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Les lignes seront générées dynamiquement -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+<script>          
+    $(document).ready(function () {
+        const table = $('#badge-table').DataTable({
+            language: {
+                url: '//cdn.datatables.net/plug-ins/2.1.8/i18n/fr-FR.json'
+            },
+            responsive: true,
+            autoWidth: false,
+            pageLength: 10,
+            lengthMenu: [5, 10, 25, 50],
+            order: [[2, 'desc']]
+        });
+
+        // Ajouter une nouvelle ligne depuis le formulaire
+        $('#add-badge').on('click', function () {
+            const nom = $('#nom').val().trim();
+            const prenom = $('#prenom').val().trim();
+            const dateTraitement = $('#dateTraitement').val();
+            const classe = $('#classe').val().trim();
+            const etatTraitement = $('#etatTraitement').val();
+
+            if (nom && prenom && dateTraitement && classe && etatTraitement) {
+                table.row.add([
+                    nom,
+                    prenom,
+                    dateTraitement,
+                    classe,
+                    etatTraitement,
+                    `<button class="btn btn-warning btn-sm btn-edit"><i class="fas fa-pencil-alt"></i></button>
+                     <button class="btn btn-danger btn-sm btn-delete"><i class="fas fa-trash-alt"></i></button>`
+                ]).draw();
+
+                // Réinitialiser le formulaire
+                $('#badge-form')[0].reset();
+            } else {
+                alert('Veuillez remplir tous les champs.');
+            }
+        });
+
+        // Gestion des actions Modifier/Supprimer
+        $('#badge-table tbody').on('click', '.btn-delete', function () {
+            if (confirm('Êtes-vous sûr de vouloir supprimer cet élément ?')) {
+                table.row($(this).parents('tr')).remove().draw();
+            }
+        });
+
+        $('#badge-table tbody').on('click', '.btn-edit', function () {
+            const row = table.row($(this).parents('tr'));
+            const data = row.data();
+
+            $('#nom').val(data[0]);
+            $('#prenom').val(data[1]);
+            $('#dateTraitement').val(data[2]);
+            $('#classe').val(data[3]);
+            $('#etatTraitement').val(data[4]);
+
+            // Supprimer la ligne pour la remplacer après modification
+            row.remove().draw();
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,121 @@
+Table "doctrine_migration_versions" {
+  "version" varchar(191) [pk, not null]
+  "executed_at" datetime
+  "execution_time" int
+}
+
+Table "etablishment" {
+  "id" int [pk, not null, increment]
+  "name" varchar(255) [not null]
+  "adress" varchar(255) [not null]
+}
+
+Table "export_logs" {
+  "id" int [pk, not null, increment]
+  "filename" varchar(255) [not null]
+  "statut" tinyint(1) [not null]
+  "date_export" date [not null]
+  "user_id" int
+  "inventory_id" int
+
+  Indexes {
+    inventory_id [type: btree, name: "IDX_D63EF0B79EEA759"]
+    user_id [type: btree, name: "IDX_D63EF0B7A76ED395"]
+  }
+}
+
+Table "import_logs" {
+  "id" int [pk, not null, increment]
+  "filename" varchar(255) [not null]
+  "statut" tinyint(1) [not null]
+  "date_import" date [not null]
+  "user_id" int
+  "inventory_id" int
+
+  Indexes {
+    inventory_id [type: btree, name: "IDX_1DA328DC9EEA759"]
+    user_id [type: btree, name: "IDX_1DA328DCA76ED395"]
+  }
+}
+
+Table "inventory" {
+  "id" int [pk, not null, increment]
+  "active_type" varchar(255) [not null]
+  "price" double [not null]
+  "num_product_serie" int [not null]
+  "total_product_lot" int [not null]
+  "provider" varchar(255) [not null]
+  "date_entry" datetime [not null]
+  "num_serie" varchar(255) [not null]
+  "num_invoice_intern" varchar(255) [not null]
+  "num_invoice" varchar(255) [not null]
+  "etablishment_id" int
+  "name_room" varchar(255) [not null]
+
+  Indexes {
+    etablishment_id [type: btree, name: "IDX_B12D4A3616BE0BCF"]
+  }
+}
+
+Table "messenger_messages" {
+  "id" bigint [pk, not null, increment]
+  "body" longtext [not null]
+  "headers" longtext [not null]
+  "queue_name" varchar(190) [not null]
+  "created_at" datetime [not null, note: '(DC2Type:datetime_immutable)']
+  "available_at" datetime [not null, note: '(DC2Type:datetime_immutable)']
+  "delivered_at" datetime [note: '(DC2Type:datetime_immutable)']
+
+  Indexes {
+    delivered_at [type: btree, name: "IDX_75EA56E016BA31DB"]
+    available_at [type: btree, name: "IDX_75EA56E0E3BD61CE"]
+    queue_name [type: btree, name: "IDX_75EA56E0FB7336F0"]
+  }
+}
+
+Table "room" {
+  "id" int [pk, not null, increment]
+  "room_name" varchar(255) [not null]
+  "etablishment_id" int
+
+  Indexes {
+    etablishment_id [type: btree, name: "IDX_729F519B16BE0BCF"]
+  }
+}
+
+Table "statistics" {
+  "id" int [pk, not null, increment]
+  "total_item" int [not null]
+  "item_recently" varchar(255) [not null]
+  "last_updated" varchar(255) [not null]
+  "total_item_salle" int [not null]
+}
+
+Table "user" {
+  "id" int [pk, not null, increment]
+  "username" varchar(180) [unique, not null]
+  "roles" json [not null]
+  "password" varchar(255) [not null]
+  "email" varchar(255) [not null]
+  "firstname" varchar(255) [not null]
+  "lastname" varchar(255) [not null]
+  "etablishment_id" int
+
+  Indexes {
+    etablishment_id [type: btree, name: "IDX_8D93D64916BE0BCF"]
+  }
+}
+
+Ref "FK_D63EF0B79EEA759":"inventory"."id" < "export_logs"."inventory_id"
+
+Ref "FK_D63EF0B7A76ED395":"user"."id" < "export_logs"."user_id"
+
+Ref "FK_1DA328DC9EEA759":"inventory"."id" < "import_logs"."inventory_id"
+
+Ref "FK_1DA328DCA76ED395":"user"."id" < "import_logs"."user_id"
+
+Ref "FK_B12D4A3616BE0BCF":"etablishment"."id" < "inventory"."etablishment_id"
+
+Ref "FK_729F519B16BE0BCF":"etablishment"."id" < "room"."etablishment_id"
+
+Ref "FK_8D93D64916BE0BCF":"etablishment"."id" < "user"."etablishment_id"

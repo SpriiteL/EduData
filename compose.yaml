@@ -1,5 +1,6 @@
 services:
   php:
+    container_name: edudata_php
     image: ${IMAGES_PREFIX:-}app-php
     restart: unless-stopped
     environment:
@@ -38,6 +39,7 @@ services:
 
 ###> doctrine/doctrine-bundle ###
   database:
+    container_name: edudata_database
     image: mysql:${MYSQL_VERSION:-8.0}
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE:-app}
@@ -57,6 +59,7 @@ services:
 
 ###> Redis container ###
   redis:
+      container_name: edudata_redis
       image: redis:alpine
       ports:
         - "6379:6379"
@@ -64,6 +67,7 @@ services:
         - redis_data:/data
 
   elasticsearch:
+    container_name: edudata_elasticsearch
     image: docker.elastic.co/elasticsearch/elasticsearch:7.17.10
     environment:
       - discovery.type=single-node
@@ -82,6 +86,7 @@ services:
 
   # Ajout de Kibana
   kibana:
+    container_name: edudata_kibana
     image: docker.elastic.co/kibana/kibana:7.17.10
     environment:
       - ELASTICSEARCH_URL=http://elasticsearch:9200
@@ -92,6 +97,7 @@ services:
 
   # Ajout de Logstash
   logstash:
+    container_name: edudata_logstash
     image: docker.elastic.co/logstash/logstash:7.17.10
     volumes:
       - ./logstash/pipeline:/usr/share/logstash/pipeline:ro
@@ -100,6 +106,15 @@ services:
       - "9600:9600"
     depends_on:
       - elasticsearch
+
+  selenium:
+        container_name: edudata_selenium
+        image: selenium/standalone-chromium
+        extra_hosts:
+            - 'host.docker.internal:host-gateway'
+        # ports: "4444:4444"
+        volumes:
+            - '/dev/shm:/dev/shm'
 
 volumes:
   caddy_data:

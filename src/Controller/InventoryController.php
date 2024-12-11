@@ -119,8 +119,8 @@ class InventoryController extends AbstractController
             "Numéro Facture Interne", 
             "Numéro de Facture", 
             "Prix Neuf", 
-            "Numero de produit de la série", 
-            "Nombre total de produits dans le lot",
+            "Nombre de Produits", 
+            "Nombre Total de Produits",
             "Nom de la Salle"
         ], ';');
 

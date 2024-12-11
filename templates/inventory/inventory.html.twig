@@ -33,7 +33,7 @@
                                 <table id="inventory-table" class="test">
                                     <thead class="text-dark fs-4">
                                         <tr class="colonne">
-                                            <th>RFID</th>
+                                            {# <th>RFID</th> #}
                                             <th>Type Actif</th>
                                             <th>Fournisseur</th>
                                             <th>Date d'arrivée</th>
@@ -50,7 +50,7 @@
                                     <tbody>
                                         {% for inventory in inventories %}
                                             <tr>
-                                                <td>{{ inventory.Reference }}</td>
+                                                {# <td>{{ inventory.Reference }}</td> #}
                                                 <td>{{ inventory.activeType }}</td>
                                                 <td>{{ inventory.provider }}</td>
                                                 <td>{{ inventory.dateEntry ? inventory.dateEntry|date('Y-m-d') }}</td>

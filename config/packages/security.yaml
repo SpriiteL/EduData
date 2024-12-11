@@ -31,6 +31,7 @@ security:
                 success_handler: lexik_jwt_authentication.handler.authentication_success
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure
             jwt: ~
+            access_denied_handler: App\Security\AccessDeniedHandler # Nouveau gestionnaire d'accès refusé
                 # where to redirect after logout
                 # target: app_any_route
 
@@ -46,10 +47,11 @@ security:
         - { path: ^/admin, roles: ROLE_ADMIN }
         - { path: ^/api, roles: ROLE_ADMIN }
         - { path: ^/inventory, roles: ROLE_USER }
-        - { path: ^/dashboard, roles: ROLE_USER }
-        - { path: ^/statistics, roles: ROLE_USER }
-        - { path: ^/profil, roles: ROLE_USER }
+        - { path: ^/dashboard, roles: ROLE_ADMIN }
+        - { path: ^/statistics, roles: ROLE_ADMIN }
+        - { path: ^/profil, roles: ROLE_ADMIN }
         - { path: ^/setting, roles: ROLE_USER }
+        - { path: ^/badge, roles: ROLE_ADMIN }
 
 when@test:
     security:

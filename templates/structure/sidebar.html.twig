@@ -13,6 +13,8 @@
       <!-- Sidebar navigation-->
       <nav class="sidebar-nav scroll-sidebar" data-simplebar="">
         <ul id="sidebarnav">
+        
+          {% if is_granted('ROLE_ADMIN') %}
           <li class="nav-small-cap">
             <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
             <span class="hide-menu">Accueil</span>
@@ -25,6 +27,7 @@
               <span class="hide-menu">Dashboard</span>
             </a>
           </li>
+          {% endif %}
           <li class="nav-small-cap">
             <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
             <span class="hide-menu">Gestion</span>
@@ -37,6 +40,7 @@
               <span class="hide-menu">Inventaire</span>
             </a>
           </li>
+          {% if is_granted('ROLE_ADMIN') %}
           <li class="sidebar-item">
             <a class="sidebar-link" href="{{path('app_statistics')}}" aria-expanded="false">
               <span>
@@ -45,6 +49,7 @@
               <span class="hide-menu">Statistiques</span>
             </a>
           </li>
+
           <li class="sidebar-item">
             <a class="sidebar-link" href="{{path('app_badge')}}" aria-expanded="false">
               <span>
@@ -53,7 +58,6 @@
               <span class="hide-menu">Badge</span>
             </a>
           </li>
-          {% if is_granted('ROLE_ADMIN') %}
             <li class="nav-small-cap">
               <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
               <span class="hide-menu">Administration</span>
@@ -71,6 +75,7 @@
             <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
             <span class="hide-menu">Paramètres</span>
           </li>
+          {% if is_granted('ROLE_ADMIN') %}
           <li class="sidebar-item">
             <a class="sidebar-link" href="{{path('app_profil')}}" aria-expanded="false">
               <span>
@@ -79,6 +84,7 @@
               <span class="hide-menu">Profil</span>
             </a>
           </li>
+          {% endif %}
           <li class="sidebar-item">
             <a class="sidebar-link" href="{{path('app_setting')}}" aria-expanded="false">
               <span>

@@ -8,6 +8,17 @@ modules:
     enabled:
         - PhpBrowser:
             url: https://localhost:80
+            host: edudata_selenium
+            browser: chrome
+            window_size: 1920x1080
+            capabilities:
+                chromeOptions:
+                    args:
+                        - '--lang=fr'
+        - Db:
+            dsn: 'mysql:host=edudata_database;dbname=app_test'
+            user: 'app'
+            password: '!ChangeMe!'
 # Add Codeception\Step\Retry trait to AcceptanceTester to enable retries
 step_decorators:
     - Codeception\Step\ConditionalAssertion

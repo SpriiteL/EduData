@@ -63,6 +63,9 @@ class Inventory
     #[ORM\Column(length: 255)]
     private ?string $nameRoom = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $Reference = null;
+
 
     // #[ORM\Column(length: 255)]
     // private ?string $name = null;
@@ -277,6 +280,18 @@ class Inventory
     public function setNameRoom(string $nameRoom): static
     {
         $this->nameRoom = $nameRoom;
+
+        return $this;
+    }
+
+    public function getReference(): ?string
+    {
+        return $this->Reference;
+    }
+
+    public function setReference(string $Reference): static
+    {
+        $this->Reference = $Reference;
 
         return $this;
     }

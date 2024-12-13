@@ -52,6 +52,7 @@ security:
         - { path: ^/profil, roles: ROLE_ADMIN }
         - { path: ^/setting, roles: ROLE_USER }
         - { path: ^/badge, roles: ROLE_ADMIN }
+        - { path: ^/choose-etablissement, roles: ROLE_ADMIN }
 
 when@test:
     security:

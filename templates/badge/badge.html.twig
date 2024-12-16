@@ -83,7 +83,7 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
-<script>          
+<script>
     $(document).ready(function () {
         const table = $('#badge-table').DataTable({
             language: {
@@ -92,56 +92,72 @@
             responsive: true,
             autoWidth: false,
             pageLength: 10,
-            lengthMenu: [5, 10, 25, 50],
-            order: [[2, 'desc']]
         });
 
-        // Ajouter une nouvelle ligne depuis le formulaire
+        // Charger les badges depuis la base au chargement de la page
+        $.ajax({
+            url: '/badge/list',
+            type: 'GET',
+            success: function (response) {
+                response.forEach(function (badge) {
+                    table.row.add([
+                        badge.nom,
+                        badge.prenom,
+                        badge.dateTraitement,
+                        badge.classe,
+                        badge.etatTraitement,
+                        `<button class="btn btn-warning btn-sm btn-edit"><i class="fas fa-pencil-alt"></i></button>
+                         <button class="btn btn-danger btn-sm btn-delete"><i class="fas fa-trash-alt"></i></button>`
+                    ]).draw();
+                });
+            },
+            error: function () {
+                alert('Erreur lors du chargement des badges.');
+            }
+        });
+
+        // Ajouter un nouveau badge via le formulaire
         $('#add-badge').on('click', function () {
             const nom = $('#nom').val().trim();
             const prenom = $('#prenom').val().trim();
             const dateTraitement = $('#dateTraitement').val();
-            const classe = $('#classe').val().trim();
+            const classe = $('#classe').val();
             const etatTraitement = $('#etatTraitement').val();
 
             if (nom && prenom && dateTraitement && classe && etatTraitement) {
-                table.row.add([
-                    nom,
-                    prenom,
-                    dateTraitement,
-                    classe,
-                    etatTraitement,
-                    `<button class="btn btn-warning btn-sm btn-edit"><i class="fas fa-pencil-alt"></i></button>
-                     <button class="btn btn-danger btn-sm btn-delete"><i class="fas fa-trash-alt"></i></button>`
-                ]).draw();
+                $.ajax({
+                    url: '/badge/add',
+                    type: 'POST',
+                    data: {
+                        nom: nom,
+                        prenom: prenom,
+                        dateTraitement: dateTraitement,
+                        classe: classe,
+                        etatTraitement: etatTraitement
+                    },
+                    success: function (response) {
+                        table.row.add([
+                            response.nom,
+                            response.prenom,
+                            response.dateTraitement,
+                            response.classe,
+                            response.etatTraitement,
+                            `<button class="btn btn-warning btn-sm btn-edit"><i class="fas fa-pencil-alt"></i></button>
+                             <button class="btn btn-danger btn-sm btn-delete"><i class="fas fa-trash-alt"></i></button>`
+                        ]).draw();
 
-                // Réinitialiser le formulaire
-                $('#badge-form')[0].reset();
+                        $('#badge-form')[0].reset();
+                    },
+                    error: function () {
+                        alert('Erreur lors de l\'ajout du badge.');
+                    }
+                });
             } else {
                 alert('Veuillez remplir tous les champs.');
             }
         });
-
-        // Gestion des actions Modifier/Supprimer
-        $('#badge-table tbody').on('click', '.btn-delete', function () {
-            if (confirm('Êtes-vous sûr de vouloir supprimer cet élément ?')) {
-                table.row($(this).parents('tr')).remove().draw();
-            }
-        });
-
-        $('#badge-table tbody').on('click', '.btn-edit', function () {
-            const row = table.row($(this).parents('tr'));
-            const data = row.data();
-
-            $('#nom').val(data[0]);
-            $('#prenom').val(data[1]);
-            $('#dateTraitement').val(data[2]);
-            $('#classe').val(data[3]);
-            $('#etatTraitement').val(data[4]);
-
-            // Supprimer la ligne pour la remplacer après modification
-            row.remove().draw();
-        });
     });
 </script>
+
+
 {% endblock %}

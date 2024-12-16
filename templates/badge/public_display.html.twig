@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste des badges validés</title>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <style>
+        /* Style général */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+
+        /* Bande dégradée en haut */
+        .header {
+            background: linear-gradient(to right, #4a90e2, #357abd);
+            color: white;
+            text-align: center;
+            padding: 20px 10px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin: 0;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        /* Tableau */
+        .badge-table {
+            margin: 20px auto;
+            width: 80%;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .badge-table th {
+            background-color: #357abd;
+            color: white;
+            font-size: 1.1em;
+            text-align: left;
+            padding: 15px;
+        }
+
+        .badge-table td {
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .badge-table tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* Pied de page (optionnel) */
+        .footer {
+            text-align: center;
+            padding: 10px 0;
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <!-- Bande bleue avec titre et message -->
+    <div class="header">
+        <h1>Liste des badges validés</h1>
+        <p>Merci de vous présenter à l'accueil.</p>
+    </div>
+
+    <!-- Tableau des badges -->
+    <table id="treated-badges" class="badge-table">
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Prénom</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Les données seront injectées ici -->
+        </tbody>
+    </table>
+
+    <!-- Pied de page -->
+    <div class="footer">
+        © 2024 Beaupeyrat - Tous droits réservés
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // Fonction pour charger les badges traités
+        function loadTreatedBadges() {
+            $.ajax({
+                url: '/badge/treated',
+                type: 'GET',
+                success: function (response) {
+                    const tbody = $('#treated-badges tbody');
+                    tbody.empty(); // Vider le tableau avant de le remplir
+                    response.forEach(function (badge) {
+                        tbody.append(`
+                            <tr>
+                                <td>${badge.nom}</td>
+                                <td>${badge.prenom}</td>
+                                <td>${badge.classe}</td>
+                            </tr>
+                        `);
+                    });
+                },
+                error: function () {
+                    console.error('Erreur lors du chargement des badges traités.');
+                }
+            });
+        }
+
+        // Charger les badges à l'initialisation de la page
+        $(document).ready(function () {
+            loadTreatedBadges();
+
+            // Rafraîchir toutes les 10 secondes
+            setInterval(loadTreatedBadges, 5000);
+        });
+    </script>
+</body>
+</html>

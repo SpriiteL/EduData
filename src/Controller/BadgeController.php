@@ -84,5 +84,27 @@ class BadgeController extends AbstractController
         return new JsonResponse(['success' => true]);
     }
 
+    #[Route('/badge/treated', name: 'badge_treated', methods: ['GET'])]
+    public function getTreatedBadges(EntityManagerInterface $entityManager): JsonResponse
+    {
+        $badges = $entityManager->getRepository(Badge::class)->findBy(['etatTraitement' => 'Traitée']);
+
+        $data = [];
+        foreach ($badges as $badge) {
+            $data[] = [
+                'nom' => $badge->getNom(),
+                'prenom' => $badge->getPrenom(),
+                'classe' => $badge->getClasse(),
+            ];
+        }
+
+        return new JsonResponse($data);
+    }
+
+    #[Route('/public/display', name: 'public_display', methods: ['GET'])]
+    public function publicDisplay(): Response
+    {
+        return $this->render('badge/public_display.html.twig');
+    }
 
 }

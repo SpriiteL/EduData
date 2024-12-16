@@ -107,4 +107,27 @@ class BadgeController extends AbstractController
         return $this->render('badge/public_display.html.twig');
     }
 
+    #[Route('/badge/update/{id}', name: 'badge_update', methods: ['PUT'])]
+    public function updateBadge(int $id, Request $request, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $badge = $entityManager->getRepository(Badge::class)->find($id);
+
+        if (!$badge) {
+            return new JsonResponse(['error' => 'Badge non trouvé'], 404);
+        }
+
+        $data = $request->request;
+
+        $badge->setNom($data->get('nom'));
+        $badge->setPrenom($data->get('prenom'));
+        $badge->setDate(new \DateTime($data->get('dateTraitement')));
+        $badge->setClasse($data->get('classe'));
+        $badge->setEtatTraitement($data->get('etatTraitement'));
+
+        $entityManager->flush();
+
+        return new JsonResponse(['success' => true]);
+    }
+
+
 }

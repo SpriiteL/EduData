@@ -79,9 +79,64 @@
     </div>
 </div>
 
+<!-- Modal pour éditer une ligne -->
+<div class="modal fade" id="editBadgeModal" tabindex="-1" aria-labelledby="editBadgeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editBadgeModalLabel">Modifier Badge</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="edit-badge-form">
+                    <input type="hidden" id="edit-id">
+                    <div class="mb-3">
+                        <label for="edit-nom" class="form-label">Nom</label>
+                        <input type="text" class="form-control" id="edit-nom" name="nom">
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-prenom" class="form-label">Prénom</label>
+                        <input type="text" class="form-control" id="edit-prenom" name="prenom">
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-dateTraitement" class="form-label">Date Traitement</label>
+                        <input type="date" class="form-control" id="edit-dateTraitement" name="dateTraitement">
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-classe" class="form-label">Classe</label>
+                        <select class="form-select" id="edit-classe" name="classe">
+                            <option value="6ème">6ème</option>
+                            <option value="5ème">5ème</option>
+                            <option value="4ème">4ème</option>
+                            <option value="3ème">3ème</option>
+                            <option value="Seconde">Seconde</option>
+                            <option value="Premiere">Première</option>
+                            <option value="Terminale">Terminal</option>
+                            <option value="BTS">BTS</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-etatTraitement" class="form-label">État du Traitement</label>
+                        <select class="form-select" id="edit-etatTraitement" name="etatTraitement">
+                            <option value="En attente">En attente</option>
+                            <option value="Traitée">Traitée</option>
+                            <option value="Refusée">Refusée</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" id="save-changes" class="btn btn-primary">Sauvegarder</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
     $(document).ready(function () {
@@ -94,7 +149,7 @@
             pageLength: 10,
         });
 
-        // Charger les badges depuis la base au chargement de la page
+        // Charger les badges
         $.ajax({
             url: '/badge/list',
             type: 'GET',
@@ -106,7 +161,7 @@
                         badge.dateTraitement,
                         badge.classe,
                         badge.etatTraitement,
-                        `<button class="btn btn-warning btn-sm btn-edit"><i class="fas fa-pencil-alt"></i></button>
+                        `<button class="btn btn-warning btn-sm btn-edit" data-id="${badge.id}" data-bs-toggle="modal" data-bs-target="#editBadgeModal"><i class="fas fa-pencil-alt"></i></button>
                          <button class="btn btn-danger btn-sm btn-delete" data-id="${badge.id}"><i class="fas fa-trash-alt"></i></button>`
                     ]).draw();
                 });
@@ -116,7 +171,7 @@
             }
         });
 
-        // Ajouter un nouveau badge via le formulaire
+        // Ajouter un badge
         $('#add-badge').on('click', function () {
             const nom = $('#nom').val().trim();
             const prenom = $('#prenom').val().trim();
@@ -142,10 +197,9 @@
                             response.dateTraitement,
                             response.classe,
                             response.etatTraitement,
-                            `<button class="btn btn-warning btn-sm btn-edit"><i class="fas fa-pencil-alt"></i></button>
+                            `<button class="btn btn-warning btn-sm btn-edit" data-id="${response.id}" data-bs-toggle="modal" data-bs-target="#editBadgeModal"><i class="fas fa-pencil-alt"></i></button>
                              <button class="btn btn-danger btn-sm btn-delete" data-id="${response.id}"><i class="fas fa-trash-alt"></i></button>`
                         ]).draw();
-
                         $('#badge-form')[0].reset();
                     },
                     error: function () {
@@ -157,17 +211,70 @@
             }
         });
 
+        // Éditer un badge
+        $('#badge-table tbody').on('click', '.btn-edit', function () {
+            const row = table.row($(this).closest('tr')).data();
+            const id = $(this).data('id');
+
+            $('#edit-id').val(id);
+            $('#edit-nom').val(row[0]);
+            $('#edit-prenom').val(row[1]);
+            $('#edit-dateTraitement').val(row[2]);
+            $('#edit-classe').val(row[3]);
+            $('#edit-etatTraitement').val(row[4]);
+        });
+
+        // Sauvegarder les modifications
+        $('#save-changes').on('click', function () {
+            const id = $('#edit-id').val();
+            const nom = $('#edit-nom').val().trim();
+            const prenom = $('#edit-prenom').val().trim();
+            const dateTraitement = $('#edit-dateTraitement').val();
+            const classe = $('#edit-classe').val();
+            const etatTraitement = $('#edit-etatTraitement').val();
+
+            if (nom && prenom && dateTraitement && classe && etatTraitement) {
+                $.ajax({
+                    url: `/badge/update/${id}`,
+                    type: 'PUT',
+                    data: {
+                        nom: nom,
+                        prenom: prenom,
+                        dateTraitement: dateTraitement,
+                        classe: classe,
+                        etatTraitement: etatTraitement
+                    },
+                    success: function () {
+                        table.row($('#badge-table tbody .btn-edit[data-id="' + id + '"]').closest('tr')).data([
+                            nom,
+                            prenom,
+                            dateTraitement,
+                            classe,
+                            etatTraitement,
+                            `<button class="btn btn-warning btn-sm btn-edit" data-id="${id}" data-bs-toggle="modal" data-bs-target="#editBadgeModal"><i class="fas fa-pencil-alt"></i></button>
+                             <button class="btn btn-danger btn-sm btn-delete" data-id="${id}"><i class="fas fa-trash-alt"></i></button>`
+                        ]).draw();
+                        $('#editBadgeModal').modal('hide');
+                    },
+                    error: function () {
+                        alert('Erreur lors de la modification du badge.');
+                    }
+                });
+            } else {
+                alert('Veuillez remplir tous les champs.');
+            }
+        });
+
         // Supprimer un badge
         $('#badge-table tbody').on('click', '.btn-delete', function () {
             const row = $(this).closest('tr');
-            const badgeId = $(this).data('id'); // Récupérer l'ID du badge
+            const badgeId = $(this).data('id');
 
             if (confirm('Êtes-vous sûr de vouloir supprimer cet élément ?')) {
                 $.ajax({
                     url: `/badge/delete/${badgeId}`,
                     type: 'DELETE',
                     success: function () {
-                        // Supprimer la ligne du tableau après confirmation
                         table.row(row).remove().draw();
                     },
                     error: function () {
@@ -178,7 +285,4 @@
         });
     });
 </script>
-
 {% endblock %}
-
-

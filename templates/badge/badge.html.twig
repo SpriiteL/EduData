@@ -107,7 +107,7 @@
                         badge.classe,
                         badge.etatTraitement,
                         `<button class="btn btn-warning btn-sm btn-edit"><i class="fas fa-pencil-alt"></i></button>
-                         <button class="btn btn-danger btn-sm btn-delete"><i class="fas fa-trash-alt"></i></button>`
+                         <button class="btn btn-danger btn-sm btn-delete" data-id="${badge.id}"><i class="fas fa-trash-alt"></i></button>`
                     ]).draw();
                 });
             },
@@ -143,7 +143,7 @@
                             response.classe,
                             response.etatTraitement,
                             `<button class="btn btn-warning btn-sm btn-edit"><i class="fas fa-pencil-alt"></i></button>
-                             <button class="btn btn-danger btn-sm btn-delete"><i class="fas fa-trash-alt"></i></button>`
+                             <button class="btn btn-danger btn-sm btn-delete" data-id="${response.id}"><i class="fas fa-trash-alt"></i></button>`
                         ]).draw();
 
                         $('#badge-form')[0].reset();
@@ -156,8 +156,29 @@
                 alert('Veuillez remplir tous les champs.');
             }
         });
+
+        // Supprimer un badge
+        $('#badge-table tbody').on('click', '.btn-delete', function () {
+            const row = $(this).closest('tr');
+            const badgeId = $(this).data('id'); // Récupérer l'ID du badge
+
+            if (confirm('Êtes-vous sûr de vouloir supprimer cet élément ?')) {
+                $.ajax({
+                    url: `/badge/delete/${badgeId}`,
+                    type: 'DELETE',
+                    success: function () {
+                        // Supprimer la ligne du tableau après confirmation
+                        table.row(row).remove().draw();
+                    },
+                    error: function () {
+                        alert('Erreur lors de la suppression du badge.');
+                    }
+                });
+            }
+        });
     });
 </script>
 
-
 {% endblock %}
+
+

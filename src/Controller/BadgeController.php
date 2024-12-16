@@ -67,4 +67,22 @@ class BadgeController extends AbstractController
         return new JsonResponse($data);
     }
 
+    #[Route('/badge/delete/{id}', name: 'badge_delete', methods: ['DELETE'])]
+    public function deleteBadge(int $id, EntityManagerInterface $entityManager): JsonResponse
+    {
+        // Récupérer le badge par son ID
+        $badge = $entityManager->getRepository(Badge::class)->find($id);
+
+        if (!$badge) {
+            return new JsonResponse(['error' => 'Badge non trouvé'], 404);
+        }
+
+        // Supprimer l'entité
+        $entityManager->remove($badge);
+        $entityManager->flush();
+
+        return new JsonResponse(['success' => true]);
+    }
+
+
 }

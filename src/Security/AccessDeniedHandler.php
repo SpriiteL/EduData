@@ -11,6 +11,6 @@ class AccessDeniedHandler implements AccessDeniedHandlerInterface
     public function handle(Request $request, \Throwable $accessDeniedException): ?RedirectResponse
     {
         // Redirection vers la route "app_inventory"
-        return new RedirectResponse('/inventory');
+        return new RedirectResponse('/unauthorized'); // Redirection vers la route "app_unauthorized"
     }
 }

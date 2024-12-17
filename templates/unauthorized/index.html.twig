@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>401 - Accès Non Autorisé</title>
+    <style>
+        /* Styles de base */
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: #121212;
+            color: #ffffff;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+            animation: fadeIn 2s ease-in-out;
+            position: relative;
+            z-index: 2;
+        }
+
+        h1 {
+            font-size: 5rem;
+            margin: 0;
+            color: #ff6f61;
+            animation: bounce 1.5s infinite alternate;
+        }
+
+        h2 {
+            font-size: 3rem;
+            color: #ffffff;
+            margin: 0 0 10px;
+            animation: slideIn 1.5s ease-out;
+        }
+
+        p {
+            font-size: 1.5rem;
+            margin: 10px 0 30px;
+            color: #b3b3b3;
+            animation: fadeIn 2s ease-in-out;
+        }
+
+        /* Bouton de retour */
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            font-size: 1.2rem;
+            color: #121212;
+            background: #ff6f61;
+            text-decoration: none;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            animation: popIn 2s ease-in-out;
+        }
+
+        .btn:hover {
+            background: #ff4d3a;
+            transform: translateY(-3px);
+        }
+
+        /* Animation CSS */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes bounce {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-20px); }
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Animation de fond avec lignes */
+        .background-animation {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .line {
+            position: absolute;
+            width: 2px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            animation: moveLine 5s linear infinite;
+            opacity: 0;
+        }
+
+        @keyframes moveLine {
+            0% {
+                transform: translateY(0) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) translateX(50px);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-animation" id="background"></div>
+    <div class="container">
+        <h2>Oops !</h2>
+        <h1>401</h1>
+        <p>Accès non autorisé. Vous n'avez pas la permission d'accéder à cette page.</p>
+        <a href="/inventory" class="btn">Retour vers EduData</a>
+    </div>
+
+    <script>
+        const background = document.getElementById('background');
+
+        function createLine() {
+            const line = document.createElement('div');
+            line.classList.add('line');
+            line.style.left = `${Math.random() * 100}vw`;
+            line.style.animationDuration = `${Math.random() * 3 + 2}s`;
+            background.appendChild(line);
+
+            setTimeout(() => {
+                line.remove();
+            }, 5000);
+        }
+
+        setInterval(createLine, 300);
+    </script>
+</body>
+</html>

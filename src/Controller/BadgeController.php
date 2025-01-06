@@ -101,10 +101,10 @@ class BadgeController extends AbstractController
         return new JsonResponse($data);
     }
 
-    #[Route('/public/display', name: 'public_display', methods: ['GET'])]
+    #[Route('/public/badges', name: 'public_badges', methods: ['GET'])]
     public function publicDisplay(): Response
     {
-        return $this->render('badge/public_display.html.twig');
+        return $this->render('badge/public_badges.html.twig');
     }
 
     #[Route('/badge/update/{id}', name: 'badge_update', methods: ['PUT'])]

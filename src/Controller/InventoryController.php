@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Inventory;
+use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use League\Csv\Writer;
@@ -17,7 +18,11 @@ class InventoryController extends AbstractController
     #[Route('/inventory', name: 'app_inventory')]
     public function index(ManagerRegistry $doctrine): Response
     {
-        $inventories = $doctrine->getRepository(Inventory::class)->findAll();
+        $user = $this->getUser();
+        $etablishment = $user->getEtablishment(); // Récupération de l'établissement de l'utilisateur
+
+        // Recherche des inventaires associés à l'établissement de l'utilisateur
+        $inventories = $doctrine->getRepository(Inventory::class)->findBy(['etablishment' => $etablishment]);
 
         return $this->render('inventory/inventory.html.twig', [
             'inventories' => $inventories,
@@ -76,6 +81,8 @@ class InventoryController extends AbstractController
                         $inventory->setTotalProductLot(intval($normalizedRow['Nombre total de produits dans le lot']));
                         $inventory->setNameRoom($normalizedRow['Nom de la Salle']);
 
+                        $inventory->setEtablishment($this->getUser()->getEtablishment());
+
                         $entityManager->persist($inventory);
                         $count++;
                     } catch (\Exception $e) {
@@ -103,7 +110,11 @@ class InventoryController extends AbstractController
     public function export(ManagerRegistry $doctrine): Response
     {
         $entityManager = $doctrine->getManager();
-        $inventories = $entityManager->getRepository(Inventory::class)->findAll();
+        $user = $this->getUser();
+        $etablishment = $user->getEtablishment(); // Récupération de l'établissement de l'utilisateur
+
+        // Recherche des inventaires associés à l'établissement de l'utilisateur
+        $inventories = $doctrine->getRepository(Inventory::class)->findBy(['etablishment' => $etablishment]);
 
         $csvFileName = 'inventaire_' . date('Ymd') . '.csv';
         $outputBuffer = fopen('php://temp', 'r+');

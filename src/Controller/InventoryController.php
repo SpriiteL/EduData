@@ -110,10 +110,10 @@ class InventoryController extends AbstractController
     public function export(ManagerRegistry $doctrine): Response
     {
         $entityManager = $doctrine->getManager();
+        
+        // Récupérer l'établissement de l'utilisateur
         $user = $this->getUser();
-        $etablishment = $user->getEtablishment(); // Récupération de l'établissement de l'utilisateur
-
-        // Recherche des inventaires associés à l'établissement de l'utilisateur
+        $etablishment = $user->getEtablishment(); 
         $inventories = $doctrine->getRepository(Inventory::class)->findBy(['etablishment' => $etablishment]);
 
         $csvFileName = 'inventaire_' . date('Ymd') . '.csv';

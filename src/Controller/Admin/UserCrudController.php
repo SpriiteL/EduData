@@ -9,6 +9,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
+
 
 class UserCrudController extends AbstractCrudController
 {
@@ -37,6 +39,7 @@ class UserCrudController extends AbstractCrudController
             TextField::new('firstname'),
             TextField::new('lastname'),
             TextField::new('password'),
+            ChoiceField::new('roles')->setChoices(['USER' => 'ROLE_USER', 'ADMIN' => 'ROLE_ADMIN', 'RESPONSABLE' => 'ROLE_RESPONSABLE']),
             AssociationField::new('etablishment','etablishment'),
         ];
     }

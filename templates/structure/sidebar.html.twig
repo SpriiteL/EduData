@@ -40,7 +40,6 @@
               <span class="hide-menu">Inventaire</span>
             </a>
           </li>
-          {% if is_granted('ROLE_ADMIN') %}
           <li class="sidebar-item">
             <a class="sidebar-link" href="{{path('app_statistics')}}" aria-expanded="false">
               <span>
@@ -62,6 +61,7 @@
               <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
               <span class="hide-menu">Administration</span>
             </li>
+            {% if is_granted('ROLE_ADMIN') %}
             <li class="sidebar-item">
               <a class="sidebar-link" href="{{ path('admin') }}" aria-expanded="false">
                 <span>
@@ -70,7 +70,16 @@
                 <span class="hide-menu">Admin</span>
               </a>
             </li>
-          {% endif %}
+            {% endif %}
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="{{ path('app_admin_responsable') }}" aria-expanded="false">
+                <span>
+                  <img src="{{ asset('asset/icons/admin.png') }}" class="ti icon">
+                </span>
+                <span class="hide-menu">Admin R</span>
+              </a>
+            </li>
+          
           <li class="nav-small-cap">
             <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
             <span class="hide-menu">Paramètres</span>

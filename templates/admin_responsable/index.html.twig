@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Réglages{% endblock %}
+
+{% block body %}
+    <div class="divcontainer">
+        <h1>Gestion des utilisateurs</h1>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Email</th>
+                    <th>Rôle actuel</th>
+                    <th>Modifier le rôle</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                    <tr>
+                        <td>{{ user.id }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.roles[0] }}</td>
+                        <td>
+                            <form action="{{ path('update_user_role', {id: user.id}) }}" method="POST">
+                                <select name="role">
+                                    <option value="ROLE_USER" {{ 'ROLE_USER' in user.roles ? 'selected' : '' }}>Utilisateur</option>
+                                    <option value="ROLE_ADMIN" {{ 'ROLE_ADMIN' in user.roles ? 'selected' : '' }}>Administrateur</option>
+                                    <option value="ROLE_RESPONSABLE" {{ 'ROLE_RESPONSABLE' in user.roles ? 'selected' : '' }}>Responsable</option>
+                                </select>
+                                <button type="submit" name="update_role">Modifier</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

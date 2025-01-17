@@ -52,13 +52,16 @@ security:
     access_control:
         - { path: ^/admin, roles: ROLE_ADMIN }
         - { path: ^/api, roles: ROLE_ADMIN }
-        - { path: ^/inventory, roles: ROLE_USER }
+        - { path: ^/inventory, roles: [ROLE_USER, ROLE_RESPONSABLE] }
         - { path: ^/dashboard, roles: ROLE_ADMIN }
         - { path: ^/statistics, roles: ROLE_ADMIN }
         - { path: ^/profil, roles: ROLE_ADMIN }
-        - { path: ^/setting, roles: ROLE_USER }
-        - { path: ^/badge, roles: ROLE_ADMIN }
-        - { path: ^/choose-etablissement, roles: ROLE_ADMIN }
+        - { path: ^/setting, roles: [ROLE_USER, ROLE_RESPONSABLE] }
+        - { path: ^/badge, roles: [ROLE_USER, ROLE_RESPONSABLE] }
+        # - { path: ^/choose-etablissement, roles: ROLE_ADMIN }
+        - { path: ^/app_admin_responsable, roles: [ROLE_RESPONSABLE, ROLE_ADMIN] }
+
+
 
 when@test:
     security:

@@ -6,9 +6,11 @@
     {# <link rel="stylesheet" href="{{ asset('css/styleLogin.css') }}" type="text/css"> #}
     <link rel="shortcut icon" type="image/png" href="{{ asset('assets/images/logos/favicon.png') }}" />
     <link rel="stylesheet" href="{{ asset('css/styles.min.css') }}" />
+    {{ encore_entry_link_tags('app') }}
 {% endblock %}
 
 {% block body %}
+<div id="app"></div>
 <!-- Body Wrapper -->
 <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
     data-sidebar-position="fixed" data-header-position="fixed">
@@ -51,7 +53,7 @@
                                             Se Souvenir de moi
                                         </label>
                                     </div>
-                                     <a class="text-primary fw-bold" href="{{ path('forgot_password') }}">Forgot Password?</a> 
+                                     <a class="text-primary fw-bold" href="{{ path('forgot_password') }}">Forgot Password?</a>
                                 </div> #}
 
                                 <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
@@ -76,4 +78,5 @@
 {% block javascripts %}
     <script src="{{ asset('libs/jquery/dist/jquery.min.js') }}"></script>
     <script src="{{ asset('libs/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
+    {{ encore_entry_script_tags('app') }}
 {% endblock %}

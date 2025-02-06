@@ -2,8 +2,7 @@
 
 {# {% block title %}Log in!{% endblock %} #}
 
-{% block stylesheets %}
-    {# <link rel="stylesheet" href="{{ asset('css/styleLogin.css') }}" type="text/css"> #}
+{# {% block stylesheets %}
     <link rel="shortcut icon" type="image/png" href="{{ asset('assets/images/logos/favicon.png') }}" />
     <link rel="stylesheet" href="{{ asset('css/styles.min.css') }}" />
     {{ encore_entry_link_tags('app') }}
@@ -19,4 +18,112 @@
     <script src="{{ asset('libs/jquery/dist/jquery.min.js') }}"></script>
     <script src="{{ asset('libs/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
     {{ encore_entry_script_tags('app') }}
+{% endblock %} #}
+
+
+
+
+
+{% block stylesheets %}
+    <link rel="shortcut icon" type="image/png" href="{{ asset('assets/images/logos/favicon.png') }}" />
+    <link rel="stylesheet" href="{{ asset('css/styles.min.css') }}" />
 {% endblock %}
+
+{% block body %}
+<!-- Body Wrapper -->
+<div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
+    data-sidebar-position="fixed" data-header-position="fixed">
+    <div class="position-relative overflow-hidden radial-gradient min-vh-100 d-flex align-items-center justify-content-center">
+        <div class="d-flex align-items-center justify-content-center w-100">
+            <div class="row justify-content-center w-100">
+                <div class="col-md-8 col-lg-6 col-xxl-3">
+                    <div class="card mb-0">
+                        <div class="card-body">
+                            <a href="{{ path('homepage') }}" class="text-nowrap logo-img text-center d-block py-3 w-100">
+                                <img src="{{ asset('asset/edu3.png') }}" width="180" alt="Logo">
+                            </a>
+
+                            <form method="post" class="login-form">
+                                {% if error %}
+                                    <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                                {% endif %}
+
+                                {% if app.user %}
+                                    <div class="mb-3">
+                                        You are logged in as {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Logout</a>
+                                    </div>
+                                {% endif %}
+
+                                <div class="mb-3">
+                                    <label for="username" class="form-label">Nom d'utilisateur</label>
+                                    <input type="text" value="{{ last_username }}" name="_username" id="username" class="form-control" autocomplete="username" required autofocus>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label for="password" class="form-label">Mot de Passe</label>
+                                    <input type="password" name="_password" id="password" class="form-control" autocomplete="current-password" required>
+                                </div>
+
+
+                                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                                <button class="btn btn-primary w-100 py-8 fs-4 mb-4 rounded-2" type="submit">Se Connecter</button>
+
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('libs/jquery/dist/jquery.min.js') }}"></script>
+    <script src="{{ asset('libs/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
+{% endblock %}
+
+
+
+
+
+{# {% block title %}Connexion{% endblock %}
+
+{% block stylesheets %}
+    <link rel="shortcut icon" type="image/png" href="{{ asset('assets/images/logos/favicon.png') }}" />
+    <link rel="stylesheet" href="{{ asset('css/styles.min.css') }}" />
+    {{ encore_entry_link_tags('app') }}
+{% endblock %}
+
+{% block body %}
+<div class="page-wrapper" id="main-wrapper">
+    <div class="position-relative overflow-hidden radial-gradient min-vh-100 d-flex align-items-center justify-content-center">
+        <div class="d-flex align-items-center justify-content-center w-100">
+            <div class="row justify-content-center w-100">
+                <div class="col-md-8 col-lg-6 col-xxl-3">
+                    <div class="card mb-0">
+                        <div class="card-body">
+                            <a href="{{ path('homepage') }}" class="text-nowrap logo-img text-center d-block py-3 w-100">
+                                <img src="{{ asset('asset/edu3.png') }}" width="180" alt="Logo">
+                            </a>
+
+                            <div id="login"></div> <!-- Conteneur pour l'application Vue.js -->
+
+                            <!-- Injecte le token CSRF ici -->
+                            <meta name="csrf-token" content="{{ csrf_token('authenticate') }}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('libs/jquery/dist/jquery.min.js') }}"></script>
+    <script src="{{ asset('libs/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
+    {{ encore_entry_script_tags('app') }}
+{% endblock %} #}

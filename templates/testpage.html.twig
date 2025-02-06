@@ -1,0 +1,23 @@
+{# {% extends 'base.html.twig' %} #}
+
+{# {% block title %}Log in!{% endblock %} #}
+
+{% block stylesheets %}
+    <link rel="shortcut icon" type="image/png" href="{{ asset('assets/images/logos/favicon.png') }}" />
+    <link rel="stylesheet" href="{{ asset('css/styles.min.css') }}" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.1/dist/css/adminlte.min.css">
+    {{ encore_entry_link_tags('app') }}
+{% endblock %}
+
+{% block body %}
+<div id="sidebar"></div>
+<!-- Body Wrapper -->
+
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('libs/jquery/dist/jquery.min.js') }}"></script>
+    <script src="{{ asset('libs/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.1/dist/js/adminlte.min.js"></script>
+    {{ encore_entry_script_tags('app') }}
+{% endblock %}

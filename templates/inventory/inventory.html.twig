@@ -1,105 +1,29 @@
-{% extends 'base.html.twig' %}
+{# {% extends 'base.html.twig' %} #}
+
+{# {% block title %}Log in!{% endblock %} #}
+
+{% block stylesheets %}
+    <link rel="shortcut icon" type="image/png" href="{{ asset('assets/images/logos/favicon.png') }}" />
+    <link rel="stylesheet" href="{{ asset('css/styles.min.css') }}" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.1/dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    {{ encore_entry_link_tags('app') }}
+{% endblock %}
 
 {% block body %}
-<div class="main-content">
-    <div class="container">
-        <div class="row">
-            <!-- Inventory table section -->
-            <div class="col-lg-12 d-flex align-items-stretch">
-                <div class="card w-100">
-                    <div class="card-body p-4">
-                        <h5 class="card-title fw-semibold mb-4 custom-title" style="font-size: 30px">Inventaire</h5>
-                        
-                        <!-- Formulaire de recherche et d'import -->
-                        <div class="d-flex align-items-center mb-4">
-                            <!-- Formulaire de recherche et d'import -->
-                            <form method="post" action="{{ path('app_inventory_import') }}" enctype="multipart/form-data" class="me-3">
-                                <div class="d-flex align-items-center">
-                                    <div class="form-group">
-                                        <input type="file" name="file" accept=".csv" class="form-control" style="max-width: 100%; width: 500px;" required>
-                                    </div>
-                                    <div class="form-group ms-3">
-                                        <button type="submit" class="btn btn-success"><i class="fas fa-file-import"></i> Importer</button>
-                                    </div>
-                                </div>
-                            </form>
+<div id="sidebar"></div>
+<div id="header"></div>
+<div id="inventory"></div>
+<!-- Body Wrapper -->
 
-                            <!-- Formulaire d'export -->
-                            <form method="post" action="{{ path('app_inventory_export') }}">
-                                <div class="form-group">
-                                    <button type="submit" class="btn btn-export"><i class="fas fa-file-export"></i> Exporter</button>
-                                </div>
-                            </form>
-                        </div>
+{% endblock %}
 
-
-                        <!-- Tableau d'inventaire -->
-                        <div class="divtable">
-                            <div class="table-test">
-                                <table id="inventory-table" class="test">
-                                    <thead class="text-dark fs-4">
-                                        <tr class="colonne">
-                                            <th>Type Actif</th>
-                                            <th>Fournisseur</th>
-                                            <th>Date d'arrivée</th>
-                                            <th>Numéro de Série</th>
-                                            <th>Numéro de Facture</th>
-                                            <th>Numéro Facture Interne</th>
-                                            <th>Prix Neuf</th>
-                                            <th>Numéro de produit de la série</th>
-                                            <th>Nombre total de produits dans le lot</th>
-                                            <th>Nom de la Salle</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for inventory in inventories %}
-                                            <tr>
-                                                <td>{{ inventory.activeType }}</td>
-                                                <td>{{ inventory.provider }}</td>
-                                                <td>{{ inventory.dateEntry ? inventory.dateEntry|date('Y-m-d') }}</td>
-                                                <td>{{ inventory.numSerie }}</td>
-                                                <td>{{ inventory.numInvoice }}</td>
-                                                <td>{{ inventory.numInvoiceIntern }}</td>
-                                                <td>{{ inventory.price }}</td>
-                                                <td>{{ inventory.numProductSerie }}</td>
-                                                <td>{{ inventory.totalProductLot }}</td>
-                                                <td>{{ inventory.nameRoom }}</td>
-                                                <td>
-                                                    <form action="{{ path('app_inventory_delete', {'id': inventory.id}) }}" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');">
-                                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ inventory.id) }}">
-                                                        <button class="btn btn-danger btn-sm"><i class="fas fa-trash-alt"></i></button>
-                                                    </form>
-                                                </td>
-                                            </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-
-<script>          
-    $(document).ready(function () {
-        $('#inventory-table').DataTable({
-            language: {
-                url: '//cdn.datatables.net/plug-ins/2.1.8/i18n/fr-FR.json'
-            },
-            responsive: true,
-            autoWidth: false,
-            pageLength: 10,
-            lengthMenu: [5, 10, 25, 50],
-            order: [[2, 'desc']] 
-        });
-    });
-</script>
+{% block javascripts %}
+    <script src="{{ asset('libs/jquery/dist/jquery.min.js') }}"></script>
+    <script src="{{ asset('libs/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.1/dist/js/adminlte.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    {{ encore_entry_script_tags('app') }}
 {% endblock %}

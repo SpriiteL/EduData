@@ -1,5 +1,5 @@
 <template>
-    <div class="card">
+    <div class="card mt-4 mx-4 p-4">
   <div class="card-header">
     <h3 class="card-title">Default Card Example</h3>
     <div class="card-tools">

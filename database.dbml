@@ -1,3 +1,12 @@
+Table "badge" {
+  "id" int [pk, not null, increment]
+  "nom" varchar(255) [not null]
+  "prenom" varchar(255) [not null]
+  "date" datetime [not null]
+  "classe" varchar(255) [not null]
+  "etat_traitement" varchar(255) [not null]
+}
+
 Table "doctrine_migration_versions" {
   "version" varchar(191) [pk, not null]
   "executed_at" datetime
@@ -51,6 +60,7 @@ Table "inventory" {
   "num_invoice" varchar(255) [not null]
   "etablishment_id" int
   "name_room" varchar(255) [not null]
+  "reference" varchar(255) [not null]
 
   Indexes {
     etablishment_id [type: btree, name: "IDX_B12D4A3616BE0BCF"]

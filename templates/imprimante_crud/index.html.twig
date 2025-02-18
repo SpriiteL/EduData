@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Imprimante index{% endblock %}
+
+{% block body %}
+    <h1>Imprimante index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Username</th>
+                <th>Printer</th>
+                <th>NbCopyBW</th>
+                <th>NbCopyColor</th>
+                <th>IdPrinter</th>
+                <th>NamePrinter</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for imprimante in imprimantes %}
+            <tr>
+                <td>{{ imprimante.id }}</td>
+                <td>{{ imprimante.username }}</td>
+                <td>{{ imprimante.printer }}</td>
+                <td>{{ imprimante.nbCopyBW }}</td>
+                <td>{{ imprimante.nbCopyColor }}</td>
+                <td>{{ imprimante.idPrinter }}</td>
+                <td>{{ imprimante.namePrinter }}</td>
+                <td>
+                    <a href="{{ path('app_imprimante_crud_show', {'id': imprimante.id}) }}">show</a>
+                    <a href="{{ path('app_imprimante_crud_edit', {'id': imprimante.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="8">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_imprimante_crud_new') }}">Create new</a>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Imprimante{% endblock %}
+
+{% block body %}
+    <h1>Imprimante</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ imprimante.id }}</td>
+            </tr>
+            <tr>
+                <th>Username</th>
+                <td>{{ imprimante.username }}</td>
+            </tr>
+            <tr>
+                <th>Printer</th>
+                <td>{{ imprimante.printer }}</td>
+            </tr>
+            <tr>
+                <th>NbCopyBW</th>
+                <td>{{ imprimante.nbCopyBW }}</td>
+            </tr>
+            <tr>
+                <th>NbCopyColor</th>
+                <td>{{ imprimante.nbCopyColor }}</td>
+            </tr>
+            <tr>
+                <th>IdPrinter</th>
+                <td>{{ imprimante.idPrinter }}</td>
+            </tr>
+            <tr>
+                <th>NamePrinter</th>
+                <td>{{ imprimante.namePrinter }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_imprimante_crud_index') }}">back to list</a>
+
+    <a href="{{ path('app_imprimante_crud_edit', {'id': imprimante.id}) }}">edit</a>
+
+    {{ include('imprimante_crud/_delete_form.html.twig') }}
+{% endblock %}

@@ -11,6 +11,7 @@ use App\Entity\ExportLogs;
 use App\Entity\ImportLogs;
 use App\Entity\Statistics;
 use App\Entity\Badge;
+use App\Entity\Imprimante;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
@@ -71,5 +72,6 @@ class AdminController extends AbstractDashboardController
         yield MenuItem::linkToCrud('ExportLogs', 'fa-solid fa-file-export', ExportLogs::class);
         yield MenuItem::linkToCrud('Statistics', 'fa-solid fa-chart-simple', Statistics::class);
         yield MenuItem::linkToCrud('Badge', 'fa-solid fa-id-card', Badge::class);
+        yield MenuItem::linkToCrud('Imprimante', 'fa-solid fa-print', Imprimante::class);
     }
 }

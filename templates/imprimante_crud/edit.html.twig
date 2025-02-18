@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Imprimante{% endblock %}
+
+{% block body %}
+    <h1>Edit Imprimante</h1>
+
+    {{ include('imprimante_crud/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_imprimante_crud_index') }}">back to list</a>
+
+    {{ include('imprimante_crud/_delete_form.html.twig') }}
+{% endblock %}

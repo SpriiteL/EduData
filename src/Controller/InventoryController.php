@@ -3,8 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\Inventory;
-use App\Entity\User;
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use League\Csv\Writer;
 use League\Csv\Reader;
@@ -12,6 +10,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Serializer\SerializerInterface;
 
 class InventoryController extends AbstractController
 {
@@ -167,21 +168,97 @@ class InventoryController extends AbstractController
         return $response;
     }
 
-    #[Route('/inventory/delete/{id}', name: 'app_inventory_delete', methods: ['POST'])]
-    public function delete(Request $request, Inventory $inventory, EntityManagerInterface $entityManager): Response
+    #[Route('/inventory/api/inventories', name: 'api_inventories', methods: ['GET'])]
+    public function apiInventories(ManagerRegistry $doctrine, SerializerInterface $serializer): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$inventory->getId(), $request->request->get('_token'))) {
-            $entityManager->remove($inventory);
-            $entityManager->flush();
+        $user = $this->getUser();
+        $etablishment = $user->getEtablishment(); // Récupération de l'établissement de l'utilisateur
 
-            $this->addFlash('success', 'L\'élément a été supprimé avec succès.');
-        } else {
-            $this->addFlash('error', 'Token CSRF invalide.');
-        }
+        $inventories = $doctrine->getRepository(Inventory::class)->findBy(['etablishment' => $etablishment]);
 
-        return $this->redirectToRoute('app_inventory');
+        // Sérialisation des données en JSON
+        $jsonContent = $serializer->serialize($inventories, 'json');
+
+        return new Response($jsonContent, 200, ['Content-Type' => 'application/json']);
     }
 
+    #[Route('/inventory/api/inventories/{id}', name: 'api_delete_inventory', methods: ['DELETE'])]
+    public function apiDeleteInventory(int $id, ManagerRegistry $doctrine): Response
+    {
+        $entityManager = $doctrine->getManager();
+        $inventory = $doctrine->getRepository(Inventory::class)->find($id);
+
+        if ($inventory) {
+            $entityManager->remove($inventory);
+            $entityManager->flush();
+            return $this->json(['message' => 'Inventaire supprimé avec succès'], 200);
+        }
+
+        return $this->json(['message' => 'Inventaire non trouvé'], 404);
+    }
+
+    // Méthode pour traiter le fichier CSV
+    private function processCsvFile(UploadedFile $file)
+    {
+        // Logic to process CSV file, parse and return data
+        $data = [];
+        if (($handle = fopen($file->getRealPath(), 'r')) !== false) {
+            while (($row = fgetcsv($handle)) !== false) {
+                // Logique pour traiter chaque ligne du CSV
+                $data[] = $row;
+            }
+            fclose($handle);
+        }
+
+        return $data;
+    }
+
+    // Méthode pour enregistrer les données importées dans la base de données
+    private function saveImportedData(array $data, ManagerRegistry $doctrine)
+    {
+        $entityManager = $doctrine->getManager();
+
+        foreach ($data as $row) {
+            $inventory = new Inventory();
+            // Assigner les données du CSV à l'inventaire, par exemple :
+            // $inventory->setActiveType($row[0]);
+            // $inventory->setProvider($row[1]);
+            // etc.
+
+            $entityManager->persist($inventory);
+        }
+
+        $entityManager->flush();
+    }
+
+    // Méthode pour générer un fichier CSV à partir des inventaires
+    private function generateCsv(array $inventories)
+    {
+        $filename = tempnam(sys_get_temp_dir(), 'csv_');
+        $file = fopen($filename, 'w');
+
+        // Ajouter les en-têtes du CSV
+        fputcsv($file, ['Type Actif', 'Fournisseur', 'Date d\'arrivée', 'Numéro de Série', 'Numéro de Facture', 'Numéro Facture Interne', 'Prix Neuf', 'Numéro de produit de la série', 'Nombre total de produits dans le lot', 'Nom de la Salle']);
+
+        // Ajouter les données des inventaires dans le CSV
+        foreach ($inventories as $inventory) {
+            fputcsv($file, [
+                $inventory->getActiveType(),
+                $inventory->getProvider(),
+                $inventory->getDateEntry()->format('Y-m-d'),
+                $inventory->getNumSerie(),
+                $inventory->getNumInvoice(),
+                $inventory->getNumInvoiceIntern(),
+                $inventory->getPrice(),
+                $inventory->getNumProductSerie(),
+                $inventory->getTotalProductLot(),
+                $inventory->getNameRoom()
+            ]);
+        }
+
+        fclose($file);
+        return $filename;
+    }
     private function generateRFID(): string
     {
         $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';

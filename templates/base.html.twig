@@ -11,6 +11,12 @@
     <link rel="stylesheet" href="{{ asset('css/styleFooter.css') }}">
     <link rel="stylesheet" href="{{ asset('css/styleheader.css') }}">
     <link rel="stylesheet" href="{{ asset('css/setting.css') }}">
+    {% block javascripts %}
+            {{ encore_entry_script_tags('app') }}
+    {% endblock %}
+    {% block stylesheets %}
+        {{ encore_entry_link_tags('app') }}
+    {% endblock %}
 </head>
 <body class="{{ app.session.get('theme', 'theme1') }}">
     <header class="header {{ app.session.get('theme', 'theme1') }}-header">
@@ -49,10 +55,8 @@
                 logo.src = '{{ asset('../asset/edupurple.png') }}';
             }  else if (theme === 'theme6') {
                 logo.src = '{{ asset('../asset/edu2.png') }}';
-            } 
+            }
         });
     </script>
-    {% block javascripts %}
-    {% endblock %}
 </body>
 </html>

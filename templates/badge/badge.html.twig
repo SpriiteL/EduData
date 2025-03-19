@@ -1,146 +1,31 @@
-{% extends 'base.html.twig' %}
+{# {% extends 'base.html.twig' %} #}
+
+{# {% block title %}Log in!{% endblock %} #}
+
+{% block stylesheets %}
+    <link rel="shortcut icon" type="image/png" href="{{ asset('assets/images/logos/favicon.png') }}" />
+    <link rel="stylesheet" href="{{ asset('css/styles.min.css') }}" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.1/dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    {{ encore_entry_link_tags('app') }}
+{% endblock %}
 
 {% block body %}
-<div class="main-content">
-    <div class="container">
-        <div class="row">
-            <!-- Inventory table section -->
-            <div class="col-lg-12 d-flex align-items-stretch">
-                <div class="card w-100">
-                    <div class="card-body p-4">
-                        <h5 class="card-title fw-semibold mb-4 custom-title" style="font-size: 30px">Badge</h5>
+<div id="sidebar"></div>
+<div id="header"></div>
+<div id="badge"></div>
+<!-- Body Wrapper -->
 
-                        <!-- Formulaire -->
-                        <form id="badge-form" class="mb-4">
-                            <div class="row" style="margin: 0;">
-                                <div class="col-md-2" style="padding: 0; margin: 0;">
-                                    <label for="nom" class="form-label">Nom</label>
-                                    <input type="text" class="form-control" id="nom" name="nom" placeholder="Nom">
-                                </div>
-                                <div class="col-md-2" style="padding: 0; margin: 0;">
-                                    <label for="prenom" class="form-label">Prénom</label>
-                                    <input type="text" class="form-control" id="prenom" name="prenom" placeholder="Prénom">
-                                </div>
-                                <div class="col-md-2" style="padding: 0; margin: 0;">
-                                    <label for="dateTraitement" class="form-label">Date Traitement</label>
-                                    <input type="date" class="form-control" id="dateTraitement" name="dateTraitement">
-                                </div>
-                                <div class="col-md-2">
-                                    <label for="classe" class="form-label">Classe</label>
-                                    <select class="form-select" id="classe" name="classe">
-                                        <option value="6ème">6ème</option>
-                                        <option value="5ème">5ème</option>
-                                        <option value="4ème">4ème</option>
-                                        <option value="3ème">3ème</option>
-                                        <option value="Seconde">Seconde</option>
-                                        <option value="Premiere">Première</option>
-                                        <option value="Terminale">Terminal</option>
-                                        <option value="BTS">BTS</option>
-                                        <option value="Bachelor">Bachelor</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-2">
-                                    <label for="etatTraitement" class="form-label">État du Traitement</label>
-                                    <select class="form-select" id="etatTraitement" name="etatTraitement">
-                                        <option value="En attente">En attente</option>
-                                        <option value="Traitée">Traitée</option>
-                                        <option value="Refusée">Refusée</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-2 d-flex align-items-end">
-                                    <button type="button" id="add-badge" class="btn btn-primary w-100">Ajouter</button>
-                                </div>
-                            </div>
-                        </form>
+{% endblock %}
 
-                        <!-- Tableau badge -->
-                        <div class="divtable">
-                            <div class="table-test">
-                                <table id="badge-table" class="test">
-                                    <thead class="text-dark fs-4">
-                                        <tr class="colonne">
-                                            <th>Nom</th>
-                                            <th>Prénom</th>
-                                            <th>Date Traitement</th>
-                                            <th>Classe</th>
-                                            <th>État du Traitement</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <!-- Les lignes seront générées dynamiquement -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal pour éditer une ligne -->
-<div class="modal fade" id="editBadgeModal" tabindex="-1" aria-labelledby="editBadgeModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editBadgeModalLabel">Modifier Badge</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="edit-badge-form">
-                    <input type="hidden" id="edit-id">
-                    <div class="mb-3">
-                        <label for="edit-nom" class="form-label">Nom</label>
-                        <input type="text" class="form-control" id="edit-nom" name="nom">
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit-prenom" class="form-label">Prénom</label>
-                        <input type="text" class="form-control" id="edit-prenom" name="prenom">
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit-dateTraitement" class="form-label">Date Traitement</label>
-                        <input type="date" class="form-control" id="edit-dateTraitement" name="dateTraitement">
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit-classe" class="form-label">Classe</label>
-                        <select class="form-select" id="edit-classe" name="classe">
-                            <option value="6ème">6ème</option>
-                            <option value="5ème">5ème</option>
-                            <option value="4ème">4ème</option>
-                            <option value="3ème">3ème</option>
-                            <option value="Seconde">Seconde</option>
-                            <option value="Premiere">Première</option>
-                            <option value="Terminale">Terminal</option>
-                            <option value="BTS">BTS</option>
-                            <option value="Bachelor">Bachelor</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit-etatTraitement" class="form-label">État du Traitement</label>
-                        <select class="form-select" id="edit-etatTraitement" name="etatTraitement">
-                            <option value="En attente">En attente</option>
-                            <option value="Traitée">Traitée</option>
-                            <option value="Refusée">Refusée</option>
-                        </select>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                <button type="button" id="save-changes" class="btn btn-primary">Sauvegarder</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-
-<script>
+{% block javascripts %}
+    <script src="{{ asset('libs/jquery/dist/jquery.min.js') }}"></script>
+    <script src="{{ asset('libs/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.1/dist/js/adminlte.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script>
     $(document).ready(function () {
         const table = $('#badge-table').DataTable({
             language: {
@@ -287,4 +172,5 @@
         });
     });
 </script>
+    {{ encore_entry_script_tags('app') }}
 {% endblock %}

@@ -11,7 +11,20 @@
           </a>
         </li>
       </ul>
-  
+      
+      <!-- Formulaire de recherche et d'import -->
+    <!-- <div class="d-flex align-items-center mb-4"> -->
+                    <form method="post" action="/imprimante/import" enctype="multipart/form-data" class="me-3">
+                      <div class="d-flex align-items-center">
+                        <div class="form-group">
+                          <input type="file" name="file" accept=".csv" class="form-control" style="max-width: 100%; width: 500px;" required>
+                        </div>
+                        <div class="form-group ms-3">
+                          <button type="submit" class="btn btn-success"><i class="fas fa-file-import"></i> Importer</button>
+                        </div>
+                      </div>
+                    </form>
+
       <div class="tab-content mt-3">
         <div v-for="(tab, index) in locations" :key="index" class="tab-pane fade" :class="{ 'show active': activeTab === tab }">
           <div class="card mt-4 mx-4 p-4">
@@ -90,4 +103,4 @@
     cursor: pointer;
   }
   </style>
-  
+  z

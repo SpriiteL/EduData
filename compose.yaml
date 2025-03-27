@@ -58,72 +58,72 @@ services:
 ###< doctrine/doctrine-bundle ###
 
 ###> Redis container ###
-  redis:
-      container_name: edudata_redis
-      image: redis:alpine
-      ports:
-        - "6379:6379"
-      volumes:
-        - redis_data:/data
+  # redis:
+  #     container_name: edudata_redis
+  #     image: redis:alpine
+  #     ports:
+  #       - "6379:6379"
+  #     volumes:
+  #       - redis_data:/data
 
-  elasticsearch:
-    container_name: edudata_elasticsearch
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.10
-    environment:
-      - discovery.type=single-node
-      - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-      - xpack.security.enabled=false
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-    volumes:
-      - es_data:/usr/share/elasticsearch/data
-    ports:
-      - "9200:9200"
-      - "9300:9300"
+  # elasticsearch:
+  #   container_name: edudata_elasticsearch
+  #   image: docker.elastic.co/elasticsearch/elasticsearch:7.17.10
+  #   environment:
+  #     - discovery.type=single-node
+  #     - bootstrap.memory_lock=true
+  #     - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+  #     - xpack.security.enabled=false
+  #   ulimits:
+  #     memlock:
+  #       soft: -1
+  #       hard: -1
+  #   volumes:
+  #     - es_data:/usr/share/elasticsearch/data
+  #   ports:
+  #     - "9200:9200"
+  #     - "9300:9300"
 
-  # Ajout de Kibana
-  kibana:
-    container_name: edudata_kibana
-    image: docker.elastic.co/kibana/kibana:7.17.10
-    environment:
-      - ELASTICSEARCH_URL=http://elasticsearch:9200
-    ports:
-      - "5601:5601"
-    depends_on:
-      - elasticsearch
+  # # Ajout de Kibana
+  # kibana:
+  #   container_name: edudata_kibana
+  #   image: docker.elastic.co/kibana/kibana:7.17.10
+  #   environment:
+  #     - ELASTICSEARCH_URL=http://elasticsearch:9200
+  #   ports:
+  #     - "5601:5601"
+  #   depends_on:
+  #     - elasticsearch
 
-  # Ajout de Logstash
-  logstash:
-    container_name: edudata_logstash
-    image: docker.elastic.co/logstash/logstash:7.17.10
-    volumes:
-      - ./logstash/pipeline:/usr/share/logstash/pipeline:ro
-    ports:
-      - "5044:5044"
-      - "9600:9600"
-    depends_on:
-      - elasticsearch
+  # # Ajout de Logstash
+  # logstash:
+  #   container_name: edudata_logstash
+  #   image: docker.elastic.co/logstash/logstash:7.17.10
+  #   volumes:
+  #     - ./logstash/pipeline:/usr/share/logstash/pipeline:ro
+  #   ports:
+  #     - "5044:5044"
+  #     - "9600:9600"
+  #   depends_on:
+  #     - elasticsearch
 
-  selenium:
-        container_name: edudata_selenium
-        image: selenium/standalone-chromium
-        extra_hosts:
-            - 'host.docker.internal:host-gateway'
-        # ports: "4444:4444"
-        volumes:
-            - '/dev/shm:/dev/shm'
+  # selenium:
+  #       container_name: edudata_selenium
+  #       image: selenium/standalone-chromium
+  #       extra_hosts:
+  #           - 'host.docker.internal:host-gateway'
+  #       # ports: "4444:4444"
+  #       volumes:
+  #           - '/dev/shm:/dev/shm'
 
 volumes:
   caddy_data:
   caddy_config:
+  database_data:
 ###> symfony/mercure-bundle ###
 ###< symfony/mercure-bundle ###
 
 ###> doctrine/doctrine-bundle ###
-  database_data:
 ###< doctrine/doctrine-bundle ###
-  redis_data:
-  es_data:
+  # redis_data:
+  # es_data:

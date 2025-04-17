@@ -1,0 +1,1 @@
+php bin/console dbal:run-sql "INSERT INTO User (id, username, roles, password, email, firstname, lastname) VALUES ('1','admin_edudata','[\"ROLE_ADMIN\"]', '\$2y\$13\$d3PY9KNYDaMKycz.YEgAEe06cn2YZTF7r3o9UxjuL1BePiDBh5W8m', 'admin@edudata.com', 'admin', 'edudata')”

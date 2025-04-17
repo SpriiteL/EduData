@@ -1,4 +1,4 @@
-services:
+²services:
   php:
     container_name: edudata_php
     image: ${IMAGES_PREFIX:-}app-php

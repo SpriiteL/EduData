@@ -119,11 +119,11 @@
 volumes:
   caddy_data:
   caddy_config:
+  database_data:
 ###> symfony/mercure-bundle ###
 ###< symfony/mercure-bundle ###
 
 ###> doctrine/doctrine-bundle ###
-  database_data:
 ###< doctrine/doctrine-bundle ###
   # redis_data:
   # es_data:

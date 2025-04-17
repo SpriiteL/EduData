@@ -1,5 +1,5 @@
 <?php
-// src/Controller/StatisticsController.php
+// src/Controller/ImprimanteController.php
 
 namespace App\Controller;
 
@@ -7,6 +7,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\UserRepository;
+use Symfony\Component\HttpFoundation\Request;
+use Doctrine\Persistence\ManagerRegistry;
+use League\Csv\Reader;
+use App\Entity\Imprimante;
 
 class ImprimanteController extends AbstractController
 {
@@ -26,27 +30,29 @@ class ImprimanteController extends AbstractController
     public function import(Request $request, ManagerRegistry $doctrine): Response
     {
         $file = $request->files->get('file');
+
         if ($file && $file->isValid()) {
             try {
                 $content = file_get_contents($file->getPathname());
+
                 if (mb_detect_encoding($content, 'UTF-8', true) === false) {
                     $content = mb_convert_encoding($content, 'UTF-8', 'ISO-8859-1');
                 }
 
                 $csv = Reader::createFromString($content);
                 $csv->setDelimiter(';');
-                $csv->setHeaderOffset(0);
+                $csv->setHeaderOffset(0); // Change selon ton fichier (0 ou autre)
 
                 $records = $csv->getRecords();
                 $entityManager = $doctrine->getManager();
 
                 $requiredColumns = [
-                    "Username",
-                    "Printer",
-                    "Nb Copy B W",
-                    "Nb Copy Color",
-                    "Id Printer",
-                    "Name Printer",
+                    "Type d'Actif",
+                    "Fournisseur",
+                    "Date d'arrivée",
+                    "Numéro de Série",
+                    "Numéro Facture Interne",
+                    "Numéro de Facture",
                 ];
 
                 $count = 0;
@@ -60,8 +66,8 @@ class ImprimanteController extends AbstractController
                         }
                     }
 
-                    $imprimante = new Imprimante();
                     try {
+                        $imprimante = new Imprimante();
                         $imprimante->setUsername($normalizedRow["Type d'Actif"]);
                         $imprimante->setProvider($normalizedRow['Fournisseur']);
                         $imprimante->setDateEntry(new \DateTime($normalizedRow["Date d'arrivée"]));

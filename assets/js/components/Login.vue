@@ -32,7 +32,7 @@
                         required
                     >
                 </div>
-
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token }}" />
                 <button type="submit" class="btn btn-primary w-100 py-2">
                     Se Connecter
                 </button>

@@ -13,6 +13,7 @@ with [FrankenPHP](https://frankenphp.dev) and [Caddy](https://caddyserver.com/) 
 6. Run `npm run dev` on app-php container to start VueJS elements
 4. Open `https://localhost` in your favorite web browser and [accept the auto-generated TLS certificate](https://stackoverflow.com/a/15076602/1352334)
 5. Run `docker compose down --remove-orphans` to stop the Docker containers.
+Run and test in the VM Ubuntu pour lançer le projet en production
 
 ## Features
 

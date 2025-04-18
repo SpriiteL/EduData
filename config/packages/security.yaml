@@ -24,6 +24,7 @@ security:
             lazy: true
             provider: app_user_provider
             entry_point: form_login
+            csrf_protection: false
             form_login:
                 login_path: app_login
                 check_path: app_login
@@ -50,16 +51,16 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        - { path: ^/admin, roles: ROLE_ADMIN }
-        - { path: ^/api, roles: ROLE_ADMIN }
+        - { path: ^/admin, roles: [ROLE_ADMIN, ROLE_USER] }
+        - { path: ^/api, roles: [ROLE_ADMIN, ROLE_USER] }
         - { path: ^/inventory, roles: [ROLE_USER, ROLE_RESPONSABLE] }
-        - { path: ^/dashboard, roles: ROLE_ADMIN }
-        - { path: ^/statistics, roles: ROLE_ADMIN }
-        - { path: ^/profil, roles: ROLE_ADMIN }
+        - { path: ^/dashboard, roles: [ROLE_ADMIN, ROLE_USER] }
+        - { path: ^/statistics, roles: [ROLE_ADMIN, ROLE_USER] }
+        - { path: ^/profil, roles: [ROLE_ADMIN, ROLE_USER] }
         - { path: ^/setting, roles: [ROLE_USER, ROLE_RESPONSABLE] }
         - { path: ^/badge, roles: [ROLE_USER, ROLE_RESPONSABLE] }
         # - { path: ^/choose-etablissement, roles: ROLE_ADMIN }
-        - { path: ^/app_admin_responsable, roles: [ROLE_RESPONSABLE, ROLE_ADMIN] }
+        - { path: ^/app_admin_responsable, roles: [ROLE_USER, ROLE_RESPONSABLE, ROLE_ADMIN] }
 
 
 

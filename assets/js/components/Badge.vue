@@ -107,17 +107,23 @@ export default {
         addBadge() {
             const form = document.getElementById('badge-form');
             const formData = new FormData(form);
-            
+
             fetch('/badge/add', {
                 method: 'POST',
                 body: formData
             })
-            .then(response => response.json())
+            .then(async response => {
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    alert('Erreur : ' + (errorData.error || 'Erreur serveur'));
+                    throw new Error('Erreur HTTP');
+                }
+                return response.json();
+            })
             .then(data => {
-                // Ajouter le nouveau badge à la liste
                 this.badges.push(data);
                 this.renderBadgeTable();
-                form.reset(); // Réinitialiser le formulaire
+                form.reset();
             })
             .catch(error => {
                 console.error('Erreur lors de l\'ajout du badge:', error);

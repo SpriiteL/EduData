@@ -151,8 +151,7 @@
     <div class="header">
         <img src="../asset/logobeaup.png" alt="Logo">
         <div>
-            <h1>Liste des Badges</h1>
-            <p>Merci de vous présenter à l'accueil.</p>
+            <h1>BEAUPEYRAT</h1>
         </div>
     </div>
 
@@ -162,7 +161,8 @@
             <tr>
                 <th>Nom</th>
                 <th>Prénom</th>
-                <th>Classe</th> <!-- Nouvelle colonne -->
+                <th>Classe</th>
+                <th>Lieu</th> <!-- Nouvelle colonne -->
             </tr>
         </thead>
         <tbody>
@@ -172,7 +172,7 @@
 
     <!-- Pied de page -->
     <div class="footer">
-        © 2024 Votre Organisation - Tous droits réservés
+        © 2024 Beaupeyrat - Tous droits réservés
     </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -191,6 +191,7 @@
                                 <td>${badge.nom}</td>
                                 <td>${badge.prenom}</td>
                                 <td>${badge.classe}</td>
+                                <td>${badge.lieu}</td>
                             </tr>
                         `);
                     });

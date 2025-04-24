@@ -21,7 +21,7 @@
       <!-- Sidebar Menu -->
       <nav class="mt-2">
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
-          <li class="nav-item menu-open">
+          <!-- <li class="nav-item menu-open">
             <a href="#" class="nav-link bg-dark">
               <i class="nav-icon fa-solid fa-house"></i>
               <p>
@@ -37,7 +37,7 @@
                 </a>
               </li>
             </ul>
-          </li>
+          </li> -->
           <li class="nav-item menu-open">
             <a href="#" class="nav-link bg-dark">
               <i class="nav-icon fas fa-tasks"></i>
@@ -71,7 +71,7 @@
               </li>
             </ul>
           </li>
-          <li class="nav-item menu-open">
+          <!-- <li class="nav-item menu-open">
             <a href="#" class="nav-link bg-dark">
               <i class="nav-icon fa-solid fa-user-tie"></i>
               <p>
@@ -95,7 +95,7 @@
                 </a>
               </li>
             </ul>
-          </li>
+          </li> -->
           <li class="nav-item menu-open">
             <a href="#" class="nav-link bg-dark">
               <i class="nav-icon fa-solid fa-gear"></i>
@@ -104,22 +104,22 @@
                 <i class="right fas fa-angle-left"></i>
               </p>
             </a>
-            <ul class="nav nav-treeview">
+            <!--<ul class="nav nav-treeview">
               <li class="nav-item">
                 <a href="/profil" class="nav-link">
                   <i class=" fa-solid fa-user nav-icon"></i>
                   <p>Profil</p>
                 </a>
               </li>
-            </ul>
-            <ul class="nav nav-treeview">
+            </ul> -->
+            <!-- <ul class="nav nav-treeview">
               <li class="nav-item">
                 <a href="/setting" class="nav-link">
                   <i class="fas fa-toolbox nav-icon"></i>
                   <p>Préferences</p>
                 </a>
               </li>
-            </ul>
+            </ul> -->
             <ul class="nav nav-treeview">
               <li class="nav-item">
                 <a href="/logout" class="nav-link">
@@ -129,7 +129,7 @@
               </li>
             </ul>
           </li>
-          <li class="nav-item">
+          <!-- <li class="nav-item">
             <a href="#" class="nav-link">
               <i class="nav-icon fas fa-th"></i>
               <p>
@@ -138,7 +138,7 @@
               </p>
             </a>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" >
             <a href="{{path('app_login')}}" class="nav-link">
               <i class="nav-icon fas fa-th"></i>
               <p>
@@ -146,7 +146,7 @@
                 <span class="right badge badge-danger">New</span>
               </p>
             </a>
-          </li>
+          </li> -->
         </ul>
       </nav>
     </div>

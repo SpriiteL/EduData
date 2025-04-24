@@ -29,6 +29,9 @@ class Badge
     #[ORM\Column(length: 255)]
     private ?string $etatTraitement = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $lieu = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -90,6 +93,18 @@ class Badge
     public function setEtatTraitement(string $etatTraitement): static
     {
         $this->etatTraitement = $etatTraitement;
+
+        return $this;
+    }
+
+    public function getLieu(): ?string
+    {
+        return $this->lieu;
+    }
+
+    public function setLieu(string $lieu): static
+    {
+        $this->lieu = $lieu;
 
         return $this;
     }

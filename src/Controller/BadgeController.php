@@ -30,6 +30,7 @@ class BadgeController extends AbstractController
         $badge->setDate(new \DateTime($data->get('dateTraitement')));
         $badge->setClasse($data->get('classe'));
         $badge->setEtatTraitement($data->get('etatTraitement'));
+        $badge->setLieu($data->get('lieu'));
 
         // Sauvegarde dans la base
         $entityManager->persist($badge);
@@ -43,6 +44,7 @@ class BadgeController extends AbstractController
             'dateTraitement' => $badge->getDate()->format('Y-m-d'),
             'classe' => $badge->getClasse(),
             'etatTraitement' => $badge->getEtatTraitement(),
+            'lieu' => $badge->getLieu(),
         ]);
     }
 
@@ -61,6 +63,7 @@ class BadgeController extends AbstractController
                 'dateTraitement' => $badge->getDate()->format('Y-m-d'),
                 'classe' => $badge->getClasse(),
                 'etatTraitement' => $badge->getEtatTraitement(),
+                'lieu' => $badge->getLieu(),
             ];
         }
 
@@ -95,6 +98,7 @@ class BadgeController extends AbstractController
                 'nom' => $badge->getNom(),
                 'prenom' => $badge->getPrenom(),
                 'classe' => $badge->getClasse(),
+                'lieu' => $badge->getLieu(),
             ];
         }
 
@@ -123,6 +127,7 @@ class BadgeController extends AbstractController
         $badge->setDate(new \DateTime($data->get('dateTraitement')));
         $badge->setClasse($data->get('classe'));
         $badge->setEtatTraitement($data->get('etatTraitement'));
+        $badge->setLieu($data->get('lieu'));
 
         $entityManager->flush();
 

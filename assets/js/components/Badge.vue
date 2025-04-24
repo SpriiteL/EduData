@@ -90,6 +90,10 @@ export default {
     mounted() {
         this.loadBadges();
         this.setupEventListeners();
+        // Si vous utilisez jQuery et DataTables, décommentez ces lignes
+        // $(document).ready(() => {
+        //     $('#badge-table').DataTable();
+        // });
     },
     methods: {
         setupEventListeners() {
@@ -130,6 +134,11 @@ export default {
             });
         },
         renderBadgeTable() {
+            // Si vous utilisez DataTables, décommentez ces lignes
+            // if ($.fn.DataTable.isDataTable('#badge-table')) {
+            //     $('#badge-table').DataTable().destroy();
+            // }
+            
             const tbody = document.querySelector('#badge-table tbody');
             tbody.innerHTML = '';
             
@@ -153,6 +162,11 @@ export default {
                 const deleteButton = tr.querySelector('.delete-badge');
                 deleteButton.addEventListener('click', () => this.deleteBadge(badge.id));
             });
+            
+            // Si vous utilisez DataTables, décommentez ces lignes
+            // $('#badge-table').DataTable({
+            //     // Vos options DataTables ici
+            // });
         },
         deleteBadge(id) {
             if (confirm('Êtes-vous sûr de vouloir supprimer ce badge?')) {

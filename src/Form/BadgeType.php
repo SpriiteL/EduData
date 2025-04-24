@@ -19,6 +19,7 @@ class BadgeType extends AbstractType
             ])
             ->add('Classe')
             ->add('etatTraitement')
+            ->add('lieu')
         ;
     }
 

@@ -269,3 +269,5 @@ class InventoryController extends AbstractController
         return $rfid;
     }
 }
+
+//controller test

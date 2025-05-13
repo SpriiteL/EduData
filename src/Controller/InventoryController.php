@@ -270,4 +270,6 @@ class InventoryController extends AbstractController
     }
 }
 
-//controller test
+//         return $this->redirectToRoute('app_inventory');
+//     }
+//         return $this->redirectToRoute('app_inventory');

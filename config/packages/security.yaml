@@ -60,6 +60,7 @@ security:
         - { path: ^/badge, roles: [ROLE_USER, ROLE_RESPONSABLE] }
         # - { path: ^/choose-etablissement, roles: ROLE_ADMIN }
         - { path: ^/app_admin_responsable, roles: [ROLE_ADMIN] }
+        - { path: ^/register, roles: [ROLE_ADMIN]}
 
 
 

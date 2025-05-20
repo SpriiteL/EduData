@@ -30,3 +30,16 @@ Error: Cannot get schema name from the connection
     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
     at async connectionHandler (C:\Users\natha\AppData\Roaming\npm\node_modules\@dbml\cli\lib\cli\connector.js:24:24)
 
+2025-05-19T12:11:03.010Z
+Error: connect ECONNREFUSED ::1:3306
+    at createConnectionPromise (/usr/local/lib/node_modules/@dbml/cli/node_modules/mysql2/promise.js:19:31)
+    at connectMySQL (/usr/local/lib/node_modules/@dbml/cli/node_modules/@dbml/connector/dist/connectors/mysqlConnector.js:8:57)
+    at fetchSchemaJson (/usr/local/lib/node_modules/@dbml/cli/node_modules/@dbml/connector/dist/connectors/mysqlConnector.js:366:26)
+    at Object.fetchSchemaJson (/usr/local/lib/node_modules/@dbml/cli/node_modules/@dbml/connector/dist/connectors/connector.js:16:57)
+    at connectionHandler (/usr/local/lib/node_modules/@dbml/cli/lib/cli/connector.js:24:51)
+    at Object.db2dbml (/usr/local/lib/node_modules/@dbml/cli/lib/cli/index.js:67:26)
+    at Object.<anonymous> (/usr/local/lib/node_modules/@dbml/cli/bin/db2dbml.js:4:19)
+    at Module._compile (node:internal/modules/cjs/loader:1356:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1414:10)
+    at Module.load (node:internal/modules/cjs/loader:1197:32)
+

@@ -43,6 +43,7 @@
         "symfony/property-info": "*",
         "symfony/runtime": "*",
         "symfony/security-bundle": "*",
+        "symfony/security-csrf": "7.2.*",
         "symfony/serializer": "*",
         "symfony/stimulus-bundle": "^2.19",
         "symfony/string": "*",

@@ -191,10 +191,13 @@ class PrinterStatController extends AbstractController
         // Lire les données ligne par ligne
         while (($row = fgetcsv($handle, 1000, ',')) !== false) {
             // Ignorer les lignes trop courtes (qui ne sont pas des données)
-            if (count($row) < 20) continue;
+            if (count($row) < 50) continue;
             
             // Extraire le nom d'utilisateur (Owner name, colonne 3)
-            $username = $row[3];
+            $username = trim($row[3]);
+            
+            // Ignorer les lignes sans nom d'utilisateur
+            if (empty($username)) continue;
             
             if (!isset($userStats[$username])) {
                 $userStats[$username] = [
@@ -218,59 +221,62 @@ class PrinterStatController extends AbstractController
                 ];
             }
             
-            // Analyser le type de travail (Print ou Copy) - colonne 0
-            $jobType = $row[0];
-            // Format du papier (A3 ou A4) - colonne 28
+            // Analyser le type de travail (Print/Copy/Scan) - colonne 0
+            $jobType = trim($row[0]);
+            // Format du papier (A3 ou A4) - colonne 28 "Output paper size"
             $paperSize = strpos($row[28], 'A3') !== false ? 'A3' : 'A4';
-            // Couleur ou Noir - colonne 30
-            $colorMode = $row[30] === 'Black' ? 'Noir' : 'Couleur';
-            // Nombre d'impressions - colonne 27
-            $count = (int)$row[27];
+            // Couleur ou Noir - colonne 30 "Color"
+            $colorMode = trim($row[30]) === 'Black' ? 'Noir' : 'Couleur';
+            // Nombre de copies réalisées - colonne 42 "Print count"
+            $printCount = (int)$row[42];
             
-            // Mettre à jour les statistiques en fonction du type de travail
+            // Si pas de copies, ignorer cette ligne
+            if ($printCount <= 0) continue;
+            
+            // Mettre à jour les statistiques en fonction du type de travail, couleur et format
             if ($jobType === 'Print') {
                 if ($colorMode === 'Couleur') {
                     if ($paperSize === 'A4') {
-                        $userStats[$username]['jobChargeCountFCL'] += $count;
-                    } else {
-                        $userStats[$username]['jobChargeCountFCS'] += $count;
+                        $userStats[$username]['jobChargeCountFCL'] += $printCount;
+                    } else { // A3
+                        $userStats[$username]['jobChargeCountFCS'] += $printCount;
                     }
-                    $userStats[$username]['impressionTotalCouleur'] += $count;
-                    $userStats[$username]['totalCouleur'] += $count;
-                } else {
+                    $userStats[$username]['impressionTotalCouleur'] += $printCount;
+                    $userStats[$username]['totalCouleur'] += $printCount;
+                } else { // Noir
                     if ($paperSize === 'A4') {
-                        $userStats[$username]['jobChargeCountMTL'] += $count;
-                    } else {
-                        $userStats[$username]['jobChargeCountMTS'] += $count;
+                        $userStats[$username]['jobChargeCountMTL'] += $printCount;
+                    } else { // A3
+                        $userStats[$username]['jobChargeCountMTS'] += $printCount;
                     }
-                    $userStats[$username]['impressionTotalMono'] += $count;
-                    $userStats[$username]['totalNoir'] += $count;
+                    $userStats[$username]['impressionTotalMono'] += $printCount;
+                    $userStats[$username]['totalNoir'] += $printCount;
                 }
             } elseif ($jobType === 'Copy') {
                 if ($colorMode === 'Couleur') {
                     if ($paperSize === 'A4') {
-                        $userStats[$username]['jobChargeCountMCL'] += $count;
-                    } else {
-                        $userStats[$username]['jobChargeCountMCS'] += $count;
+                        $userStats[$username]['jobChargeCountMCL'] += $printCount;
+                    } else { // A3
+                        $userStats[$username]['jobChargeCountMCS'] += $printCount;
                     }
-                    $userStats[$username]['copieTotalCouleur'] += $count;
-                    $userStats[$username]['totalCouleur'] += $count;
-                } else {
+                    $userStats[$username]['copieTotalCouleur'] += $printCount;
+                    $userStats[$username]['totalCouleur'] += $printCount;
+                } else { // Noir
                     if ($paperSize === 'A4') {
-                        $userStats[$username]['jobChargeCountMBL'] += $count;
-                    } else {
-                        $userStats[$username]['jobChargeCountMBS'] += $count;
+                        $userStats[$username]['jobChargeCountMBL'] += $printCount;
+                    } else { // A3
+                        $userStats[$username]['jobChargeCountMBS'] += $printCount;
                     }
-                    $userStats[$username]['copieTotalMono'] += $count;
-                    $userStats[$username]['totalNoir'] += $count;
+                    $userStats[$username]['copieTotalMono'] += $printCount;
+                    $userStats[$username]['totalNoir'] += $printCount;
                 }
             } elseif ($jobType === 'Scan') {
                 if ($paperSize === 'A4') {
-                    $userStats[$username]['scanA4'] += $count;
-                } else {
-                    $userStats[$username]['scanA3'] += $count;
+                    $userStats[$username]['scanA4'] += $printCount;
+                } else { // A3
+                    $userStats[$username]['scanA3'] += $printCount;
                 }
-                $userStats[$username]['totalScan'] += $count;
+                $userStats[$username]['totalScan'] += $printCount;
             }
         }
         

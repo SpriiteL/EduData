@@ -136,6 +136,16 @@
   </script>
   
   <style scoped>
-  /* Style spécifique au composant */
+  
+  .colonne th {
+    font-size: 1.15rem; /* Réduction de la taille de police */
+    white-space: normal; /* Permet le retour à la ligne */
+    word-wrap: break-word;
+    padding: 8px;
+    max-width: 120px; /* Largeur maximale par colonne */
+    text-align: left;
+    vertical-align: left;
+  }
+
   </style>
   

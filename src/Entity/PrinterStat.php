@@ -17,55 +17,21 @@ class PrinterStat
     private ?string $username = null;
 
     #[ORM\Column]
-    private ?int $jobChargeCountFCL = 0;
+    private int $totalBlack = 0;
 
     #[ORM\Column]
-    private ?int $jobChargeCountFCS = 0;
+    private int $totalColor = 0;
 
     #[ORM\Column]
-    private ?int $impressionTotalCouleur = 0;
+    private int $totalScans = 0;
 
-    #[ORM\Column]
-    private ?int $jobChargeCountMTL = 0;
+    #[ORM\Column(type: 'datetime')]
+    private \DateTimeInterface $createdAt;
 
-    #[ORM\Column]
-    private ?int $jobChargeCountMTS = 0;
-
-    #[ORM\Column]
-    private ?int $impressionTotalMono = 0;
-
-    #[ORM\Column]
-    private ?int $jobChargeCountMCL = 0;
-
-    #[ORM\Column]
-    private ?int $jobChargeCountMCS = 0;
-
-    #[ORM\Column]
-    private ?int $copieTotalCouleur = 0;
-
-    #[ORM\Column]
-    private ?int $jobChargeCountMBL = 0;
-
-    #[ORM\Column]
-    private ?int $jobChargeCountMBS = 0;
-
-    #[ORM\Column]
-    private ?int $copieTotalMono = 0;
-
-    #[ORM\Column]
-    private ?int $totalCouleur = 0;
-
-    #[ORM\Column]
-    private ?int $totalNoir = 0;
-
-    #[ORM\Column]
-    private ?int $scanA4 = 0;
-
-    #[ORM\Column]
-    private ?int $scanA3 = 0;
-
-    #[ORM\Column]
-    private ?int $totalScan = 0;
+    public function __construct()
+    {
+        $this->createdAt = new \DateTime();
+    }
 
     public function getId(): ?int
     {
@@ -80,211 +46,68 @@ class PrinterStat
     public function setUsername(string $username): static
     {
         $this->username = $username;
-
         return $this;
     }
 
-    public function getJobChargeCountFCL(): ?int
+    public function getTotalBlack(): int
     {
-        return $this->jobChargeCountFCL;
+        return $this->totalBlack;
     }
 
-    public function setJobChargeCountFCL(int $jobChargeCountFCL): static
+    public function setTotalBlack(int $totalBlack): static
     {
-        $this->jobChargeCountFCL = $jobChargeCountFCL;
-
+        $this->totalBlack = $totalBlack;
         return $this;
     }
 
-    public function getJobChargeCountFCS(): ?int
+    public function getTotalColor(): int
     {
-        return $this->jobChargeCountFCS;
+        return $this->totalColor;
     }
 
-    public function setJobChargeCountFCS(int $jobChargeCountFCS): static
+    public function setTotalColor(int $totalColor): static
     {
-        $this->jobChargeCountFCS = $jobChargeCountFCS;
-
+        $this->totalColor = $totalColor;
         return $this;
     }
 
-    public function getImpressionTotalCouleur(): ?int
+    public function getTotalScans(): int
     {
-        return $this->impressionTotalCouleur;
+        return $this->totalScans;
     }
 
-    public function setImpressionTotalCouleur(int $impressionTotalCouleur): static
+    public function setTotalScans(int $totalScans): static
     {
-        $this->impressionTotalCouleur = $impressionTotalCouleur;
-
+        $this->totalScans = $totalScans;
         return $this;
     }
 
-    public function getJobChargeCountMTL(): ?int
+    public function getCreatedAt(): \DateTimeInterface
     {
-        return $this->jobChargeCountMTL;
+        return $this->createdAt;
     }
 
-    public function setJobChargeCountMTL(int $jobChargeCountMTL): static
+    public function setCreatedAt(\DateTimeInterface $createdAt): static
     {
-        $this->jobChargeCountMTL = $jobChargeCountMTL;
-
+        $this->createdAt = $createdAt;
         return $this;
     }
 
-    public function getJobChargeCountMTS(): ?int
+    public function addBlack(int $amount): static
     {
-        return $this->jobChargeCountMTS;
-    }
-
-    public function setJobChargeCountMTS(int $jobChargeCountMTS): static
-    {
-        $this->jobChargeCountMTS = $jobChargeCountMTS;
-
+        $this->totalBlack += $amount;
         return $this;
     }
 
-    public function getImpressionTotalMono(): ?int
+    public function addColor(int $amount): static
     {
-        return $this->impressionTotalMono;
-    }
-
-    public function setImpressionTotalMono(int $impressionTotalMono): static
-    {
-        $this->impressionTotalMono = $impressionTotalMono;
-
+        $this->totalColor += $amount;
         return $this;
     }
 
-    public function getJobChargeCountMCL(): ?int
+    public function addScans(int $amount): static
     {
-        return $this->jobChargeCountMCL;
-    }
-
-    public function setJobChargeCountMCL(int $jobChargeCountMCL): static
-    {
-        $this->jobChargeCountMCL = $jobChargeCountMCL;
-
-        return $this;
-    }
-
-    public function getJobChargeCountMCS(): ?int
-    {
-        return $this->jobChargeCountMCS;
-    }
-
-    public function setJobChargeCountMCS(int $jobChargeCountMCS): static
-    {
-        $this->jobChargeCountMCS = $jobChargeCountMCS;
-
-        return $this;
-    }
-
-    public function getCopieTotalCouleur(): ?int
-    {
-        return $this->copieTotalCouleur;
-    }
-
-    public function setCopieTotalCouleur(int $copieTotalCouleur): static
-    {
-        $this->copieTotalCouleur = $copieTotalCouleur;
-
-        return $this;
-    }
-
-    public function getJobChargeCountMBL(): ?int
-    {
-        return $this->jobChargeCountMBL;
-    }
-
-    public function setJobChargeCountMBL(int $jobChargeCountMBL): static
-    {
-        $this->jobChargeCountMBL = $jobChargeCountMBL;
-
-        return $this;
-    }
-
-    public function getJobChargeCountMBS(): ?int
-    {
-        return $this->jobChargeCountMBS;
-    }
-
-    public function setJobChargeCountMBS(int $jobChargeCountMBS): static
-    {
-        $this->jobChargeCountMBS = $jobChargeCountMBS;
-
-        return $this;
-    }
-
-    public function getCopieTotalMono(): ?int
-    {
-        return $this->copieTotalMono;
-    }
-
-    public function setCopieTotalMono(int $copieTotalMono): static
-    {
-        $this->copieTotalMono = $copieTotalMono;
-
-        return $this;
-    }
-
-    public function getTotalCouleur(): ?int
-    {
-        return $this->totalCouleur;
-    }
-
-    public function setTotalCouleur(int $totalCouleur): static
-    {
-        $this->totalCouleur = $totalCouleur;
-
-        return $this;
-    }
-
-    public function getTotalNoir(): ?int
-    {
-        return $this->totalNoir;
-    }
-
-    public function setTotalNoir(int $totalNoir): static
-    {
-        $this->totalNoir = $totalNoir;
-
-        return $this;
-    }
-
-    public function getScanA4(): ?int
-    {
-        return $this->scanA4;
-    }
-
-    public function setScanA4(int $scanA4): static
-    {
-        $this->scanA4 = $scanA4;
-
-        return $this;
-    }
-
-    public function getScanA3(): ?int
-    {
-        return $this->scanA3;
-    }
-
-    public function setScanA3(int $scanA3): static
-    {
-        $this->scanA3 = $scanA3;
-
-        return $this;
-    }
-
-    public function getTotalScan(): ?int
-    {
-        return $this->totalScan;
-    }
-
-    public function setTotalScan(int $totalScan): static
-    {
-        $this->totalScan = $totalScan;
-
+        $this->totalScans += $amount;
         return $this;
     }
 }

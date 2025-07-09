@@ -31,6 +31,9 @@ class Imprimante
     #[ORM\Column(length: 255)]
     private ?string $namePrinter = null;
 
+    #[ORM\Column]
+    private ?int $totalScan = 0;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -104,6 +107,18 @@ class Imprimante
     public function setNamePrinter(string $namePrinter): static
     {
         $this->namePrinter = $namePrinter;
+
+        return $this;
+    }
+
+    public function getTotalScan(): ?int
+    {
+        return $this->totalScan;
+    }
+
+    public function setTotalScan(int $totalScan): static
+    {
+        $this->totalScan = $totalScan;
 
         return $this;
     }

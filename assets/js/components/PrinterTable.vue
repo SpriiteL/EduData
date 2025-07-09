@@ -1,395 +1,560 @@
 <template>
-  <div class="card">
-    <div class="card-header">
-      <h3 class="card-title">Statistiques d'imprimantes</h3>
-      <div class="card-tools">
-        <span class="badge badge-primary">Impressions</span>
+  <div class="printer-usage-container">
+    <div class="header-section">
+      <h1 class="page-title">Statistiques d'utilisation des imprimantes</h1>
+      
+      <div class="import-section">
+        <div class="file-upload-wrapper">
+          <input 
+            ref="fileInput"
+            type="file" 
+            accept=".csv"
+            @change="handleFileSelect"
+            class="file-input"
+            id="csvFile"
+          />
+          <label for="csvFile" class="file-label">
+            <i class="fas fa-upload"></i>
+            Choisir un fichier CSV
+          </label>
+          <span v-if="selectedFile" class="file-name">{{ selectedFile.name }}</span>
+        </div>
+        
+        <div class="action-buttons">
+          <button 
+            @click="importCsv" 
+            :disabled="!selectedFile || isLoading"
+            class="btn btn-primary"
+          >
+            <i class="fas fa-file-import"></i>
+            {{ isLoading ? 'Import en cours...' : 'Importer' }}
+          </button>
+          
+          <button 
+            @click="clearData" 
+            :disabled="isLoading"
+            class="btn btn-danger"
+          >
+            <i class="fas fa-trash"></i>
+            Effacer les données
+          </button>
+        </div>
+      </div>
+
+      <div v-if="message" :class="['alert', messageType === 'success' ? 'alert-success' : 'alert-error']">
+        {{ message }}
       </div>
     </div>
-    
-    <div class="card-body">
-      <div class="main-content">
-        <div class="container">
-          <div class="row">
-            <div class="col-lg-12 d-flex align-items-stretch">
-              <div class="card w-100">
-                <div class="card-body p-4">
-                  
-                  <!-- Débogage -->
-                  <div class="alert alert-info" v-if="debugInfo">
-                    <strong>Info de débogage:</strong> {{ debugInfo }}
-                  </div>
-                  
-                  <!-- Alerte de succès -->
-                  <div class="alert alert-success" v-if="successMessage">
-                    {{ successMessage }}
-                  </div>
-                  
-                  <!-- Formulaire de recherche et d'import -->
-                  <div class="d-flex align-items-center mb-4">
-                    <form @submit.prevent="uploadCsv" enctype="multipart/form-data" ref="uploadForm" class="me-3">
-                      <div class="d-flex align-items-center">
-                        <div class="form-group">
-                          <input type="file" name="csv" ref="fileInput" accept=".csv" class="form-control" style="max-width: 100%; width: 500px;" required>
-                        </div>
-                        <div class="form-group ms-3">
-                          <button type="submit" class="btn btn-success" :disabled="isUploading">
-                            <i class="fas fa-file-import"></i> {{ isUploading ? 'Importation en cours...' : 'Importer' }}
-                          </button>
-                        </div>
-                      </div>
-                    </form>
 
-                    <a :href="'/printer-stats/export'" class="btn btn-export">
-                      <i class="fas fa-file-export"></i> Exporter
-                    </a>
-                    
-                    <button @click="showRawData" class="btn btn-info ms-3">
-                      <i class="fas fa-eye"></i> Voir données brutes
-                    </button>
-                  </div>
-
-                  <!-- Modal pour afficher les données brutes -->
-                  <div class="modal fade" id="rawDataModal" tabindex="-1" role="dialog" aria-labelledby="rawDataModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-lg" role="document">
-                      <div class="modal-content">
-                        <div class="modal-header">
-                          <h5 class="modal-title" id="rawDataModalLabel">Données brutes</h5>
-                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                          </button>
-                        </div>
-                        <div class="modal-body">
-                          <pre>{{ JSON.stringify(stats, null, 2) }}</pre>
-                        </div>
-                        <div class="modal-footer">
-                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Affichage simplifié des données (sans DataTables) -->
-                  <div v-if="viewMode === 'simple'" class="mb-4">
-                    <button @click="switchToAdvanced" class="btn btn-primary mb-3">Passer à la vue avancée</button>
-                    <table class="table table-striped">
-                      <thead>
-                        <tr>
-                          <th>Utilisateur</th>
-                          <th>Total Couleur</th>
-                          <th>Total Noir</th>
-                          <th>Total Scan</th>
-                          <th>Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr v-for="stat in stats" :key="stat.id">
-                          <td>{{ stat.username }}</td>
-                          <td>{{ stat.totalCouleur }}</td>
-                          <td>{{ stat.totalNoir }}</td>
-                          <td>{{ stat.totalScan }}</td>
-                          <td>
-                            <form @submit.prevent="deleteStat(stat.id)">
-                              <button class="btn btn-danger btn-sm"><i class="fas fa-trash-alt"></i></button>
-                            </form>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                  
-                  <!-- Tableau de statistiques avec DataTables -->
-                  <div v-if="viewMode === 'advanced'" class="divtable">
-                    <button @click="switchToSimple" class="btn btn-primary mb-3">Passer à la vue simplifiée</button>
-                    <div class="table-test">
-                      <table id="printer-table" class="test">
-                        <thead class="text-dark fs-4">
-                          <tr class="colonne">
-                            <th>Utilisateur</th>
-                            <th>Job charge count FCL</th>
-                            <th>Job charge count FCS</th>
-                            <th>Total Impression Couleur</th>
-                            <th>Job charge count MTL</th>
-                            <th>Job charge count MTS</th>
-                            <th>Job charge count MCL</th>
-                            <th>Job charge count MCS</th>
-                            <th>Total Copie Couleur</th>
-                            <th>Job charge count MBL</th>
-                            <th>Job charge count MBS</th>
-                            <th>Total Copie Mono</th>
-                            <th>Total Couleur</th>
-                            <th>Total Noir</th>
-                            <th>Scan A4</th>
-                            <th>Scan A3</th>
-                            <th>Total Scan</th>
-                            <th>Actions</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr v-for="stat in stats" :key="stat.id">
-                            <td>{{ stat.username }}</td>
-                            <td>{{ stat.jobChargeCountFCL }}</td>
-                            <td>{{ stat.jobChargeCountFCS }}</td>
-                            <td>{{ stat.impressionTotalCouleur }}</td>
-                            <td>{{ stat.jobChargeCountMTL }}</td>
-                            <td>{{ stat.jobChargeCountMTS }}</td>
-                            <td>{{ stat.impressionTotalMono }}</td>
-                            <td>{{ stat.jobChargeCountMCL }}</td>
-                            <td>{{ stat.jobChargeCountMCS }}</td>
-                            <td>{{ stat.copieTotalCouleur }}</td>
-                            <td>{{ stat.jobChargeCountMBL }}</td>
-                            <td>{{ stat.jobChargeCountMBS }}</td>
-                            <td>{{ stat.totalCouleur }}</td>
-                            <td>{{ stat.totalNoir }}</td>
-                            <td>{{ stat.scanA4 }}</td>
-                            <td>{{ stat.scanA3 }}</td>
-                            <td>{{ stat.totalScan }}</td>
-                            <td>
-                              <form @submit.prevent="deleteStat(stat.id)">
-                                <button class="btn btn-danger btn-sm"><i class="fas fa-trash-alt"></i></button>
-                              </form>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+    <div class="table-section">
+      <div class="table-header">
+        <h2>Résultats par utilisateur</h2>
+        <div class="table-info">
+          <span class="total-users">{{ filteredData.length }} utilisateur(s)</span>
+          <div class="search-wrapper">
+            <input 
+              v-model="searchQuery"
+              type="text"
+              placeholder="Rechercher un utilisateur..."
+              class="search-input"
+              @input="currentPage = 1"
+            />
+            <i class="fas fa-search search-icon"></i>
           </div>
         </div>
       </div>
-    </div>
-    
-    <div class="card-footer">
-      <button @click="fetchStats" class="btn btn-primary me-2">Recharger</button>
-      <button @click="clearDebug" class="btn btn-outline-secondary">Effacer débogage</button>
+
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th @click="sortBy('username')" class="sortable">
+                Utilisateur
+                <i :class="getSortIcon('username')"></i>
+              </th>
+              <th @click="sortBy('totalBlack')" class="sortable">
+                Total Noir
+                <i :class="getSortIcon('totalBlack')"></i>
+              </th>
+              <th @click="sortBy('totalColor')" class="sortable">
+                Total Couleur
+                <i :class="getSortIcon('totalColor')"></i>
+              </th>
+              <th @click="sortBy('totalScans')" class="sortable">
+                Total Scans
+                <i :class="getSortIcon('totalScans')"></i>
+              </th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-if="isLoading">
+              <td colspan="5" class="loading-row">
+                <i class="fas fa-spinner fa-spin"></i>
+                Chargement des données...
+              </td>
+            </tr>
+            <tr v-else-if="filteredData.length === 0">
+              <td colspan="5" class="no-data">
+                {{ searchQuery ? 'Aucun utilisateur trouvé' : 'Aucune donnée disponible' }}
+              </td>
+            </tr>
+            <tr v-else v-for="user in paginatedData" :key="user.id">
+              <td class="username-cell">
+                <i class="fas fa-user"></i>
+                {{ user.username }}
+              </td>
+              <td class="number-cell">
+                <span class="badge badge-dark">{{ user.totalBlack }}</span>
+              </td>
+              <td class="number-cell">
+                <span class="badge badge-color">{{ user.totalColor }}</span>
+              </td>
+              <td class="number-cell">
+                <span class="badge badge-info">{{ user.totalScans }}</span>
+              </td>
+              <td class="number-cell total-cell">
+                <span class="badge badge-total">{{ user.totalBlack + user.totalColor + user.totalScans }}</span>
+              </td>
+            </tr>
+          </tbody>
+          <tfoot v-if="filteredData.length > 0">
+            <tr>
+              <td><strong>Total général</strong></td>
+              <td class="number-cell">
+                <span class="badge badge-total-general">{{ totalBlack }}</span>
+              </td>
+              <td class="number-cell">
+                <span class="badge badge-total-general">{{ totalColor }}</span>
+              </td>
+              <td class="number-cell">
+                <span class="badge badge-total-general">{{ totalScans }}</span>
+              </td>
+              <td class="number-cell total-cell">
+                <span class="badge badge-total-general">{{ totalBlack + totalColor + totalScans }}</span>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <div v-if="filteredData.length > itemsPerPage" class="pagination">
+        <button 
+          @click="currentPage--" 
+          :disabled="currentPage === 1"
+          class="btn btn-secondary"
+        >
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        
+        <span class="page-info">
+          Page {{ currentPage }} sur {{ totalPages }}
+        </span>
+        
+        <button 
+          @click="currentPage++" 
+          :disabled="currentPage === totalPages"
+          class="btn btn-secondary"
+        >
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import axios from 'axios';
-import $ from 'jquery';
-import 'datatables.net-dt';
 
 export default {
-  props: ['initialData'],
+  name: 'PrinterUsage',
   data() {
     return {
-      stats: [],
-      dataTable: null,
-      isUploading: false,
-      successMessage: '',
-      debugInfo: '',
-      viewMode: 'simple' // 'simple' ou 'advanced'
+      printerData: [],
+      selectedFile: null,
+      isLoading: false,
+      message: '',
+      messageType: 'success',
+      searchQuery: '',
+      sortField: 'username',
+      sortDirection: 'asc',
+      currentPage: 1,
+      itemsPerPage: 10
     };
   },
-  methods: {
-    // Méthodes de débogage
-    logDebug(message) {
-      console.log(message);
-      this.debugInfo = new Date().toLocaleTimeString() + ': ' + message;
-    },
-    clearDebug() {
-      this.debugInfo = '';
-    },
-    showRawData() {
-      // Afficher la modal avec les données brutes
-      $('#rawDataModal').modal('show');
-    },
-    switchToAdvanced() {
-      this.viewMode = 'advanced';
-      this.$nextTick(() => {
-        this.initDataTable();
-      });
-    },
-    switchToSimple() {
-      this.viewMode = 'simple';
-    },
+  computed: {
+    filteredData() {
+      let filtered = this.printerData;
 
-    // Méthodes principales
-    initDataTable() {
-      this.logDebug(`Initialisation de DataTable avec ${this.stats.length} entrées`);
-      
-      // Détruire l'instance DataTable existante si elle existe
-      if (this.dataTable) {
-        this.dataTable.destroy();
+      if (this.searchQuery) {
+        const query = this.searchQuery.toLowerCase();
+        filtered = filtered.filter(user =>
+          user.username.toLowerCase().includes(query)
+        );
       }
-      
-      // Initialiser une nouvelle instance DataTable
-      this.$nextTick(() => {
-        setTimeout(() => {
-          try {
-            this.dataTable = $('#printer-table').DataTable({
-              responsive: true,
-              language: {
-                url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/fr-FR.json'
-              }
-            });
-            this.logDebug('DataTable initialisé avec succès');
-          } catch (error) {
-            this.logDebug(`Erreur DataTable: ${error.message}`);
-          }
-        }, 200);
-      });
-    },
-    
-    async uploadCsv() {
-      this.isUploading = true;
-      this.successMessage = '';
-      this.logDebug('Début de l\'upload CSV');
-      
-      try {
-        const formData = new FormData();
-        const file = this.$refs.fileInput.files[0];
-        formData.append('csv', file);
-        this.logDebug(`Fichier sélectionné: ${file.name}`);
-        
-        // Envoyer le fichier au serveur
-        const response = await axios.post('/printer-stats/import', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            'Accept': 'application/json'
-          }
-        });
-        
-        this.logDebug(`Réponse reçue: ${response.status}`);
-        
-        // Afficher le message de succès
-        this.successMessage = response.data.message || 'Fichier importé avec succès';
-        
-        // Vérifier le contenu de la réponse
-        if (response.data.stats && Array.isArray(response.data.stats)) {
-          this.logDebug(`Données reçues: ${response.data.stats.length} entrées`);
-          
-          // Mettre à jour les stats
-          this.stats = [];
-          this.$nextTick(() => {
-            this.stats = response.data.stats;
-            this.logDebug(`Stats mises à jour: ${this.stats.length} entrées`);
-          });
+
+      filtered.sort((a, b) => {
+        let aVal = a[this.sortField];
+        let bVal = b[this.sortField];
+
+        if (typeof aVal === 'string') {
+          aVal = aVal.toLowerCase();
+          bVal = bVal.toLowerCase();
+        }
+
+        if (this.sortDirection === 'asc') {
+          return aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
         } else {
-          this.logDebug('Pas de données dans la réponse ou format invalide');
-          // Recharger les données depuis l'API
-          this.fetchStats();
+          return aVal > bVal ? -1 : aVal < bVal ? 1 : 0;
         }
-        
-        // Reset form
-        this.$refs.uploadForm.reset();
-      } catch (error) {
-        console.error('Erreur:', error);
-        this.logDebug(`Erreur d'upload: ${error.message}`);
-        alert('Une erreur est survenue lors de l\'importation du fichier');
-      } finally {
-        this.isUploading = false;
-      }
+      });
+
+      return filtered;
     },
-    
-    async fetchStats() {
-      this.logDebug('Récupération des statistiques...');
-      
-      try {
-        const response = await axios.get('/printer-stats/api/stats');
-        this.logDebug(`API stats: ${response.status}, ${response.data.length} entrées`);
-        
-        // Mettre à jour les stats
-        this.stats = [];
-        this.$nextTick(() => {
-          this.stats = response.data;
-          this.logDebug(`Stats mises à jour: ${this.stats.length} entrées`);
-          
-          if (this.viewMode === 'advanced') {
-            this.initDataTable();
-          }
-        });
-      } catch (error) {
-        console.error('Erreur lors du chargement des statistiques:', error);
-        this.logDebug(`Erreur fetchStats: ${error.message}`);
-      }
+    paginatedData() {
+      const start = (this.currentPage - 1) * this.itemsPerPage;
+      const end = start + this.itemsPerPage;
+      return this.filteredData.slice(start, end);
     },
-    
-    async deleteStat(id) {
-      if (confirm('Êtes-vous sûr de vouloir supprimer cette statistique ?')) {
-        this.logDebug(`Suppression de la statistique ${id}`);
-        
-        try {
-          const response = await axios.delete(`/printer-stats/api/stats/${id}`);
-          this.logDebug(`Suppression: ${response.status}`);
-          
-          // Filtrer le tableau pour supprimer l'entrée
-          this.stats = this.stats.filter(stat => stat.id !== id);
-          
-          if (this.viewMode === 'advanced') {
-            this.initDataTable();
-          }
-        } catch (error) {
-          console.error('Erreur lors de la suppression:', error);
-          this.logDebug(`Erreur deleteStat: ${error.message}`);
-        }
-      }
+    totalPages() {
+      return Math.ceil(this.filteredData.length / this.itemsPerPage);
+    },
+    // Calcul des totaux généraux
+    totalBlack() {
+      return this.filteredData.reduce((sum, user) => sum + user.totalBlack, 0);
+    },
+    totalColor() {
+      return this.filteredData.reduce((sum, user) => sum + user.totalColor, 0);
+    },
+    totalScans() {
+      return this.filteredData.reduce((sum, user) => sum + user.totalScans, 0);
     }
   },
-  created() {
-    // Initialiser les données
-    if (this.initialData && Array.isArray(this.initialData) && this.initialData.length > 0) {
-      this.stats = JSON.parse(JSON.stringify(this.initialData));
-      this.logDebug(`Données initiales chargées: ${this.stats.length} entrées`);
-    } else {
-      this.logDebug('Pas de données initiales, chargement depuis l\'API');
-      this.fetchStats();
+  methods: {
+    async loadData() {
+      this.isLoading = true;
+      try {
+        const response = await axios.get('/printer-stats/data');
+        this.printerData = response.data;
+      } catch (error) {
+        this.showMessage('Erreur lors du chargement des données', 'error');
+      } finally {
+        this.isLoading = false;
+      }
+    },
+    handleFileSelect(event) {
+      this.selectedFile = event.target.files[0];
+    },
+    async importCsv() {
+      if (!this.selectedFile) {
+        this.showMessage('Veuillez sélectionner un fichier CSV', 'error');
+        return;
+      }
+
+      this.isLoading = true;
+      const formData = new FormData();
+      formData.append('csvFile', this.selectedFile);
+
+      try {
+        const response = await axios.post('/printer-stats/import', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+
+        if (response.data.success) {
+          this.showMessage(`Import réussi! ${response.data.usersProcessed} utilisateur(s) traité(s)`, 'success');
+          await this.loadData();
+          this.selectedFile = null;
+          this.$refs.fileInput.value = '';
+        } else {
+          this.showMessage(response.data.error || 'Erreur lors de l\'import', 'error');
+        }
+      } catch (error) {
+        this.showMessage('Erreur lors de l\'import du fichier', 'error');
+      } finally {
+        this.isLoading = false;
+      }
+    },
+    async clearData() {
+      if (!confirm('Êtes-vous sûr de vouloir effacer toutes les données ?')) {
+        return;
+      }
+
+      this.isLoading = true;
+      try {
+        const response = await axios.delete('/printer-stats/clear');
+        if (response.data.success) {
+          this.showMessage('Données effacées avec succès', 'success');
+          this.printerData = [];
+        } else {
+          this.showMessage(response.data.error || 'Erreur lors de la suppression', 'error');
+        }
+      } catch (error) {
+        this.showMessage('Erreur lors de la suppression', 'error');
+      } finally {
+        this.isLoading = false;
+      }
+    },
+    sortBy(field) {
+      if (this.sortField === field) {
+        this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+      } else {
+        this.sortField = field;
+        this.sortDirection = 'asc';
+      }
+      this.currentPage = 1;
+    },
+    getSortIcon(field) {
+      if (this.sortField !== field) {
+        return 'fas fa-sort';
+      }
+      return this.sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down';
+    },
+    showMessage(text, type) {
+      this.message = text;
+      this.messageType = type;
+      setTimeout(() => {
+        this.message = '';
+      }, 5000);
     }
   },
   mounted() {
-    if (this.viewMode === 'advanced') {
-      this.initDataTable();
-    }
+    this.loadData();
   }
 };
 </script>
 
 <style scoped>
-/* Style spécifique au composant */
-.alert {
-  padding: 10px;
-  margin-bottom: 15px;
-  border-radius: 4px;
+.printer-usage-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
+
+.header-section {
+  margin-bottom: 30px;
+}
+
+.page-title {
+  color: #333;
+  margin-bottom: 20px;
+  font-size: 2rem;
+}
+
+.import-section {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.file-upload-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.file-input {
+  display: none;
+}
+
+.file-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: #007bff;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.file-label:hover {
+  background-color: #0056b3;
+}
+
+.file-name {
+  font-weight: 600;
+  color: #555;
+}
+
+.action-buttons button {
+  margin-right: 10px;
+  min-width: 140px;
+}
+
+.alert {
+  padding: 10px 15px;
+  border-radius: 5px;
+  margin-top: 10px;
+  font-weight: 600;
+}
+
 .alert-success {
   background-color: #d4edda;
   color: #155724;
-  border: 1px solid #c3e6cb;
-}
-.alert-info {
-  background-color: #d1ecf1;
-  color: #0c5460;
-  border: 1px solid #bee5eb;
 }
 
-.btn-export {
+.alert-error {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.table-section {
+  background: white;
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
+}
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.table-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.table-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.total-users {
+  font-weight: 600;
+  color: #666;
+}
+
+.search-wrapper {
+  position: relative;
+  width: 250px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 8px 35px 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.search-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #aaa;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 1rem;
+  color: #444;
+}
+
+.data-table th,
+.data-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #e2e2e2;
+  text-align: left;
+}
+
+.data-table th.sortable {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.data-table th.sortable i {
+  margin-left: 8px;
+  color: #888;
+}
+
+.username-cell i {
+  margin-right: 8px;
+  color: #007bff;
+}
+
+.number-cell {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.badge {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 15px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: white;
+  min-width: 40px;
+  text-align: center;
+}
+
+.badge-dark {
+  background-color: #343a40;
+}
+
+.badge-color {
+  background-color: #28a745;
+}
+
+.badge-info {
   background-color: #17a2b8;
-  color: white;
 }
-.btn-export:hover {
-  background-color: #138496;
+
+.badge-total {
+  background-color: #ffc107;
+  color: #212529;
+}
+
+/* Nouveau style pour les bulles du total général */
+.badge-total-general {
+  background-color: #6c757d; /* gris */
   color: white;
 }
 
-/* Espacement entre les boutons */
-.me-2 {
-  margin-right: 0.5rem;
+.loading-row {
+  text-align: center;
+  color: #666;
+  font-style: italic;
 }
-.me-3 {
-  margin-right: 1rem;
+
+.no-data {
+  text-align: center;
+  color: #999;
+  font-style: italic;
 }
-.ms-3 {
-  margin-left: 1rem;
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  gap: 15px;
 }
-.mb-3 {
-  margin-bottom: 1rem;
+
+.pagination button {
+  min-width: 40px;
+  padding: 6px 10px;
 }
-.mb-4 {
-  margin-bottom: 1.5rem;
+
+.page-info {
+  font-weight: 600;
+  color: #555;
 }
 </style>

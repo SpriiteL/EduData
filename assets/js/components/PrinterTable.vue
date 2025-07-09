@@ -506,7 +506,7 @@ export default {
 }
 
 .badge-dark {
-  background-color: #343a40;
+  background-color: #d63535;
 }
 
 .badge-color {
@@ -519,12 +519,12 @@ export default {
 
 .badge-total {
   background-color: #ffc107;
-  color: #212529;
+  /* color: #212529; */
 }
 
 /* Nouveau style pour les bulles du total général */
 .badge-total-general {
-  background-color: #6c757d; /* gris */
+  background-color: #343a40; /* gris */
   color: white;
 }
 

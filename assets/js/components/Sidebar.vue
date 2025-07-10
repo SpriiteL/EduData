@@ -72,7 +72,7 @@
 <style scoped>
 .nav-link.bg-dark {
   background-color: #ffffff !important;
-  color: #a7abb8 !important;
+  color: #000000 !important;
 }
 
 .nav-link.bg-dark:hover {
@@ -102,7 +102,7 @@
 
 .sidebar .nav-link {
   background-color: #ffffff !important;
-  color: #a7abb8 !important;
+  color: #000000 !important;
   border-radius: 0.25rem;
   transition: background-color 0.3s, color 0.3s;
 }
@@ -111,4 +111,13 @@
   background-color: #0042FF !important;
   color: #ffffff !important;
 }
+
+.sidebar .nav-link i {
+  color: #1016c8 !important;
+}
+
+.sidebar .nav-link:hover i {
+  color: #ffffff !important;
+}
+
 </style>

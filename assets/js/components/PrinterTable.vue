@@ -9,27 +9,39 @@
             ref="fileInput"
             type="file" 
             accept=".csv"
+            multiple
             @change="handleFileSelect"
             class="file-input"
             id="csvFile"
           />
           <label for="csvFile" class="file-label">
             <i class="fas fa-upload"></i>
-            Choisir un fichier CSV
+            Choisir un ou plusieurs fichiers CSV
           </label>
-          <span v-if="selectedFile" class="file-name">{{ selectedFile.name }}</span>
+          <span v-if="selectedFiles.length > 0" class="file-name">
+            {{ selectedFiles.map(file => file.name).join(', ') }}
+          </span>
         </div>
         
         <div class="action-buttons">
           <button 
             @click="importCsv" 
-            :disabled="!selectedFile || isLoading"
+            :disabled="selectedFiles.length === 0 || isLoading"
             class="btn btn-primary"
           >
             <i class="fas fa-file-import"></i>
             {{ isLoading ? 'Import en cours...' : 'Importer' }}
           </button>
           
+          <button 
+            @click="exportCsv" 
+            :disabled="isLoading || printerData.length === 0"
+            class="btn btn-secondary"
+          >
+            <i class="fas fa-file-export"></i>
+            Exporter en CSV
+          </button>
+
           <button 
             @click="clearData" 
             :disabled="isLoading"
@@ -171,7 +183,7 @@ export default {
   data() {
     return {
       printerData: [],
-      selectedFile: null,
+      selectedFiles: [],
       isLoading: false,
       message: '',
       messageType: 'success',
@@ -219,7 +231,6 @@ export default {
     totalPages() {
       return Math.ceil(this.filteredData.length / this.itemsPerPage);
     },
-    // Calcul des totaux généraux
     totalBlack() {
       return this.filteredData.reduce((sum, user) => sum + user.totalBlack, 0);
     },
@@ -243,17 +254,19 @@ export default {
       }
     },
     handleFileSelect(event) {
-      this.selectedFile = event.target.files[0];
+      this.selectedFiles = Array.from(event.target.files);
     },
     async importCsv() {
-      if (!this.selectedFile) {
-        this.showMessage('Veuillez sélectionner un fichier CSV', 'error');
+      if (this.selectedFiles.length === 0) {
+        this.showMessage('Veuillez sélectionner un ou plusieurs fichiers CSV', 'error');
         return;
       }
 
       this.isLoading = true;
       const formData = new FormData();
-      formData.append('csvFile', this.selectedFile);
+      this.selectedFiles.forEach(file => {
+        formData.append('csvFiles[]', file);
+      });
 
       try {
         const response = await axios.post('/printer-stats/import', formData, {
@@ -261,30 +274,48 @@ export default {
         });
 
         if (response.data.success) {
-          this.showMessage(`Import réussi! ${response.data.usersProcessed} utilisateur(s) traité(s)`, 'success');
+          this.showMessage(`Import réussi ! ${response.data.usersProcessed} utilisateur(s) traité(s)`, 'success');
           await this.loadData();
-          this.selectedFile = null;
+          this.selectedFiles = [];
           this.$refs.fileInput.value = '';
         } else {
           this.showMessage(response.data.error || 'Erreur lors de l\'import', 'error');
         }
       } catch (error) {
-        this.showMessage('Erreur lors de l\'import du fichier', 'error');
+        this.showMessage('Erreur lors de l\'import des fichiers', 'error');
+      } finally {
+        this.isLoading = false;
+      }
+    },
+    async exportCsv() {
+      try {
+        this.isLoading = true;
+        const response = await axios.get('/printer-stats/export', {
+          responseType: 'blob'
+        });
+
+        const blob = new Blob([response.data], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'printer_stats_export.csv');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      } catch (error) {
+        this.showMessage('Erreur lors de l\'export', 'error');
       } finally {
         this.isLoading = false;
       }
     },
     async clearData() {
-      if (!confirm('Êtes-vous sûr de vouloir effacer toutes les données ?')) {
-        return;
-      }
-
-      this.isLoading = true;
       try {
+        this.isLoading = true;
         const response = await axios.delete('/printer-stats/clear');
         if (response.data.success) {
-          this.showMessage('Données effacées avec succès', 'success');
-          this.printerData = [];
+          this.showMessage('Données supprimées avec succès', 'success');
+          await this.loadData();
         } else {
           this.showMessage(response.data.error || 'Erreur lors de la suppression', 'error');
         }
@@ -294,6 +325,11 @@ export default {
         this.isLoading = false;
       }
     },
+    showMessage(message, type) {
+      this.message = message;
+      this.messageType = type;
+      setTimeout(() => this.message = '', 5000);
+    },
     sortBy(field) {
       if (this.sortField === field) {
         this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
@@ -301,20 +337,10 @@ export default {
         this.sortField = field;
         this.sortDirection = 'asc';
       }
-      this.currentPage = 1;
     },
     getSortIcon(field) {
-      if (this.sortField !== field) {
-        return 'fas fa-sort';
-      }
+      if (this.sortField !== field) return 'fas fa-sort';
       return this.sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down';
-    },
-    showMessage(text, type) {
-      this.message = text;
-      this.messageType = type;
-      setTimeout(() => {
-        this.message = '';
-      }, 5000);
     }
   },
   mounted() {
@@ -322,6 +348,7 @@ export default {
   }
 };
 </script>
+
 
 <style scoped>
 .printer-usage-container {

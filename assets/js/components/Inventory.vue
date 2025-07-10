@@ -3,18 +3,27 @@
     <div class="header-gradient"></div> <!-- Rectangle dégradé bleu en haut -->
     <div class="inventory-container">
       <h1 class="page-title">Gestion de l'inventaire</h1>
-      <div class="explication">
-      Cette page vous permet de gérer l'inventaire des actifs de l'établissement. Vous pouvez importer des données depuis un fichier CSV, exporter les données actuelles, et supprimer des entrées.
-      Pour importer un fichier CSV, assurez-vous qu'il respecte le format requis. Le fichier doit contenir les colonnes suivantes : Type Actif, Fournisseur, Date d'arrivée, Numéro de Série, Numéro de Facture, N° Facture Interne, Prix Neuf, Lot, Quantité, Salle.
-      Après l'importation, les données seront ajoutées à l'inventaire et vous pourrez les visualiser dans le tableau ci-dessous. Vous pouvez également trier les données par colonne en cliquant sur les en-têtes.
-      Pour exporter les données actuelles, cliquez sur le bouton "Exporter". Un fichier CSV sera téléchargé contenant toutes les entrées de l'inventaire.
-      Pour supprimer une entrée, cliquez sur l'icône de la corbeille à côté de l'entrée correspondante. Une confirmation sera demandée avant la suppression.
-      Utilisez les boutons de pagination pour naviguer entre les pages si l'inventaire contient de nombreuses entrées.
-      Si vous rencontrez des problèmes ou avez des questions, n'hésitez pas à contacter l'administrateur du système.
-      Merci de votre attention et bonne gestion de l'inventaire !
-    </div>
+
+      <!-- BOUTON AFFICHER / MASQUER -->
+      <button @click="showExplanation = !showExplanation" class="btn btn-secondary" style="margin-bottom: 10px;">
+        {{ showExplanation ? 'Masquer les explications' : 'Afficher les explications' }}
+      </button>
+
+      <!-- BLOC D'EXPLICATION -->
+      <div v-show="showExplanation" class="explication">
+        Cette page vous permet de gérer l'inventaire des actifs de l'établissement. Vous pouvez importer des données depuis un fichier CSV, exporter les données actuelles, et supprimer des entrées.
+        Pour importer un fichier CSV, assurez-vous qu'il respecte le format requis. Le fichier doit contenir les colonnes suivantes : Type Actif, Fournisseur, Date d'arrivée, Numéro de Série, Numéro de Facture, N° Facture Interne, Prix Neuf, Lot, Quantité, Salle.
+        Après l'importation, les données seront ajoutées à l'inventaire et vous pourrez les visualiser dans le tableau ci-dessous. Vous pouvez également trier les données par colonne en cliquant sur les en-têtes.
+        Pour exporter les données actuelles, cliquez sur le bouton "Exporter". Un fichier CSV sera téléchargé contenant toutes les entrées de l'inventaire.
+        Pour supprimer une entrée, cliquez sur l'icône de la corbeille à côté de l'entrée correspondante. Une confirmation sera demandée avant la suppression.
+        Utilisez les boutons de pagination pour naviguer entre les pages si l'inventaire contient de nombreuses entrées.
+        Si vous rencontrez des problèmes ou avez des questions, n'hésitez pas à contacter l'administrateur du système.
+        Merci de votre attention et bonne gestion de l'inventaire !
+      </div>
+
+      <!-- RESTE DE TA PAGE INCHANGÉ -->
       <div class="header-section">
-        <h1 class="page-title">Inventaire</h1>
+        <!-- <h1 class="page-title">Inventaire</h1> -->
         
         <div class="import-export-section">
           <div class="file-upload-wrapper">
@@ -28,7 +37,7 @@
             />
             <label for="csvFile" class="file-label">
               <i class="fas fa-upload"></i>
-              Choisir un fichier CSV
+               Choisir un fichier CSV
             </label>
             <span v-if="selectedFile" class="file-name">{{ selectedFile.name }}</span>
           </div>
@@ -126,7 +135,7 @@
       </div>
 
       <div class="footer-section">
-        <button @click="fetchInventories" class="btn btn-primary">
+        <button @click="fetchInventories" class="btn btn-primary btn-fullwidth">
           <i class="fas fa-sync-alt"></i> Rafraîchir
         </button>
       </div>
@@ -150,6 +159,7 @@ export default {
       sortDirection: 'desc',
       currentPage: 1,
       itemsPerPage: 10,
+      showExplanation: true // ✅ Ajout ici
     };
   },
   computed: {
@@ -284,18 +294,21 @@ export default {
   left: 0;
   width: 100%;
   height: 500px; /* Encore plus large */
-  background: linear-gradient(90deg,#00aaff, #003cff);
+  background: linear-gradient(90deg,#003cff, #00aaff);
   z-index: 0; /* derrière tout */
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3); /* Ombre en bas */
 }
 .inventory-container {
-  padding: 20px;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding-top: 320px; /* espace pour le grand gradient */
+  max-width: 1500px; /* plus large */
+  margin: 0 auto 0 0; /* aligné à gauche (marge droite automatique) */
+  padding-top: 320px;
   position: relative;
-  z-index: 100; /* au-dessus du gradient */
+  z-index: 100;
   margin-top: -250px;
+  margin-left: 300px; /* Décalage à gauche */
+  ;
 }
+
 .header-section {
   margin-bottom: 20px;
   position: relative;
@@ -334,6 +347,7 @@ export default {
   cursor: pointer;
   display: inline-flex;
   align-items: center;
+  margin-top: 8px;
 }
 .file-label:hover {
   background: #1749ab;
@@ -412,6 +426,8 @@ export default {
 .btn-primary {
   background: #007bff;
   color: white;
+  /* max-width: 1500px;  */
+  /* plus large */
 }
 .btn-success {
   background: #1b60eb;
@@ -440,7 +456,22 @@ export default {
   font-size: 0.70rem;
   line-height: 1.5;
   background-color: white;
+  color: #6c757d; /* Couleur de texte grise */
   border-radius: 8px;
-  padding: 4px 8px;
+  padding: 20px 25px; /* Augmentation du padding */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* Optionnel : petit effet de profondeur */
 }
+
+.btn-fullwidth {
+  width: 100%;
+  max-width: 1500px;
+  margin-left: 0; /* aligné à gauche comme le tableau */
+  font-size: 1.2rem;
+  padding: 12px;
+  border-radius: 8px;
+  display: block;
+  margin-bottom: 20px; /* Espace entre le bouton et le bas de la section */
+}
+
+
 </style>

@@ -20,9 +20,6 @@ class PrinterStatController extends AbstractController
         $this->doctrine = $doctrine;
     }
 
-    /**
-     * Affiche la liste des stats
-     */
     #[Route('/printer-stats', name: 'app_printer_stats', methods: ['GET'])]
     public function index(): Response
     {
@@ -33,9 +30,6 @@ class PrinterStatController extends AbstractController
         ]);
     }
 
-    /**
-     * Retourne les stats au format JSON
-     */
     #[Route('/printer-stats/data', name: 'app_printer_stats_data', methods: ['GET'])]
     public function getData(): JsonResponse
     {
@@ -56,37 +50,42 @@ class PrinterStatController extends AbstractController
         return new JsonResponse($data);
     }
 
-    /**
-     * Import des stats depuis un fichier CSV uploadé
-     */
     #[Route('/printer-stats/import', name: 'app_printer_stats_import', methods: ['POST'])]
     public function importCsv(Request $request): JsonResponse
     {
-        /** @var UploadedFile|null $file */
-        $file = $request->files->get('csvFile');
+        $files = $request->files->all('csvFiles');
 
-        if (!$file) {
+        if (empty($files)) {
             return new JsonResponse(['error' => 'Aucun fichier fourni'], 400);
         }
 
-        // Validation simple du type de fichier
-        if ($file->getClientMimeType() !== 'text/csv' && $file->getClientOriginalExtension() !== 'csv') {
-            return new JsonResponse(['error' => 'Le fichier doit être au format CSV'], 400);
+        foreach ($files as $file) {
+            if (
+                !$file instanceof UploadedFile ||
+                ($file->getClientMimeType() !== 'text/csv' && $file->getClientOriginalExtension() !== 'csv')
+            ) {
+                return new JsonResponse(['error' => 'Tous les fichiers doivent être au format CSV'], 400);
+            }
         }
 
         try {
             $entityManager = $this->doctrine->getManager();
-
-            // Supprimer les anciennes données
             $entityManager->createQuery('DELETE FROM App\Entity\PrinterStat')->execute();
 
-            // Parser et traiter le CSV
-            $csvData = $this->parseCsvFile($file);
-            if (empty($csvData)) {
-                return new JsonResponse(['error' => 'Le fichier CSV est vide ou invalide'], 400);
+            $allCsvData = [];
+
+            foreach ($files as $file) {
+                $parsedData = $this->parseCsvFile($file);
+                if (!empty($parsedData)) {
+                    $allCsvData = array_merge($allCsvData, $parsedData);
+                }
             }
 
-            $userStats = $this->processUserStats($csvData);
+            if (empty($allCsvData)) {
+                return new JsonResponse(['error' => 'Aucun fichier CSV valide ou vide'], 400);
+            }
+
+            $userStats = $this->processUserStats($allCsvData);
 
             foreach ($userStats as $username => $stats) {
                 $printerStat = new PrinterStat();
@@ -103,18 +102,15 @@ class PrinterStatController extends AbstractController
 
             return new JsonResponse([
                 'success' => true,
-                'message' => 'Données importées avec succès',
+                'message' => 'Import réussi',
                 'usersProcessed' => count($userStats),
                 'usernames' => array_keys($userStats),
             ]);
         } catch (\Exception $e) {
-            return new JsonResponse(['error' => 'Erreur lors du traitement du fichier: ' . $e->getMessage()], 500);
+            return new JsonResponse(['error' => 'Erreur lors du traitement des fichiers : ' . $e->getMessage()], 500);
         }
     }
 
-    /**
-     * Lit et extrait les données du CSV
-     */
     private function parseCsvFile(UploadedFile $file): array
     {
         $csvData = [];
@@ -124,7 +120,6 @@ class PrinterStatController extends AbstractController
             return [];
         }
 
-        // Ignorer les 4 premières lignes (header spécifique)
         for ($i = 0; $i < 4; $i++) {
             fgets($handle);
         }
@@ -137,7 +132,6 @@ class PrinterStatController extends AbstractController
 
         $headers = array_map('trim', $headers);
 
-        // Recherche des colonnes importantes
         $ownerIndex = array_search('Owner name', $headers);
         $jobKindIndex = array_search('Job kind', $headers);
         $colorIndex = array_search('Color', $headers);
@@ -149,9 +143,7 @@ class PrinterStatController extends AbstractController
             return [];
         }
 
-        // Parcourir les lignes restantes
         while (($row = fgetcsv($handle)) !== false) {
-            // Vérification minimale de longueur de ligne
             if (count($row) <= max($ownerIndex, $jobKindIndex, $colorIndex, $originalPagesIndex, $printCountIndex)) {
                 continue;
             }
@@ -162,7 +154,6 @@ class PrinterStatController extends AbstractController
             $originalPages = is_numeric($row[$originalPagesIndex]) ? (int)$row[$originalPagesIndex] : 0;
             $printCount = is_numeric($row[$printCountIndex]) ? (int)$row[$printCountIndex] : 0;
 
-            // Filtrage des données non valides ou indésirables
             if (
                 empty($owner) ||
                 in_array($owner, ['COPY', 'PRINT', 'SCAN', 'JOB KIND', 'DOCUMENT'], true) ||
@@ -187,9 +178,6 @@ class PrinterStatController extends AbstractController
         return $csvData;
     }
 
-    /**
-     * Traite les données CSV et agrège les statistiques par utilisateur
-     */
     private function processUserStats(array $csvData): array
     {
         $userStats = [];
@@ -223,9 +211,6 @@ class PrinterStatController extends AbstractController
         return $userStats;
     }
 
-    /**
-     * Supprime toutes les données PrinterStat
-     */
     #[Route('/printer-stats/clear', name: 'app_printer_stats_clear', methods: ['DELETE'])]
     public function clearData(): JsonResponse
     {
@@ -237,5 +222,55 @@ class PrinterStatController extends AbstractController
         } catch (\Exception $e) {
             return new JsonResponse(['error' => 'Erreur lors de la suppression: ' . $e->getMessage()], 500);
         }
+    }
+
+    #[Route('/printer-stats/export', name: 'app_printer_stats_export', methods: ['GET'])]
+    public function exportCsv(): Response
+    {
+        $stats = $this->doctrine->getRepository(PrinterStat::class)->findAll();
+
+        $handle = fopen('php://temp', 'r+');
+
+        // BOM UTF-8 pour Excel
+        fwrite($handle, "\xEF\xBB\xBF");
+
+        // Entêtes avec ;
+        fputcsv($handle, ['Username', 'Total Noir', 'Total Couleur', 'Total Scans', 'Date de création'], ';');
+
+        $totalBlack = 0;
+        $totalColor = 0;
+        $totalScans = 0;
+
+        foreach ($stats as $stat) {
+            $totalBlack += $stat->getTotalBlack();
+            $totalColor += $stat->getTotalColor();
+            $totalScans += $stat->getTotalScans();
+
+            fputcsv($handle, [
+                $stat->getUsername(),
+                $stat->getTotalBlack(),
+                $stat->getTotalColor(),
+                $stat->getTotalScans(),
+                $stat->getCreatedAt()?->format('Y-m-d H:i:s'),
+            ], ';');
+        }
+
+        // Ligne TOTAL
+        fputcsv($handle, [
+            'TOTAL GÉNÉRAL',
+            $totalBlack,
+            $totalColor,
+            $totalScans,
+            '',
+        ], ';');
+
+        rewind($handle);
+        $csvContent = stream_get_contents($handle);
+        fclose($handle);
+
+        return new Response($csvContent, 200, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="printer_stats_export.csv"',
+        ]);
     }
 }

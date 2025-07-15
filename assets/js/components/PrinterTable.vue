@@ -1,178 +1,200 @@
 <template>
-  <div class="printer-usage-container">
-    <div class="header-section">
-      <h1 class="page-title">Statistiques d'utilisation des imprimantes</h1>
-      
-      <div class="import-section">
-        <div class="file-upload-wrapper">
-          <input 
-            ref="fileInput"
-            type="file" 
-            accept=".csv"
-            multiple
-            @change="handleFileSelect"
-            class="file-input"
-            id="csvFile"
-          />
-          <label for="csvFile" class="file-label">
-            <i class="fas fa-upload"></i>
-            Choisir un ou plusieurs fichiers CSV
-          </label>
-          <span v-if="selectedFiles.length > 0" class="file-name">
-            {{ selectedFiles.map(file => file.name).join(', ') }}
-          </span>
-        </div>
+  <div class="header-gradient"></div>
+    <div class="printer-usage-container">
+      <div class="header-section">
+        <h1 class="page-title">Statistiques d'utilisation des imprimantes</h1>
         
-        <div class="action-buttons">
-          <button 
-            @click="importCsv" 
-            :disabled="selectedFiles.length === 0 || isLoading"
-            class="btn btn-primary"
-          >
-            <i class="fas fa-file-import"></i>
-            {{ isLoading ? 'Import en cours...' : 'Importer' }}
-          </button>
-          
-          <button 
-            @click="exportCsv" 
-            :disabled="isLoading || printerData.length === 0"
-            class="btn btn-secondary"
-          >
-            <i class="fas fa-file-export"></i>
-            Exporter en CSV
-          </button>
+        <!-- BOUTON AFFICHER / MASQUER -->
+      <button @click="showExplanation = !showExplanation" class="btn btn-secondary" style="margin-bottom: 10px;">
+        {{ showExplanation ? 'Masquer les explications' : 'Afficher les explications' }}
+      </button>
 
-          <button 
-            @click="clearData" 
-            :disabled="isLoading"
-            class="btn btn-danger"
-          >
-            <i class="fas fa-trash"></i>
-            Effacer les données
-          </button>
-        </div>
+      <!-- BLOC D'EXPLICATION -->
+      <div v-show="showExplanation" class="explication">
+        <p>
+          Cette page affiche les statistiques d'utilisation des imprimantes par utilisateur. 
+          Vous pouvez importer des fichiers CSV contenant les données d'impression, exporter les résultats au format CSV, 
+          et effacer les données existantes.
+          Pour exporter des données, sélectionnez Exporter en CSV, vous obtiendrez un fichier contenant les colonnes suivantes : 
+          <strong>username</strong>, <strong>Total Noir</strong>, <strong>Total Couleur</strong>, <strong>Total Scans</strong>.
+        </p>
       </div>
 
-      <div v-if="message" :class="['alert', messageType === 'success' ? 'alert-success' : 'alert-error']">
-        {{ message }}
-      </div>
-    </div>
+        <div class="import-section">
+          <div class="upload-actions-wrapper">
+            <!-- Upload file section -->
+            <div class="file-upload-wrapper">
+              <input 
+                ref="fileInput"
+                type="file" 
+                accept=".csv"
+                multiple
+                @change="handleFileSelect"
+                class="file-input"
+                id="csvFile"
+              />
+              <label for="csvFile" class="file-label">
+                <i class="fas fa-upload"></i>
+                Choisir un ou plusieurs fichiers CSV
+              </label>
+              <span v-if="selectedFiles.length > 0" class="file-name">
+                {{ selectedFiles.map(file => file.name).join(', ') }}
+              </span>
+            </div>
 
-    <div class="table-section">
-      <div class="table-header">
-        <h2>Résultats par utilisateur</h2>
-        <div class="table-info">
-          <span class="total-users">{{ filteredData.length }} utilisateur(s)</span>
-          <div class="search-wrapper">
-            <input 
-              v-model="searchQuery"
-              type="text"
-              placeholder="Rechercher un utilisateur..."
-              class="search-input"
-              @input="currentPage = 1"
-            />
-            <i class="fas fa-search search-icon"></i>
+            <!-- Buttons aligned to the right -->
+            <div class="action-buttons">
+              <button 
+                @click="importCsv" 
+                :disabled="selectedFiles.length === 0 || isLoading"
+                class="btn btn-primary"
+              >
+                <i class="fas fa-file-import"></i>
+                {{ isLoading ? 'Import en cours...' : 'Importer' }}
+              </button>
+
+              <button 
+                @click="exportCsv" 
+                :disabled="isLoading || printerData.length === 0"
+                class="btn btn-secondary"
+              >
+                <i class="fas fa-file-export"></i>
+                Exporter en CSV
+              </button>
+
+              <button 
+                @click="clearData" 
+                :disabled="isLoading"
+                class="btn btn-danger"
+              >
+                <i class="fas fa-trash"></i>
+                Effacer les données
+              </button>
+            </div>
           </div>
         </div>
+
+
+        <div v-if="message" :class="['alert', messageType === 'success' ? 'alert-success' : 'alert-error']">
+          {{ message }}
+        </div>
       </div>
 
-      <div class="table-wrapper">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th @click="sortBy('username')" class="sortable">
-                Utilisateur
-                <i :class="getSortIcon('username')"></i>
-              </th>
-              <th @click="sortBy('totalBlack')" class="sortable">
-                Total Noir
-                <i :class="getSortIcon('totalBlack')"></i>
-              </th>
-              <th @click="sortBy('totalColor')" class="sortable">
-                Total Couleur
-                <i :class="getSortIcon('totalColor')"></i>
-              </th>
-              <th @click="sortBy('totalScans')" class="sortable">
-                Total Scans
-                <i :class="getSortIcon('totalScans')"></i>
-              </th>
-              <th>Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-if="isLoading">
-              <td colspan="5" class="loading-row">
-                <i class="fas fa-spinner fa-spin"></i>
-                Chargement des données...
-              </td>
-            </tr>
-            <tr v-else-if="filteredData.length === 0">
-              <td colspan="5" class="no-data">
-                {{ searchQuery ? 'Aucun utilisateur trouvé' : 'Aucune donnée disponible' }}
-              </td>
-            </tr>
-            <tr v-else v-for="user in paginatedData" :key="user.id">
-              <td class="username-cell">
-                <i class="fas fa-user"></i>
-                {{ user.username }}
-              </td>
-              <td class="number-cell">
-                <span class="badge badge-dark">{{ user.totalBlack }}</span>
-              </td>
-              <td class="number-cell">
-                <span class="badge badge-color">{{ user.totalColor }}</span>
-              </td>
-              <td class="number-cell">
-                <span class="badge badge-info">{{ user.totalScans }}</span>
-              </td>
-              <td class="number-cell total-cell">
-                <span class="badge badge-total">{{ user.totalBlack + user.totalColor + user.totalScans }}</span>
-              </td>
-            </tr>
-          </tbody>
-          <tfoot v-if="filteredData.length > 0">
-            <tr>
-              <td><strong>Total général</strong></td>
-              <td class="number-cell">
-                <span class="badge badge-total-general">{{ totalBlack }}</span>
-              </td>
-              <td class="number-cell">
-                <span class="badge badge-total-general">{{ totalColor }}</span>
-              </td>
-              <td class="number-cell">
-                <span class="badge badge-total-general">{{ totalScans }}</span>
-              </td>
-              <td class="number-cell total-cell">
-                <span class="badge badge-total-general">{{ totalBlack + totalColor + totalScans }}</span>
-              </td>
-            </tr>
-          </tfoot>
-        </table>
-      </div>
+      <div class="table-section">
+        <div class="table-header">
+          <h2>Résultats par utilisateur</h2>
+          <div class="table-info">
+            <span class="total-users">{{ filteredData.length }} utilisateur(s)</span>
+            <div class="search-wrapper">
+              <input 
+                v-model="searchQuery"
+                type="text"
+                placeholder="Rechercher un utilisateur..."
+                class="search-input"
+                @input="currentPage = 1"
+              />
+              <i class="fas fa-search search-icon"></i>
+            </div>
+          </div>
+        </div>
 
-      <div v-if="filteredData.length > itemsPerPage" class="pagination">
-        <button 
-          @click="currentPage--" 
-          :disabled="currentPage === 1"
-          class="btn btn-secondary"
-        >
-          <i class="fas fa-chevron-left"></i>
-        </button>
-        
-        <span class="page-info">
-          Page {{ currentPage }} sur {{ totalPages }}
-        </span>
-        
-        <button 
-          @click="currentPage++" 
-          :disabled="currentPage === totalPages"
-          class="btn btn-secondary"
-        >
-          <i class="fas fa-chevron-right"></i>
-        </button>
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th @click="sortBy('username')" class="sortable">
+                  Utilisateur
+                  <i :class="getSortIcon('username')"></i>
+                </th>
+                <th @click="sortBy('totalBlack')" class="sortable">
+                  Total Noir
+                  <i :class="getSortIcon('totalBlack')"></i>
+                </th>
+                <th @click="sortBy('totalColor')" class="sortable">
+                  Total Couleur
+                  <i :class="getSortIcon('totalColor')"></i>
+                </th>
+                <th @click="sortBy('totalScans')" class="sortable">
+                  Total Scans
+                  <i :class="getSortIcon('totalScans')"></i>
+                </th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-if="isLoading">
+                <td colspan="5" class="loading-row">
+                  <i class="fas fa-spinner fa-spin"></i>
+                  Chargement des données...
+                </td>
+              </tr>
+              <tr v-else-if="filteredData.length === 0">
+                <td colspan="5" class="no-data">
+                  {{ searchQuery ? 'Aucun utilisateur trouvé' : 'Aucune donnée disponible' }}
+                </td>
+              </tr>
+              <tr v-else v-for="user in paginatedData" :key="user.id">
+                <td class="username-cell">
+                  <i class="fas fa-user"></i>
+                  {{ user.username }}
+                </td>
+                <td class="number-cell">
+                  <span class="badge badge-dark">{{ user.totalBlack }}</span>
+                </td>
+                <td class="number-cell">
+                  <span class="badge badge-color">{{ user.totalColor }}</span>
+                </td>
+                <td class="number-cell">
+                  <span class="badge badge-info">{{ user.totalScans }}</span>
+                </td>
+                <td class="number-cell total-cell">
+                  <span class="badge badge-total">{{ user.totalBlack + user.totalColor + user.totalScans }}</span>
+                </td>
+              </tr>
+            </tbody>
+            <tfoot v-if="filteredData.length > 0">
+              <tr>
+                <td><strong>Total général</strong></td>
+                <td class="number-cell">
+                  <span class="badge badge-total-general">{{ totalBlack }}</span>
+                </td>
+                <td class="number-cell">
+                  <span class="badge badge-total-general">{{ totalColor }}</span>
+                </td>
+                <td class="number-cell">
+                  <span class="badge badge-total-general">{{ totalScans }}</span>
+                </td>
+                <td class="number-cell total-cell">
+                  <span class="badge badge-total-general">{{ totalBlack + totalColor + totalScans }}</span>
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <div v-if="filteredData.length > itemsPerPage" class="pagination">
+          <button 
+            @click="currentPage--" 
+            :disabled="currentPage === 1"
+            class="btn btn-secondary"
+          >
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          
+          <span class="page-info">
+            Page {{ currentPage }} sur {{ totalPages }}
+          </span>
+          
+          <button 
+            @click="currentPage++" 
+            :disabled="currentPage === totalPages"
+            class="btn btn-secondary"
+          >
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
       </div>
     </div>
-  </div>
 </template>
 
 <script>
@@ -191,7 +213,8 @@ export default {
       sortField: 'username',
       sortDirection: 'asc',
       currentPage: 1,
-      itemsPerPage: 10
+      itemsPerPage: 10,
+      showExplanation: true // ✅ Ajout ici
     };
   },
   computed: {
@@ -351,10 +374,25 @@ export default {
 
 
 <style scoped>
+.header-gradient {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 500px; /* Ajuste la hauteur selon besoin */
+  background: linear-gradient(90deg, #003cff, #00aaff);
+  z-index: 0;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3);
+}
+
+
 .printer-usage-container {
   padding: 20px;
-  max-width: 1200px;
+  max-width: 1500px;
   margin: 0 auto;
+  margin-left: 300px;
+  position: relative;
+  z-index: 1; /* Pour s'assurer que le contenu est au-dessus du header-gradient */
 }
 
 .header-section {
@@ -362,7 +400,7 @@ export default {
 }
 
 .page-title {
-  color: #333;
+  color: #ffffff;
   margin-bottom: 20px;
   font-size: 2rem;
 }
@@ -378,7 +416,7 @@ export default {
   display: flex;
   align-items: center;
   gap: 15px;
-  margin-bottom: 15px;
+  flex-grow: 1;
 }
 
 .file-input {
@@ -584,4 +622,24 @@ export default {
   font-weight: 600;
   color: #555;
 }
+
+.explication {
+  margin-bottom: 20px;
+  font-size: 0.70rem;
+  line-height: 1.5;
+  background-color: white;
+  color: #6c757d; /* Couleur de texte grise */
+  border-radius: 8px;
+  padding: 20px 25px; /* Augmentation du padding */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* Optionnel : petit effet de profondeur */
+}
+
+.upload-actions-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
 </style>

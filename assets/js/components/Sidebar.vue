@@ -29,7 +29,7 @@
             </ul>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="/imprimante" class="nav-link">
+                <a href="/printer-stats" class="nav-link">
                   <i class="fas fa-chart-bar nav-icon"></i>
                   <p>Imprimante</p>
                 </a>

@@ -2,7 +2,7 @@
   <!-- Main Sidebar Container -->
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
-    <a href="#" class="brand-link logo-switch">
+    <a href="/inventory" class="brand-link logo-switch">
       <img src="asset/edu3.png" alt="AdminLTE Docs Logo Large" class="brand-image-xl">
     </a>
 
@@ -26,16 +26,12 @@
                   <p>Inventaire</p>
                 </a>
               </li>
-            </ul>
-            <ul class="nav nav-treeview">
               <li class="nav-item">
                 <a href="/printer-stats" class="nav-link">
                   <i class="fas fa-chart-bar nav-icon"></i>
                   <p>Imprimante</p>
                 </a>
               </li>
-            </ul>
-            <ul class="nav nav-treeview">
               <li class="nav-item">
                 <a href="/badge" class="nav-link">
                   <i class="fa-solid fa-id-card nav-icon"></i>
@@ -87,6 +83,8 @@
   height: auto !important;
   padding: 10px 0;
   text-decoration: none;
+  border-bottom: none !important;
+  margin-bottom: 0 !important;
 }
 
 .brand-image-xl {
@@ -96,8 +94,31 @@
   object-fit: contain;
 }
 
+.sidebar {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+  border-top: none !important;
+}
+
+.sidebar .nav {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
 .main-sidebar {
   background-color: rgb(255, 255, 255) !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  height: 100vh !important;
+  overflow-y: hidden !important;
+  z-index: 1000 !important;
+  width: 250px !important; /* Ajustez la largeur selon vos besoins */
+}
+
+.sidebar {
+  height: calc(100vh - 120px) !important; /* Soustrait la hauteur du logo */
+  overflow-y: hidden !important;
 }
 
 .sidebar .nav-link {
@@ -120,4 +141,18 @@
   color: #ffffff !important;
 }
 
+/* Empêcher le collapse de la sidebar */
+.main-sidebar {
+  min-width: 250px !important;
+  max-width: 250px !important;
+}
+
+/* Masquer les boutons de toggle de la sidebar s'ils existent */
+.nav-link[data-widget="pushmenu"] {
+  display: none !important;
+}
+
+[data-widget="pushmenu"] {
+  display: none !important;
+}
 </style>

@@ -31,6 +31,9 @@ class PrinterStat
     #[ORM\Column(length: 2)]
     private ?string $month = null;
 
+    #[ORM\Column(length: 50)]
+    private ?string $printer = null;
+
     public function __construct()
     {
         $this->createdAt = new \DateTime();
@@ -104,6 +107,17 @@ class PrinterStat
     public function setMonth(string $month): static
     {
         $this->month = $month;
+        return $this;
+    }
+
+    public function getPrinter(): ?string
+    {
+        return $this->printer;
+    }
+
+    public function setPrinter(string $printer): static
+    {
+        $this->printer = $printer;
         return $this;
     }
 

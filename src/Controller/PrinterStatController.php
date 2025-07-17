@@ -15,6 +15,10 @@ class PrinterStatController extends AbstractController
 {
     private ManagerRegistry $doctrine;
 
+    private const AVAILABLE_PRINTERS = [
+        'SDP1', 'SDP2', 'VieScolaire', 'Secretariat', 'StAurelien', 'StLaurent', 'StMartial'
+    ];
+
     public function __construct(ManagerRegistry $doctrine)
     {
         $this->doctrine = $doctrine;
@@ -35,11 +39,22 @@ class PrinterStatController extends AbstractController
     {
         $repository = $this->doctrine->getRepository(PrinterStat::class);
         
-        // Filtrage par mois si spécifié
+        // Filtrage par mois et copieur
         $selectedMonth = $request->query->get('month');
+        $selectedPrinter = $request->query->get('printer');
+        
+        $criteria = [];
         
         if ($selectedMonth && $selectedMonth !== 'all') {
-            $stats = $repository->findBy(['month' => $selectedMonth]);
+            $criteria['month'] = $selectedMonth;
+        }
+        
+        if ($selectedPrinter && $selectedPrinter !== 'all') {
+            $criteria['printer'] = $selectedPrinter;
+        }
+        
+        if (!empty($criteria)) {
+            $stats = $repository->findBy($criteria);
         } else {
             $stats = $repository->findAll();
         }
@@ -53,6 +68,7 @@ class PrinterStatController extends AbstractController
                 'totalColor' => $stat->getTotalColor(),
                 'totalScans' => $stat->getTotalScans(),
                 'month' => $stat->getMonth(),
+                'printer' => $stat->getPrinter(),
                 'createdAt' => $stat->getCreatedAt()?->format('Y-m-d H:i:s'),
             ];
         }
@@ -67,6 +83,7 @@ class PrinterStatController extends AbstractController
             // Récupération des fichiers avec gestion d'erreur
             $files = $request->files->get('csvFiles');
             $selectedMonth = $request->request->get('selectedMonth');
+            $selectedPrinter = $request->request->get('selectedPrinter');
 
             // Validation des paramètres
             if (!$files || (is_array($files) && empty($files))) {
@@ -75,6 +92,14 @@ class PrinterStatController extends AbstractController
 
             if (!$selectedMonth) {
                 return new JsonResponse(['error' => 'Veuillez sélectionner un mois'], 400);
+            }
+
+            if (!$selectedPrinter) {
+                return new JsonResponse(['error' => 'Veuillez sélectionner un copieur'], 400);
+            }
+
+            if (!in_array($selectedPrinter, self::AVAILABLE_PRINTERS)) {
+                return new JsonResponse(['error' => 'Copieur non valide'], 400);
             }
 
             // Convertir en tableau si ce n'est pas déjà le cas
@@ -109,9 +134,10 @@ class PrinterStatController extends AbstractController
 
             $entityManager = $this->doctrine->getManager();
             
-            // Supprimer seulement les données du mois sélectionné
-            $deletedCount = $entityManager->createQuery('DELETE FROM App\Entity\PrinterStat p WHERE p.month = :month')
+            // Supprimer seulement les données du mois et copieur sélectionnés
+            $deletedCount = $entityManager->createQuery('DELETE FROM App\Entity\PrinterStat p WHERE p.month = :month AND p.printer = :printer')
                          ->setParameter('month', $selectedMonth)
+                         ->setParameter('printer', $selectedPrinter)
                          ->execute();
 
             $allCsvData = [];
@@ -143,6 +169,7 @@ class PrinterStatController extends AbstractController
                 $printerStat->setTotalColor($stats['totalColor']);
                 $printerStat->setTotalScans($stats['totalScans']);
                 $printerStat->setMonth($selectedMonth);
+                $printerStat->setPrinter($selectedPrinter);
                 $printerStat->setCreatedAt(new \DateTime());
 
                 $entityManager->persist($printerStat);
@@ -153,11 +180,12 @@ class PrinterStatController extends AbstractController
 
             return new JsonResponse([
                 'success' => true,
-                'message' => "Import réussi pour le mois de " . $this->getMonthName($selectedMonth),
+                'message' => "Import réussi pour le mois de " . $this->getMonthName($selectedMonth) . " - Copieur: " . $selectedPrinter,
                 'usersProcessed' => $savedCount,
                 'filesProcessed' => $processedFiles,
                 'deletedRecords' => $deletedCount,
                 'month' => $selectedMonth,
+                'printer' => $selectedPrinter,
                 'usernames' => array_keys($userStats),
             ]);
 
@@ -302,15 +330,39 @@ class PrinterStatController extends AbstractController
         try {
             $entityManager = $this->doctrine->getManager();
             $month = $request->query->get('month');
+            $printer = $request->query->get('printer');
+            
+            $qb = $entityManager->createQueryBuilder();
+            $qb->delete('App\Entity\PrinterStat', 'p');
+            
+            $conditions = [];
+            $parameters = [];
             
             if ($month && $month !== 'all') {
-                $deletedCount = $entityManager->createQuery('DELETE FROM App\Entity\PrinterStat p WHERE p.month = :month')
-                             ->setParameter('month', $month)
-                             ->execute();
-                $message = "Données du mois de " . $this->getMonthName($month) . " supprimées avec succès ($deletedCount enregistrements)";
-            } else {
-                $deletedCount = $entityManager->createQuery('DELETE FROM App\Entity\PrinterStat')->execute();
-                $message = "Toutes les données supprimées avec succès ($deletedCount enregistrements)";
+                $conditions[] = 'p.month = :month';
+                $parameters['month'] = $month;
+            }
+            
+            if ($printer && $printer !== 'all') {
+                $conditions[] = 'p.printer = :printer';
+                $parameters['printer'] = $printer;
+            }
+            
+            if (!empty($conditions)) {
+                $qb->where(implode(' AND ', $conditions));
+                foreach ($parameters as $key => $value) {
+                    $qb->setParameter($key, $value);
+                }
+            }
+            
+            $deletedCount = $qb->getQuery()->execute();
+            
+            $message = "Données supprimées avec succès ($deletedCount enregistrements)";
+            if ($month && $month !== 'all') {
+                $message .= " - Mois: " . $this->getMonthName($month);
+            }
+            if ($printer && $printer !== 'all') {
+                $message .= " - Copieur: " . $printer;
             }
 
             return new JsonResponse(['success' => true, 'message' => $message]);
@@ -324,22 +376,37 @@ class PrinterStatController extends AbstractController
     {
         $repository = $this->doctrine->getRepository(PrinterStat::class);
         $selectedMonth = $request->query->get('month');
+        $selectedPrinter = $request->query->get('printer');
+        
+        $criteria = [];
+        $filenameParts = ['printer_stats_export'];
         
         if ($selectedMonth && $selectedMonth !== 'all') {
-            $stats = $repository->findBy(['month' => $selectedMonth]);
-            $filename = "printer_stats_export_$selectedMonth.csv";
+            $criteria['month'] = $selectedMonth;
+            $filenameParts[] = $selectedMonth;
+        }
+        
+        if ($selectedPrinter && $selectedPrinter !== 'all') {
+            $criteria['printer'] = $selectedPrinter;
+            $filenameParts[] = $selectedPrinter;
+        }
+        
+        if (!empty($criteria)) {
+            $stats = $repository->findBy($criteria);
         } else {
             $stats = $repository->findAll();
-            $filename = "printer_stats_export_all.csv";
+            $filenameParts[] = 'all';
         }
+        
+        $filename = implode('_', $filenameParts) . '.csv';
 
         $handle = fopen('php://temp', 'r+');
 
         // BOM UTF-8 pour Excel
         fwrite($handle, "\xEF\xBB\xBF");
 
-        // Entêtes avec mois
-        fputcsv($handle, ['Username', 'Total Noir', 'Total Couleur', 'Total Scans', 'Mois', 'Date de création'], ';');
+        // Entêtes avec copieur
+        fputcsv($handle, ['Username', 'Total Noir', 'Total Couleur', 'Total Scans', 'Mois', 'Copieur', 'Date de création'], ';');
 
         $totalBlack = 0;
         $totalColor = 0;
@@ -356,6 +423,7 @@ class PrinterStatController extends AbstractController
                 $stat->getTotalColor(),
                 $stat->getTotalScans(),
                 $this->getMonthName($stat->getMonth()),
+                $stat->getPrinter(),
                 $stat->getCreatedAt()?->format('Y-m-d H:i:s'),
             ], ';');
         }
@@ -367,6 +435,7 @@ class PrinterStatController extends AbstractController
             $totalColor,
             $totalScans,
             $selectedMonth ? $this->getMonthName($selectedMonth) : 'TOUS',
+            $selectedPrinter ?: 'TOUS',
             '',
         ], ';');
 
@@ -393,6 +462,27 @@ class PrinterStatController extends AbstractController
         $monthsList = array_map(fn($m) => $m['month'], $months);
         
         return new JsonResponse($monthsList);
+    }
+
+    #[Route('/printer-stats/printers', name: 'app_printer_stats_printers', methods: ['GET'])]
+    public function getAvailablePrinters(): JsonResponse
+    {
+        $repository = $this->doctrine->getRepository(PrinterStat::class);
+        $printers = $repository->createQueryBuilder('p')
+            ->select('DISTINCT p.printer')
+            ->orderBy('p.printer', 'ASC')
+            ->getQuery()
+            ->getResult();
+
+        $printersList = array_map(fn($p) => $p['printer'], $printers);
+        
+        return new JsonResponse($printersList);
+    }
+
+    #[Route('/printer-stats/available-printers', name: 'app_printer_stats_available_printers', methods: ['GET'])]
+    public function getAvailablePrintersList(): JsonResponse
+    {
+        return new JsonResponse(self::AVAILABLE_PRINTERS);
     }
 
     private function getMonthName(string $monthValue): string

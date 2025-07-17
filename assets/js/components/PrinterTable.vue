@@ -13,23 +13,35 @@
         <div v-show="showExplanation" class="explication">
           <p>
             Cette page affiche les statistiques d'utilisation des imprimantes par utilisateur. 
-            Vous pouvez importer des fichiers CSV contenant les données d'impression en sélectionnant le mois correspondant, 
-            filtrer les données par mois, exporter les résultats au format CSV, et effacer les données existantes.
-            Pour exporter des données, sélectionnez le mois souhaité et cliquez sur Exporter en CSV, vous obtiendrez un fichier contenant les colonnes suivantes : 
-            <strong>username</strong>, <strong>Total Noir</strong>, <strong>Total Couleur</strong>, <strong>Total Scans</strong>, <strong>Mois</strong>.
+            Vous pouvez importer des fichiers CSV contenant les données d'impression en sélectionnant le mois et le copieur correspondants, 
+            filtrer les données par mois et copieur, exporter les résultats au format CSV, et effacer les données existantes.
+            Pour exporter des données, sélectionnez le mois et le copieur souhaités et cliquez sur Exporter en CSV, vous obtiendrez un fichier contenant les colonnes suivantes : 
+            <strong>username</strong>, <strong>Total Noir</strong>, <strong>Total Couleur</strong>, <strong>Total Scans</strong>, <strong>Mois</strong>, <strong>Copieur</strong>.
           </p>
         </div>
 
         <!-- SECTION FILTRAGE -->
         <div class="filter-section">
           <div class="filter-wrapper">
-            <label for="filterMonth">Filtrer par mois :</label>
-            <select v-model="selectedFilterMonth" @change="loadData" id="filterMonth" class="month-select">
-              <option value="all">Tous les mois</option>
-              <option v-for="month in availableMonths" :key="month" :value="month">
-                {{ getMonthLabel(month) }}
-              </option>
-            </select>
+            <div class="filter-group">
+              <label for="filterMonth">Filtrer par mois :</label>
+              <select v-model="selectedFilterMonth" @change="loadData" id="filterMonth" class="month-select">
+                <option value="all">Tous les mois</option>
+                <option v-for="month in availableMonths" :key="month" :value="month">
+                  {{ getMonthLabel(month) }}
+                </option>
+              </select>
+            </div>
+            
+            <div class="filter-group">
+              <label for="filterPrinter">Filtrer par copieur :</label>
+              <select v-model="selectedFilterPrinter" @change="loadData" id="filterPrinter" class="printer-select">
+                <option value="all">Tous les copieur</option>
+                <option v-for="printer in availablePrinters" :key="printer" :value="printer">
+                  {{ printer }}
+                </option>
+              </select>
+            </div>
           </div>
         </div>
 
@@ -44,6 +56,17 @@
                   <option value="">Sélectionner un mois</option>
                   <option v-for="month in months" :key="month.value" :value="month.value">
                     {{ month.label }}
+                  </option>
+                </select>
+              </div>
+
+              <!-- Sélection du copieur pour l'import -->
+              <div class="printer-selector">
+                <label for="importPrinter">Copieur d'import :</label>
+                <select v-model="selectedImportPrinter" id="importPrinter" class="printer-select">
+                  <option value="">Sélectionner un copieur</option>
+                  <option v-for="printer in availablePrintersList" :key="printer" :value="printer">
+                    {{ printer }}
                   </option>
                 </select>
               </div>
@@ -70,7 +93,7 @@
             <div class="action-buttons">
               <button 
                 @click="importCsv" 
-                :disabled="selectedFiles.length === 0 || isLoading || !selectedImportMonth"
+                :disabled="selectedFiles.length === 0 || isLoading || !selectedImportMonth || !selectedImportPrinter"
                 class="btn btn-primary"
               >
                 <i class="fas fa-file-import"></i>
@@ -83,7 +106,7 @@
                 class="btn btn-secondary"
               >
                 <i class="fas fa-file-export"></i>
-                {{ selectedFilterMonth === 'all' ? 'Exporter tous les mois' : `Exporter ${getMonthLabel(selectedFilterMonth)}` }}
+                {{ getExportLabel() }}
               </button>
 
               <button 
@@ -92,7 +115,7 @@
                 class="btn btn-danger"
               >
                 <i class="fas fa-trash"></i>
-                {{ selectedFilterMonth === 'all' ? 'Effacer toutes les données' : `Effacer ${getMonthLabel(selectedFilterMonth)}` }}
+                {{ getClearLabel() }}
               </button>
             </div>
           </div>
@@ -107,7 +130,10 @@
         <div class="table-header">
           <h2>
             Résultats par utilisateur
-            <span v-if="selectedFilterMonth !== 'all'" class="month-badge">{{ getMonthLabel(selectedFilterMonth) }}</span>
+            <span v-if="selectedFilterMonth !== 'all' || selectedFilterPrinter !== 'all'" class="filter-badges">
+              <span v-if="selectedFilterMonth !== 'all'" class="badge badge-month">{{ getMonthLabel(selectedFilterMonth) }}</span>
+              <span v-if="selectedFilterPrinter !== 'all'" class="badge badge-printer">{{ selectedFilterPrinter }}</span>
+            </span>
           </h2>
           <div class="table-info">
             <span class="total-users">{{ filteredData.length }} utilisateur(s)</span>
@@ -148,18 +174,22 @@
                   Mois
                   <i :class="getSortIcon('month')"></i>
                 </th>
+                <th @click="sortBy('printer')" class="sortable">
+                  Copieur
+                  <i :class="getSortIcon('printer')"></i>
+                </th>
                 <th>Total</th>
               </tr>
             </thead>
             <tbody>
               <tr v-if="isLoading">
-                <td colspan="6" class="loading-row">
+                <td colspan="7" class="loading-row">
                   <i class="fas fa-spinner fa-spin"></i>
                   Chargement des données...
                 </td>
               </tr>
               <tr v-else-if="filteredData.length === 0">
-                <td colspan="6" class="no-data">
+                <td colspan="7" class="no-data">
                   {{ searchQuery ? 'Aucun utilisateur trouvé' : 'Aucune donnée disponible' }}
                 </td>
               </tr>
@@ -180,6 +210,9 @@
                 <td class="month-cell">
                   <span class="badge badge-month">{{ getMonthLabel(user.month) }}</span>
                 </td>
+                <td class="printer-cell">
+                  <span class="badge badge-printer">{{ user.printer }}</span>
+                </td>
                 <td class="number-cell total-cell">
                   <span class="badge badge-total">{{ user.totalBlack + user.totalColor + user.totalScans }}</span>
                 </td>
@@ -199,6 +232,9 @@
                 </td>
                 <td class="month-cell">
                   <span class="badge badge-total-general">{{ selectedFilterMonth === 'all' ? 'TOUS' : getMonthLabel(selectedFilterMonth) }}</span>
+                </td>
+                <td class="printer-cell">
+                  <span class="badge badge-total-general">{{ selectedFilterPrinter === 'all' ? 'TOUS' : selectedFilterPrinter }}</span>
                 </td>
                 <td class="number-cell total-cell">
                   <span class="badge badge-total-general">{{ totalBlack + totalColor + totalScans }}</span>
@@ -252,8 +288,12 @@ export default {
       itemsPerPage: 10,
       showExplanation: true,
       selectedImportMonth: '',
+      selectedImportPrinter: '',
       selectedFilterMonth: 'all',
+      selectedFilterPrinter: 'all',
       availableMonths: [],
+      availablePrinters: [],
+      availablePrintersList: [],
       months: [
         { value: '01', label: 'Janvier' },
         { value: '02', label: 'Février' },
@@ -325,6 +365,9 @@ export default {
         if (this.selectedFilterMonth !== 'all') {
           params.month = this.selectedFilterMonth;
         }
+        if (this.selectedFilterPrinter !== 'all') {
+          params.printer = this.selectedFilterPrinter;
+        }
         
         const response = await axios.get('/printer-stats/data', { params });
         this.printerData = response.data;
@@ -342,6 +385,22 @@ export default {
         console.error('Erreur lors du chargement des mois disponibles', error);
       }
     },
+    async loadAvailablePrinters() {
+      try {
+        const response = await axios.get('/printer-stats/printers');
+        this.availablePrinters = response.data;
+      } catch (error) {
+        console.error('Erreur lors du chargement des copieur disponibles', error);
+      }
+    },
+    async loadAvailablePrintersList() {
+      try {
+        const response = await axios.get('/printer-stats/available-printers');
+        this.availablePrintersList = response.data;
+      } catch (error) {
+        console.error('Erreur lors du chargement de la liste des copieur', error);
+      }
+    },
     handleFileSelect(event) {
       this.selectedFiles = Array.from(event.target.files);
     },
@@ -353,6 +412,11 @@ export default {
 
       if (!this.selectedImportMonth) {
         this.showMessage('Veuillez sélectionner un mois pour l\'import', 'error');
+        return;
+      }
+
+      if (!this.selectedImportPrinter) {
+        this.showMessage('Veuillez sélectionner un copieur pour l\'import', 'error');
         return;
       }
 
@@ -386,6 +450,7 @@ export default {
         });
         
         formData.append('selectedMonth', this.selectedImportMonth);
+        formData.append('selectedPrinter', this.selectedImportPrinter);
 
         const response = await axios.post('/printer-stats/import', formData, {
           headers: {
@@ -408,10 +473,12 @@ export default {
           // Recharger les données
           await this.loadData();
           await this.loadAvailableMonths();
+          await this.loadAvailablePrinters();
           
           // Réinitialiser le formulaire
           this.selectedFiles = [];
           this.selectedImportMonth = '';
+          this.selectedImportPrinter = '';
           this.$refs.fileInput.value = '';
         } else {
           this.showMessage(response.data.error || 'Erreur lors de l\'import', 'error');
@@ -452,6 +519,9 @@ export default {
         if (this.selectedFilterMonth !== 'all') {
           params.month = this.selectedFilterMonth;
         }
+        if (this.selectedFilterPrinter !== 'all') {
+          params.printer = this.selectedFilterPrinter;
+        }
         
         const response = await axios.get('/printer-stats/export', {
           params,
@@ -463,9 +533,17 @@ export default {
         const link = document.createElement('a');
         link.href = url;
         
-        const filename = this.selectedFilterMonth === 'all' 
-          ? 'printer_stats_export_all.csv'
-          : `printer_stats_export_${this.selectedFilterMonth}.csv`;
+        let filename = 'printer_stats_export';
+        if (this.selectedFilterMonth !== 'all') {
+          filename += `_${this.selectedFilterMonth}`;
+        }
+        if (this.selectedFilterPrinter !== 'all') {
+          filename += `_${this.selectedFilterPrinter}`;
+        }
+        if (this.selectedFilterMonth === 'all' && this.selectedFilterPrinter === 'all') {
+          filename += '_all';
+        }
+        filename += '.csv';
         
         link.setAttribute('download', filename);
         document.body.appendChild(link);
@@ -479,9 +557,7 @@ export default {
       }
     },
     async clearData() {
-      const confirmMessage = this.selectedFilterMonth === 'all'
-        ? 'Êtes-vous sûr de vouloir supprimer toutes les données ?'
-        : `Êtes-vous sûr de vouloir supprimer les données du mois ${this.getMonthLabel(this.selectedFilterMonth)} ?`;
+      const confirmMessage = this.getClearConfirmMessage();
       
       if (!confirm(confirmMessage)) {
         return;
@@ -493,12 +569,16 @@ export default {
         if (this.selectedFilterMonth !== 'all') {
           params.month = this.selectedFilterMonth;
         }
+        if (this.selectedFilterPrinter !== 'all') {
+          params.printer = this.selectedFilterPrinter;
+        }
         
         const response = await axios.delete('/printer-stats/clear', { params });
         if (response.data.success) {
           this.showMessage(response.data.message, 'success');
           await this.loadData();
           await this.loadAvailableMonths();
+          await this.loadAvailablePrinters();
         } else {
           this.showMessage(response.data.error || 'Erreur lors de la suppression', 'error');
         }
@@ -528,11 +608,53 @@ export default {
     getMonthLabel(monthValue) {
       const month = this.months.find(m => m.value === monthValue);
       return month ? month.label : monthValue;
+    },
+    getExportLabel() {
+      let label = 'Exporter';
+      if (this.selectedFilterMonth !== 'all') {
+        label += ` ${this.getMonthLabel(this.selectedFilterMonth)}`;
+      }
+      if (this.selectedFilterPrinter !== 'all') {
+        label += ` ${this.selectedFilterPrinter}`;
+      }
+      if (this.selectedFilterMonth === 'all' && this.selectedFilterPrinter === 'all') {
+        label += ' toutes les données';
+      }
+      return label;
+    },
+    getClearLabel() {
+      let label = 'Effacer';
+      if (this.selectedFilterMonth !== 'all') {
+        label += ` ${this.getMonthLabel(this.selectedFilterMonth)}`;
+      }
+      if (this.selectedFilterPrinter !== 'all') {
+        label += ` ${this.selectedFilterPrinter}`;
+      }
+      if (this.selectedFilterMonth === 'all' && this.selectedFilterPrinter === 'all') {
+        label += ' toutes les données';
+      }
+      return label;
+    },
+    getClearConfirmMessage() {
+      let message = 'Êtes-vous sûr de vouloir supprimer ';
+      if (this.selectedFilterMonth !== 'all' && this.selectedFilterPrinter !== 'all') {
+        message += `les données du mois ${this.getMonthLabel(this.selectedFilterMonth)} pour le copieur ${this.selectedFilterPrinter}`;
+      } else if (this.selectedFilterMonth !== 'all') {
+        message += `les données du mois ${this.getMonthLabel(this.selectedFilterMonth)}`;
+      } else if (this.selectedFilterPrinter !== 'all') {
+        message += `les données du copieur ${this.selectedFilterPrinter}`;
+      } else {
+        message += 'toutes les données';
+      }
+      message += ' ?';
+      return message;
     }
   },
   mounted() {
     this.loadData();
     this.loadAvailableMonths();
+    this.loadAvailablePrinters();
+    this.loadAvailablePrintersList();
   }
 };
 </script>
@@ -596,6 +718,14 @@ export default {
   min-width: 150px;
 }
 
+.printer-select {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  min-width: 150px;
+}
+
 .import-section {
   background: #f8f9fa;
   padding: 20px;
@@ -626,7 +756,19 @@ export default {
   white-space: nowrap;
 }
 
+.printer-selector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
 .month-selector label {
+  font-weight: 600;
+  color: #333;
+}
+
+.printer-selector label {
   font-weight: 600;
   color: #333;
 }
@@ -865,6 +1007,10 @@ export default {
 
 .badge-month {
   background-color: #6f42c1;
+}
+
+.badge-printer {
+  background-color: #cb1695;
 }
 
 .badge-total {

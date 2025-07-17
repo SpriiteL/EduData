@@ -30,6 +30,7 @@ class BadgeController extends AbstractController
         $badge->setDate(new \DateTime($data->get('dateTraitement')));
         $badge->setClasse($data->get('classe'));
         $badge->setEtatTraitement($data->get('etatTraitement'));
+        $badge->setLieu($data->get('lieu'));
 
         // Sauvegarde dans la base
         $entityManager->persist($badge);
@@ -43,6 +44,7 @@ class BadgeController extends AbstractController
             'dateTraitement' => $badge->getDate()->format('Y-m-d'),
             'classe' => $badge->getClasse(),
             'etatTraitement' => $badge->getEtatTraitement(),
+            'lieu' => $badge->getLieu(),
         ]);
     }
 
@@ -61,6 +63,7 @@ class BadgeController extends AbstractController
                 'dateTraitement' => $badge->getDate()->format('Y-m-d'),
                 'classe' => $badge->getClasse(),
                 'etatTraitement' => $badge->getEtatTraitement(),
+                'lieu' => $badge->getLieu(),
             ];
         }
 
@@ -84,7 +87,11 @@ class BadgeController extends AbstractController
          return new JsonResponse(['success' => true]);
      }
 
+<<<<<<< HEAD
     #[Route('/badge/treated', name: 'badge_treated', methods: ['GET'])]
+=======
+     #[Route('/badge/treated', name: 'badge_treated', methods: ['GET'])]
+>>>>>>> feature/frontend
      public function getTreatedBadges(EntityManagerInterface $entityManager): JsonResponse
      {
          $badges = $entityManager->getRepository(Badge::class)->findBy(['etatTraitement' => 'Traitée']);
@@ -107,7 +114,11 @@ class BadgeController extends AbstractController
          return $this->render('badge/public_badges.html.twig');
      }
 
+<<<<<<< HEAD
     #[Route('/badge/update/{id}', name: 'badge_update', methods: ['PUT'])]
+=======
+     #[Route('/badge/update/{id}', name: 'badge_update', methods: ['PUT'])]
+>>>>>>> feature/frontend
      public function updateBadge(int $id, Request $request, EntityManagerInterface $entityManager): JsonResponse
      {
          $badge = $entityManager->getRepository(Badge::class)->find($id);

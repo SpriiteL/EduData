@@ -8,12 +8,12 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+// use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 class LoginController extends AbstractController
 {
     #[Route(path: '/login', name: 'app_login')]
-    public function login(AuthenticationUtils $authenticationUtils, Security $security, SessionInterface $session, CsrfTokenManagerInterface $csrfTokenManager): Response
+    public function login(AuthenticationUtils $authenticationUtils, Security $security, SessionInterface $session): Response
     {
         if ($this->getUser()) {
             $theme = $session->get('theme', 'theme1'); // Récupérer le thème actuel ou définir par défaut
@@ -22,7 +22,7 @@ class LoginController extends AbstractController
             if ($security->isGranted('ROLE_ADMIN')) {
                 return $this->redirectToRoute('admin');
             } elseif ($security->isGranted('ROLE_USER')) {
-                return $this->redirectToRoute('app_inventory');
+                return $this->redirectToRoute('app_home_cards');
             }
         }
 
@@ -30,13 +30,13 @@ class LoginController extends AbstractController
         $error = $authenticationUtils->getLastAuthenticationError();
         $lastUsername = $authenticationUtils->getLastUsername();
 
-        $csrfToken = $csrfTokenManager->getToken('authenticate')->getValue();
+        // $csrfToken = $csrfTokenManager->getToken('authenticate')->getValue();
 
         return $this->render('login/login.html.twig', [
             'last_username' => $lastUsername,
             'error' => $error,
             'theme' => $theme,
-            'csrf_token' => $csrfToken,
+            // 'csrf_token' => $csrfToken,
         ]);
     }
 

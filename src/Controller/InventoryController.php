@@ -269,3 +269,7 @@ class InventoryController extends AbstractController
         return $rfid;
     }
 }
+
+//         return $this->redirectToRoute('app_inventory');
+//     }
+//         return $this->redirectToRoute('app_inventory');

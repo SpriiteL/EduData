@@ -28,6 +28,9 @@ class PrinterStat
     #[ORM\Column(type: 'datetime')]
     private \DateTimeInterface $createdAt;
 
+    #[ORM\Column(length: 2)]
+    private ?string $month = null;
+
     public function __construct()
     {
         $this->createdAt = new \DateTime();
@@ -90,6 +93,17 @@ class PrinterStat
     public function setCreatedAt(\DateTimeInterface $createdAt): static
     {
         $this->createdAt = $createdAt;
+        return $this;
+    }
+
+    public function getMonth(): ?string
+    {
+        return $this->month;
+    }
+
+    public function setMonth(string $month): static
+    {
+        $this->month = $month;
         return $this;
     }
 

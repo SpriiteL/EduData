@@ -14,7 +14,7 @@
         <ul>
           <li><a href="/cgu">Conditions Générales d'Utilisation</a></li>
           <!-- <li><a href="/confidentialite">Politique de confidentialité</a></li> -->
-          <li><a href="/mentions-legales">Mentions légales</a></li>
+          <!-- <li><a href="/mentions-legales">Mentions légales</a></li> -->
         </ul>
       </div>
 

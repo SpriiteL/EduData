@@ -38,3 +38,8 @@ npm-debug.log
 yarn-error.log
 ###< symfony/webpack-encore-bundle ###
 /frankenphp/Caddyfile
+
+# Environment files
+.env
+.env.local
+.env.*.local

@@ -21,6 +21,12 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
+                <a href="/home/cards" class="nav-link">
+                  <i class=" fa-solid fa-home nav-icon"></i>
+                  <p>Accueil</p>
+                </a>
+              </li>
+              <li class="nav-item">
                 <a href="/inventory" class="nav-link">
                   <i class=" fa-solid fa-boxes-stacked nav-icon"></i>
                   <p>Inventaire</p>

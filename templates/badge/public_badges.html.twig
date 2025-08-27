@@ -1,216 +1,27 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Liste des badges validés</title>
+{# {% extends 'base.html.twig' %} #}
+
+{# {% block title %}Log in!{% endblock %} #}
+
+{% block stylesheets %}
+    <link rel="shortcut icon" type="image/png" href="{{ asset('assets/images/logos/favicon.png') }}" />
+    <link rel="stylesheet" href="{{ asset('css/styles.min.css') }}" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.1/dist/css/adminlte.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-    <style>
-        /* Style général */
-        body {
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f9;
-            color: #333;
-            overflow-x: hidden; /* Empêche le débordement */
-        }
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    {{ encore_entry_link_tags('app') }}
+{% endblock %}
 
-        /* Bande dégradée en haut */
-        .header {
-            background: linear-gradient(to right, #003366, #00609C);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            gap: 20px;
-            padding: 20px 10px;
-            animation: slideInHeader 1.5s ease-out;
-            position: relative;
-        }
+{% block body %}
+<div id="publicbadge"></div>
+<!-- Body Wrapper -->
 
-        /* Animation de translation */
-        @keyframes slideInHeader {
-            from {
-                transform: translateY(-100%);
-            }
-            to {
-                transform: translateY(0);
-            }
-        }
+{% endblock %}
 
-        /* Animation continue toutes les 20 secondes */
-        {# @keyframes pulseHeader {
-            0% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.02);
-            }
-            100% {
-                transform: scale(1);
-            }
-        } #}
-
-        .header {
-            animation: slideInHeader 1.5s ease-out, pulseHeader 20s infinite;
-        }
-
-        /* Animation toupie pour le logo toutes les 15 secondes */
-        @keyframes spinLogo {
-            0% {
-                transform: rotate(0deg);
-            }
-            50% {
-                transform: rotate(360deg);
-            }
-            100% {
-                transform: rotate(0deg);
-            }
-        }
-
-        .header img {
-            max-height: 100px;
-            margin-right: 500px;
-            border: 1px solid white;
-            border-radius: 50%;
-            animation: fadeIn 2s ease-in, spinLogo 15s infinite;
-        }
-
-        .header h1, .header p {
-            opacity: 0;
-            animation: fadeIn 2s forwards, bounce 2.5s ease-in-out 0.5s;
-        }
-
-        /* Animation de fondu enchaîné */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-
-        /* Animation de rebond subtil */
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% {
-                transform: translateY(0);
-            }
-            40% {
-                transform: translateY(-10px);
-            }
-            60% {
-                transform: translateY(-5px);
-            }
-        }
-
-        .sf-toolbar {
-            display: none !important;
-        }   
-
-        /* Tableau agrandi */
-        .badge-table {
-            margin: 20px auto;
-            width: 90%;
-            border-collapse: collapse;
-            background: white;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            overflow: hidden;
-            font-size: 2em;
-            font-weight: bold;
-        }
-
-        .badge-table th {
-            background-color: #00609C;
-            color: white;
-            font-size: 1.3em;
-            text-align: left;
-            padding: 20px;
-        }
-
-        .badge-table td {
-            padding: 20px;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .badge-table tr:hover {
-            background-color: #f1f1f1;
-        }
-
-        /* Pied de page (optionnel) */
-        .footer {
-            text-align: center;
-            padding: 10px 0;
-            margin-top: 20px;
-            font-size: 0.9em;
-            color: #666;
-        }
-
-    </style>
-</head>
-<body>
-    <!-- Bande bleue avec titre et message -->
-    <div class="header">
-        <img src="../asset/logobeaup.png" alt="Logo">
-        <div>
-            <h1>BEAUPEYRAT</h1>
-        </div>
-    </div>
-
-    <!-- Tableau des badges -->
-    <table id="treated-badges" class="badge-table">
-        <thead>
-            <tr>
-                <th>Nom</th>
-                <th>Prénom</th>
-                <th>Classe</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Les données seront injectées ici -->
-        </tbody>
-    </table>
-
-    <!-- Pied de page -->
-    <div class="footer">
-        © 2024 Beaupeyrat - Tous droits réservés
-    </div>
-
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        // Fonction pour charger les badges traités
-        function loadTreatedBadges() {
-            $.ajax({
-                url: '/badge/treated',
-                type: 'GET',
-                success: function (response) {
-                    const tbody = $('#treated-badges tbody');
-                    tbody.empty(); // Vider le tableau avant de le remplir
-                    response.forEach(function (badge) {
-                        tbody.append(`
-                            <tr>
-                                <td>${badge.nom}</td>
-                                <td>${badge.prenom}</td>
-                                <td>${badge.classe}</td>
-                            </tr>
-                        `);
-                    });
-                },
-                error: function () {
-                    console.error('Erreur lors du chargement des badges traités.');
-                }
-            });
-        }
-
-        // Charger les badges à l'initialisation de la page
-        $(document).ready(function () {
-            loadTreatedBadges();
-
-            // Rafraîchir toutes les 10 secondes
-            setInterval(loadTreatedBadges, 10000);
-        });
-    </script>
-</body>
-</html>
+{% block javascripts %}
+    <script src="{{ asset('libs/jquery/dist/jquery.min.js') }}"></script>
+    <script src="{{ asset('libs/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.1/dist/js/adminlte.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    {{ encore_entry_script_tags('app') }}
+{% endblock %}

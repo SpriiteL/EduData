@@ -167,6 +167,9 @@
         </button>
       </div>
     </div>
+<<<<<<< HEAD
+</template>
+=======
   </div>
 </template>
 
@@ -644,3 +647,4 @@ export default {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 </style>
+>>>>>>> feature/frontend

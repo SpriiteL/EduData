@@ -27,16 +27,16 @@
           <form id="badge-form" class="badge-form">
             <div class="form-row">
               <div class="form-group">
-                <label for="nom" class="form-label">Nom</label>
-                <input type="text" class="form-control" id="nom" name="nom" placeholder="Nom" v-model="formData.nom">
+                <label for="nom" class="form-label">Nom *</label>
+                <input type="text" class="form-control" id="nom" name="nom" placeholder="Nom" v-model="formData.nom" required>
               </div>
               <div class="form-group">
-                <label for="prenom" class="form-label">Prénom</label>
-                <input type="text" class="form-control" id="prenom" name="prenom" placeholder="Prénom" v-model="formData.prenom">
+                <label for="prenom" class="form-label">Prénom *</label>
+                <input type="text" class="form-control" id="prenom" name="prenom" placeholder="Prénom" v-model="formData.prenom" required>
               </div>
               <div class="form-group">
-                <label for="dateTraitement" class="form-label">Date Traitement</label>
-                <input type="date" class="form-control" id="dateTraitement" name="dateTraitement" v-model="formData.dateTraitement">
+                <label for="dateTraitement" class="form-label">Date Traitement *</label>
+                <input type="date" class="form-control" id="dateTraitement" name="dateTraitement" v-model="formData.dateTraitement" required>
               </div>
               <div class="form-group">
                 <label for="classe" class="form-label">Classe</label>
@@ -61,8 +61,8 @@
                 </select>
               </div>
               <div class="form-group">
-                <label for="lieu" class="form-label">Lieu</label>
-                <input type="text" class="form-control" id="lieu" name="lieu" placeholder="Lieu" v-model="formData.lieu">
+                <label for="lieu" class="form-label">Lieu *</label>
+                <input type="text" class="form-control" id="lieu" name="lieu" placeholder="Lieu" v-model="formData.lieu" required>
               </div>
             </div>
             
@@ -121,7 +121,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-if="isLoading">
+              <tr v-if="isLoading && badges.length === 0">
                 <td colspan="7" class="loading-row">
                   <i class="fas fa-spinner fa-spin"></i> Chargement…
                 </td>
@@ -141,7 +141,7 @@
                 </td>
                 <td>{{ badge.lieu }}</td>
                 <td>
-                  <button @click="deleteBadge(badge.id)" class="btn btn-danger btn-sm">
+                  <button @click="deleteBadge(badge.id)" class="btn btn-danger btn-sm" :disabled="isLoading">
                     <i class="fas fa-trash-alt"></i>
                   </button>
                 </td>
@@ -162,7 +162,7 @@
       </div>
 
       <div class="footer-section">
-        <button @click="loadBadges" class="btn btn-primary btn-fullwidth">
+        <button @click="loadBadges" class="btn btn-primary btn-fullwidth" :disabled="isLoading">
           <i class="fas fa-sync-alt"></i> Rafraîchir
         </button>
       </div>
@@ -255,27 +255,67 @@ export default {
         etatTraitement: 'En attente',
         lieu: ''
       };
+      this.message = '';
+    },
+    showMessage(text, type = 'success') {
+      this.message = text;
+      this.messageType = type;
+      setTimeout(() => {
+        this.message = '';
+      }, 5000);
+    },
+    validateForm() {
+      const errors = [];
+      
+      if (!this.formData.nom?.trim()) {
+        errors.push('Le nom est obligatoire');
+      }
+      if (!this.formData.prenom?.trim()) {
+        errors.push('Le prénom est obligatoire');
+      }
+      if (!this.formData.dateTraitement) {
+        errors.push('La date de traitement est obligatoire');
+      }
+      if (!this.formData.lieu?.trim()) {
+        errors.push('Le lieu est obligatoire');
+      }
+      
+      return errors;
     },
     async loadBadges() {
       this.isLoading = true;
       try {
         const response = await fetch('/badge/list');
+        
+        // Vérifier si la réponse est du JSON
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          const textResponse = await response.text();
+          console.error('Réponse non-JSON reçue lors du chargement:', textResponse);
+          throw new Error('Le serveur a retourné une réponse invalide');
+        }
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Erreur serveur');
+        }
+        
         const data = await response.json();
-        this.badges = data;
+        this.badges = data || [];
+        
       } catch (error) {
         console.error('Erreur lors du chargement des badges:', error);
-        this.message = 'Erreur de chargement';
-        this.messageType = 'error';
-        setTimeout(() => this.message = '', 5000);
+        this.showMessage('Erreur lors du chargement des badges: ' + error.message, 'error');
+        this.badges = []; // S'assurer qu'on a un tableau vide en cas d'erreur
       } finally {
         this.isLoading = false;
       }
     },
     async addBadge() {
-      if (!this.formData.nom || !this.formData.prenom || !this.formData.lieu) {
-        this.message = 'Veuillez remplir tous les champs obligatoires';
-        this.messageType = 'error';
-        setTimeout(() => this.message = '', 5000);
+      // Validation côté client
+      const validationErrors = this.validateForm();
+      if (validationErrors.length > 0) {
+        this.showMessage(validationErrors.join(', '), 'error');
         return;
       }
 
@@ -283,7 +323,8 @@ export default {
       try {
         const formData = new FormData();
         Object.keys(this.formData).forEach(key => {
-          formData.append(key, this.formData[key]);
+          const value = this.formData[key];
+          formData.append(key, typeof value === 'string' ? value.trim() : value);
         });
 
         const response = await fetch('/badge/add', {
@@ -291,27 +332,39 @@ export default {
           body: formData
         });
 
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || 'Erreur serveur');
+        // Vérifier si la réponse est du JSON
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          const textResponse = await response.text();
+          console.error('Réponse HTML reçue lors de l\'ajout:', textResponse);
+          throw new Error('Le serveur a retourné une page d\'erreur. Vérifiez les logs du serveur.');
         }
 
         const data = await response.json();
-        this.badges.push(data);
+        
+        if (!response.ok) {
+          throw new Error(data.error || `Erreur serveur (${response.status})`);
+        }
+
+        // Ajouter le nouveau badge à la liste locale
+        this.badges.unshift(data); // Ajouter au début pour qu'il apparaisse en premier
         this.resetForm();
-        this.message = 'Badge ajouté avec succès';
-        this.messageType = 'success';
+        this.showMessage('Badge ajouté avec succès', 'success');
+        
+        // Optionnel : recharger la liste pour être sûr de la synchronisation
+        // await this.loadBadges();
+        
       } catch (error) {
         console.error('Erreur lors de l\'ajout du badge:', error);
-        this.message = 'Erreur lors de l\'ajout : ' + error.message;
-        this.messageType = 'error';
+        this.showMessage('Erreur lors de l\'ajout: ' + error.message, 'error');
       } finally {
         this.isLoading = false;
-        setTimeout(() => this.message = '', 5000);
       }
     },
     async deleteBadge(id) {
-      if (!confirm('Êtes-vous sûr de vouloir supprimer ce badge?')) return;
+      if (!confirm('Êtes-vous sûr de vouloir supprimer ce badge?')) {
+        return;
+      }
       
       this.isLoading = true;
       try {
@@ -319,21 +372,37 @@ export default {
           method: 'DELETE'
         });
         
+        // Vérifier si la réponse est du JSON
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          const textResponse = await response.text();
+          console.error('Réponse non-JSON reçue lors de la suppression:', textResponse);
+          throw new Error('Le serveur a retourné une réponse invalide');
+        }
+        
         const data = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(data.error || `Erreur serveur (${response.status})`);
+        }
+        
         if (data.success) {
+          // Retirer le badge de la liste locale
           this.badges = this.badges.filter(badge => badge.id !== id);
-          this.message = 'Badge supprimé avec succès';
-          this.messageType = 'success';
+          this.showMessage('Badge supprimé avec succès', 'success');
+          
+          // Ajuster la page courante si nécessaire
+          if (this.paginatedData.length === 0 && this.currentPage > 1) {
+            this.currentPage--;
+          }
         } else {
-          throw new Error('Erreur lors de la suppression');
+          throw new Error('La suppression a échoué');
         }
       } catch (error) {
         console.error('Erreur lors de la suppression du badge:', error);
-        this.message = 'Erreur lors de la suppression';
-        this.messageType = 'error';
+        this.showMessage('Erreur lors de la suppression: ' + error.message, 'error');
       } finally {
         this.isLoading = false;
-        setTimeout(() => this.message = '', 5000);
       }
     }
   },
@@ -421,6 +490,10 @@ export default {
   outline: none;
   border-color: #1b60eb;
   box-shadow: 0 0 0 2px rgba(27, 96, 235, 0.2);
+}
+
+.form-control:invalid {
+  border-color: #dc3545;
 }
 
 .action-buttons {

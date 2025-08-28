@@ -12,22 +12,33 @@ import Sidebar2 from './components/Sidenav/index.vue';
 import Footer from './components/Footer.vue';
 import CGU from './components/CGU.vue';
 import PublicBadge from './components/PublicBadge.vue';
+import GestionUserAdmin from './components/GestionUserAdmin.vue';
 import 'font-awesome/css/font-awesome.css';
 import "/node_modules/flag-icons/css/flag-icons.min.css";
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
+// Fonction pour monter les composants de manière sécurisée
+function mountComponent(component, selector) {
+    const element = document.querySelector(selector);
+    if (element) {
+        createApp(component).mount(selector);
+    }
+}
 
-
-createApp(Login).mount('#login');
-createApp(Sidebar).mount('#sidebar');
-createApp(Header).mount('#header');
-createApp(Badge).mount('#badge');
-createApp(Dashboard).mount('#dashboard');
-createApp(Inventory).mount('#inventory');
-createApp(Imprimante).mount('#imprimante');
-createApp(PrinterTable).mount('#vue-table');
-createApp(Home).mount('#home');
-createApp(Sidebar2).mount('#sidebar2');
-createApp(Footer).mount('#footer');
-createApp(CGU).mount('#cgu');
-createApp(PublicBadge).mount('#publicbadge');
+// Vérifier que le DOM est chargé avant de monter les composants
+document.addEventListener('DOMContentLoaded', () => {
+    mountComponent(Login, '#login');
+    mountComponent(Sidebar, '#sidebar');
+    mountComponent(Header, '#header');
+    mountComponent(Badge, '#badge');
+    mountComponent(Dashboard, '#dashboard');
+    mountComponent(Inventory, '#inventory');
+    mountComponent(Imprimante, '#imprimante');
+    mountComponent(PrinterTable, '#vue-table');
+    mountComponent(Home, '#home');
+    mountComponent(Sidebar2, '#sidebar2');
+    mountComponent(Footer, '#footer');
+    mountComponent(CGU, '#cgu');
+    mountComponent(PublicBadge, '#publicbadge');
+    mountComponent(GestionUserAdmin, '#gestion-user-admin');
+});

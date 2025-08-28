@@ -1,0 +1,857 @@
+<template>
+  <div>
+    <div class="header-gradient"></div> <!-- Rectangle dégradé bleu en haut -->
+    <div class="user-container">
+      <h1 class="page-title">Gestion des Utilisateurs</h1>
+
+      <!-- BOUTON AFFICHER / MASQUER -->
+      <button @click="showExplanation = !showExplanation" class="btn btn-secondary" style="margin-bottom: 10px;">
+        {{ showExplanation ? 'Masquer les explications' : 'Afficher les explications' }}
+      </button>
+
+      <!-- BLOC D'EXPLICATION -->
+      <div v-show="showExplanation" class="explication">
+        Cette page vous permet de gérer les utilisateurs du système. Vous pouvez ajouter de nouveaux utilisateurs, visualiser la liste des utilisateurs existants, modifier leurs mots de passe et supprimer des comptes.
+        Pour ajouter un utilisateur, remplissez tous les champs du formulaire : nom d'utilisateur, email, prénom, nom, mot de passe, rôle et établissement (optionnel).
+        Après l'ajout, l'utilisateur sera affiché dans le tableau ci-dessous. Vous pouvez trier les données par colonne si nécessaire.
+        Pour modifier le mot de passe d'un utilisateur, cliquez sur le bouton "Modifier MDP" à côté de l'utilisateur correspondant.
+        Pour supprimer un utilisateur, cliquez sur le bouton "Supprimer" à côté de l'entrée correspondante. Une confirmation sera demandée avant la suppression.
+        Les rôles disponibles sont : "ROLE_USER" (utilisateur standard), "ROLE_ADMIN" (administrateur) et "ROLE_SUPER_ADMIN" (super administrateur).
+        Attention : les mots de passe sont automatiquement hashés avant d'être stockés en base de données pour des raisons de sécurité.
+      </div>
+
+      <!-- FORMULAIRE D'AJOUT -->
+      <div class="header-section">
+        <div class="form-section">
+          <form class="user-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="username" class="form-label">Nom d'utilisateur *</label>
+                <input type="text" class="form-control" id="username" placeholder="Nom d'utilisateur" v-model="formData.username">
+              </div>
+              <div class="form-group">
+                <label for="email" class="form-label">Email *</label>
+                <input type="email" class="form-control" id="email" placeholder="Email" v-model="formData.email">
+              </div>
+              <div class="form-group">
+                <label for="firstname" class="form-label">Prénom *</label>
+                <input type="text" class="form-control" id="firstname" placeholder="Prénom" v-model="formData.firstname">
+              </div>
+              <div class="form-group">
+                <label for="lastname" class="form-label">Nom *</label>
+                <input type="text" class="form-control" id="lastname" placeholder="Nom" v-model="formData.lastname">
+              </div>
+              <div class="form-group">
+                <label for="password" class="form-label">Mot de passe *</label>
+                <input type="password" class="form-control" id="password" placeholder="Mot de passe" v-model="formData.password">
+              </div>
+              <div class="form-group">
+                <label for="roles" class="form-label">Rôle</label>
+                <select class="form-control" id="roles" v-model="formData.roles">
+                  <option value="ROLE_USER">Utilisateur</option>
+                  <option value="ROLE_ADMIN">Administrateur</option>
+                  <option value="ROLE_SUPER_ADMIN">Super Administrateur</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="etablishment" class="form-label">Établissement</label>
+                <select class="form-control" id="etablishment" v-model="formData.etablishment_id">
+                  <option value="">Aucun établissement</option>
+                  <option v-for="etablishment in etablishments" :key="etablishment.id" :value="etablishment.id">
+                    {{ etablishment.name }}
+                  </option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="action-buttons">
+              <button 
+                type="button" 
+                @click="addUser"
+                :disabled="isLoading"
+                class="btn btn-success"
+              >
+                <i class="fas fa-plus"></i>
+                {{ isLoading ? 'Ajout en cours...' : 'Ajouter Utilisateur' }}
+              </button>
+              <button 
+                type="button" 
+                @click="resetForm"
+                class="btn btn-secondary"
+              >
+                <i class="fas fa-eraser"></i>
+                Réinitialiser
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <div v-if="message" :class="['alert', messageType === 'success' ? 'alert-success' : 'alert-error']">
+          {{ message }}
+        </div>
+      </div>
+
+      <!-- TABLEAU DES UTILISATEURS -->
+      <div class="table-section">
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th @click="sortBy('username')" class="sortable">
+                  Nom d'utilisateur <i :class="getSortIcon('username')"></i>
+                </th>
+                <th @click="sortBy('email')" class="sortable">
+                  Email <i :class="getSortIcon('email')"></i>
+                </th>
+                <th @click="sortBy('firstname')" class="sortable">
+                  Prénom <i :class="getSortIcon('firstname')"></i>
+                </th>
+                <th @click="sortBy('lastname')" class="sortable">
+                  Nom <i :class="getSortIcon('lastname')"></i>
+                </th>
+                <th>Rôles</th>
+                <th>Établissement</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-if="isLoading">
+                <td colspan="7" class="loading-row">
+                  <i class="fas fa-spinner fa-spin"></i> Chargement…
+                </td>
+              </tr>
+              <tr v-else-if="users.length === 0">
+                <td colspan="7" class="no-data">Aucun utilisateur disponible</td>
+              </tr>
+              <tr v-else v-for="user in paginatedData" :key="user.id">
+                <td>{{ user.username }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.firstname }}</td>
+                <td>{{ user.lastname }}</td>
+                <td>
+                  <span v-for="role in user.roles" :key="role" :class="getRoleClass(role)" class="role-badge">
+                    {{ formatRole(role) }}
+                  </span>
+                </td>
+                <td>{{ user.etablishment ? user.etablishment.name : 'Aucun' }}</td>
+                <td class="action-buttons-cell">
+                  <button @click="openPasswordModal(user)" class="btn btn-warning btn-sm">
+                    <i class="fas fa-key"></i> Modifier MDP
+                  </button>
+                  <button @click="deleteUser(user.id)" class="btn btn-danger btn-sm">
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div v-if="users.length > itemsPerPage" class="pagination">
+          <button @click="currentPage--" :disabled="currentPage === 1" class="btn btn-secondary">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <span class="page-info">Page {{ currentPage }} / {{ totalPages }}</span>
+          <button @click="currentPage++" :disabled="currentPage === totalPages" class="btn btn-secondary">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- MODAL MODIFICATION MOT DE PASSE -->
+      <div v-if="showPasswordModal" class="modal-overlay" @click="closePasswordModal">
+        <div class="modal-content" @click.stop>
+          <div class="modal-header">
+            <h3>Modifier le mot de passe</h3>
+            <button @click="closePasswordModal" class="close-btn">&times;</button>
+          </div>
+          <div class="modal-body">
+            <p><strong>Utilisateur :</strong> {{ selectedUser?.username }}</p>
+            <div class="form-group">
+              <label for="newPassword" class="form-label">Nouveau mot de passe *</label>
+              <input type="password" class="form-control" id="newPassword" placeholder="Nouveau mot de passe" v-model="newPassword">
+            </div>
+            <div class="form-group">
+              <label for="confirmPassword" class="form-label">Confirmer le mot de passe *</label>
+              <input type="password" class="form-control" id="confirmPassword" placeholder="Confirmer le mot de passe" v-model="confirmPassword">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button @click="updatePassword" :disabled="isUpdatingPassword" class="btn btn-success">
+              <i class="fas fa-save"></i>
+              {{ isUpdatingPassword ? 'Mise à jour...' : 'Mettre à jour' }}
+            </button>
+            <button @click="closePasswordModal" class="btn btn-secondary">
+              <i class="fas fa-times"></i>
+              Annuler
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-section">
+        <button @click="loadUsers" class="btn btn-primary btn-fullwidth">
+          <i class="fas fa-sync-alt"></i> Rafraîchir
+        </button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'UserManager',
+  data() {
+    return {
+      users: [],
+      etablishments: [],
+      isLoading: false,
+      message: '',
+      messageType: 'success',
+      sortField: 'username',
+      sortDirection: 'asc',
+      currentPage: 1,
+      itemsPerPage: 10,
+      showExplanation: true,
+      showPasswordModal: false,
+      selectedUser: null,
+      newPassword: '',
+      confirmPassword: '',
+      isUpdatingPassword: false,
+      formData: {
+        username: '',
+        email: '',
+        firstname: '',
+        lastname: '',
+        password: '',
+        roles: 'ROLE_USER',
+        etablishment_id: ''
+      }
+    };
+  },
+  computed: {
+    sortedData() {
+      const data = [...this.users];
+      data.sort((a, b) => {
+        let aVal = a[this.sortField];
+        let bVal = b[this.sortField];
+        if (typeof aVal === 'string') {
+          aVal = aVal.toLowerCase();
+          bVal = bVal.toLowerCase();
+        }
+        if (this.sortDirection === 'asc') {
+          return aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
+        } else {
+          return aVal > bVal ? -1 : aVal < bVal ? 1 : 0;
+        }
+      });
+      return data;
+    },
+    paginatedData() {
+      const start = (this.currentPage - 1) * this.itemsPerPage;
+      return this.sortedData.slice(start, start + this.itemsPerPage);
+    },
+    totalPages() {
+      return Math.ceil(this.users.length / this.itemsPerPage);
+    },
+  },
+  methods: {
+    formatRole(role) {
+      const roleMap = {
+        'ROLE_USER': 'Utilisateur',
+        'ROLE_ADMIN': 'Administrateur',
+        'ROLE_SUPER_ADMIN': 'Super Admin'
+      };
+      return roleMap[role] || role;
+    },
+    getRoleClass(role) {
+      const classMap = {
+        'ROLE_USER': 'role-user',
+        'ROLE_ADMIN': 'role-admin',
+        'ROLE_SUPER_ADMIN': 'role-super-admin'
+      };
+      return classMap[role] || 'role-default';
+    },
+    sortBy(field) {
+      if (this.sortField === field) {
+        this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+      } else {
+        this.sortField = field;
+        this.sortDirection = 'asc';
+      }
+      this.currentPage = 1;
+    },
+    getSortIcon(field) {
+      if (this.sortField !== field) return 'fas fa-sort';
+      return this.sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down';
+    },
+    resetForm() {
+      this.formData = {
+        username: '',
+        email: '',
+        firstname: '',
+        lastname: '',
+        password: '',
+        roles: 'ROLE_USER',
+        etablishment_id: ''
+      };
+    },
+    async loadUsers() {
+      this.isLoading = true;
+      try {
+        const response = await fetch('/gestion/user/admin/list');
+        const data = await response.json();
+        this.users = data;
+      } catch (error) {
+        console.error('Erreur lors du chargement des utilisateurs:', error);
+        this.message = 'Erreur de chargement des utilisateurs';
+        this.messageType = 'error';
+        setTimeout(() => this.message = '', 5000);
+      } finally {
+        this.isLoading = false;
+      }
+    },
+    async loadEtablishments() {
+      try {
+        const response = await fetch('/gestion/user/admin/etablishments');
+        const data = await response.json();
+        this.etablishments = data;
+      } catch (error) {
+        console.error('Erreur lors du chargement des établissements:', error);
+      }
+    },
+    async addUser() {
+      if (!this.formData.username || !this.formData.email || !this.formData.firstname || 
+          !this.formData.lastname || !this.formData.password) {
+        this.message = 'Veuillez remplir tous les champs obligatoires';
+        this.messageType = 'error';
+        setTimeout(() => this.message = '', 5000);
+        return;
+      }
+
+      // Validation email basique
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(this.formData.email)) {
+        this.message = 'Veuillez saisir une adresse email valide';
+        this.messageType = 'error';
+        setTimeout(() => this.message = '', 5000);
+        return;
+      }
+
+      if (this.formData.password.length < 6) {
+        this.message = 'Le mot de passe doit contenir au moins 6 caractères';
+        this.messageType = 'error';
+        setTimeout(() => this.message = '', 5000);
+        return;
+      }
+
+      this.isLoading = true;
+      try {
+        const formData = new FormData();
+        Object.keys(this.formData).forEach(key => {
+          if (this.formData[key] !== '') {
+            formData.append(key, this.formData[key]);
+          }
+        });
+
+        const response = await fetch('/gestion/user/admin/add', {
+          method: 'POST',
+          body: formData
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Erreur serveur');
+        }
+
+        this.users.push(data);
+        this.resetForm();
+        this.message = 'Utilisateur ajouté avec succès';
+        this.messageType = 'success';
+      } catch (error) {
+        console.error('Erreur lors de l\'ajout de l\'utilisateur:', error);
+        this.message = 'Erreur lors de l\'ajout : ' + error.message;
+        this.messageType = 'error';
+      } finally {
+        this.isLoading = false;
+        setTimeout(() => this.message = '', 5000);
+      }
+    },
+    openPasswordModal(user) {
+      this.selectedUser = user;
+      this.newPassword = '';
+      this.confirmPassword = '';
+      this.showPasswordModal = true;
+    },
+    closePasswordModal() {
+      this.showPasswordModal = false;
+      this.selectedUser = null;
+      this.newPassword = '';
+      this.confirmPassword = '';
+    },
+    async updatePassword() {
+      if (!this.newPassword) {
+        alert('Veuillez saisir un nouveau mot de passe');
+        return;
+      }
+
+      if (this.newPassword.length < 6) {
+        alert('Le mot de passe doit contenir au moins 6 caractères');
+        return;
+      }
+
+      if (this.newPassword !== this.confirmPassword) {
+        alert('Les mots de passe ne correspondent pas');
+        return;
+      }
+
+      this.isUpdatingPassword = true;
+      try {
+        const formData = new FormData();
+        formData.append('password', this.newPassword);
+
+        const response = await fetch(`/gestion/user/admin/update-password/${this.selectedUser.id}`, {
+          method: 'POST',
+          body: formData
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Erreur serveur');
+        }
+
+        this.closePasswordModal();
+        this.message = 'Mot de passe mis à jour avec succès';
+        this.messageType = 'success';
+        setTimeout(() => this.message = '', 5000);
+      } catch (error) {
+        console.error('Erreur lors de la mise à jour du mot de passe:', error);
+        alert('Erreur lors de la mise à jour : ' + error.message);
+      } finally {
+        this.isUpdatingPassword = false;
+      }
+    },
+    async deleteUser(id) {
+      if (!confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur?')) return;
+      
+      this.isLoading = true;
+      try {
+        const response = await fetch(`/gestion/user/admin/delete/${id}`, {
+          method: 'DELETE'
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+          this.users = this.users.filter(user => user.id !== id);
+          this.message = 'Utilisateur supprimé avec succès';
+          this.messageType = 'success';
+        } else {
+          throw new Error(data.error || 'Erreur lors de la suppression');
+        }
+      } catch (error) {
+        console.error('Erreur lors de la suppression de l\'utilisateur:', error);
+        this.message = 'Erreur lors de la suppression : ' + error.message;
+        this.messageType = 'error';
+      } finally {
+        this.isLoading = false;
+        setTimeout(() => this.message = '', 5000);
+      }
+    }
+  },
+  async mounted() {
+    await this.loadEtablishments();
+    await this.loadUsers();
+  }
+};
+</script>
+
+<style scoped>
+.header-gradient {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 500px;
+  background: linear-gradient(90deg, #003cff, #00aaff);
+  z-index: 0;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3);
+}
+
+.user-container {
+  max-width: 1500px;
+  margin: 0 auto 0 0;
+  padding-top: 320px;
+  position: relative;
+  z-index: 100;
+  margin-top: -250px;
+  margin-left: 300px;
+}
+
+.header-section {
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 100;
+}
+
+.page-title {
+  font-size: 2rem;
+  color: #ffffff;
+  margin-bottom: 15px;
+}
+
+.form-section {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  position: relative;
+  z-index: 100;
+}
+
+.user-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-label {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.form-control {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+  transition: border-color 0.3s;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #1b60eb;
+  box-shadow: 0 0 0 2px rgba(27, 96, 235, 0.2);
+}
+
+.action-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-start;
+}
+
+.action-buttons .btn {
+  min-width: 140px;
+}
+
+.action-buttons-cell {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.alert {
+  margin-top: 10px;
+  padding: 10px 15px;
+  border-radius: 5px;
+  font-weight: 600;
+  position: relative;
+  z-index: 100;
+}
+
+.alert-success {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.alert-error {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.table-section {
+  background: white;
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
+  position: relative;
+  z-index: 100;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 1000px;
+}
+
+.data-table th, .data-table td {
+  padding: 12px;
+  border-bottom: 1px solid #e2e2e2;
+  text-align: left;
+}
+
+.data-table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: #333;
+}
+
+.data-table th.sortable {
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s;
+}
+
+.data-table th.sortable:hover {
+  background-color: #e9ecef;
+}
+
+.data-table th.sortable i {
+  margin-left: 8px;
+  color: #888;
+}
+
+.data-table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+.loading-row, .no-data {
+  text-align: center;
+  color: #666;
+  font-style: italic;
+  padding: 20px;
+}
+
+.role-badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-right: 4px;
+}
+
+.role-user {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.role-admin {
+  background: #fff3e0;
+  color: #f57c00;
+}
+
+.role-super-admin {
+  background: #fce4ec;
+  color: #c2185b;
+}
+
+.role-default {
+  background: #f5f5f5;
+  color: #666;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 15px;
+  gap: 10px;
+}
+
+.page-info {
+  font-weight: 600;
+  color: #555;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #e2e2e2;
+}
+
+.modal-header h3 {
+  margin: 0;
+  color: #333;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #999;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-btn:hover {
+  color: #333;
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+.modal-body p {
+  margin-bottom: 15px;
+  color: #666;
+}
+
+.modal-footer {
+  padding: 20px;
+  border-top: 1px solid #e2e2e2;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.footer-section {
+  text-align: center;
+  margin-top: 20px;
+  position: relative;
+  z-index: 100;
+}
+
+.btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.3s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: #007bff;
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #0056b3;
+}
+
+.btn-success {
+  background: #1b60eb;
+  color: white;
+}
+
+.btn-success:hover:not(:disabled) {
+  background: #1749ab;
+}
+
+.btn-warning {
+  background: #ffc107;
+  color: #212529;
+}
+
+.btn-warning:hover:not(:disabled) {
+  background: #e0a800;
+}
+
+.btn-secondary {
+  background: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #5a6268;
+}
+
+.btn-danger {
+  background: #dc3545;
+  color: white;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #c82333;
+}
+
+.btn-sm {
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+.btn-fullwidth {
+  width: 100%;
+  max-width: 1500px;
+  margin-left: 0;
+  font-size: 1.2rem;
+  padding: 12px;
+  border-radius: 8px;
+  display: block;
+  margin-bottom: 20px;
+}
+
+:global(body) {
+  margin: 0;
+  background-color: #eeeeee;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.explication {
+  margin-bottom: 20px;
+  font-size: 0.70rem;
+  line-height: 1.5;
+  background-color: white;
+  color: #6c757d;
+  border-radius: 8px;
+  padding: 20px 25px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+</style>

@@ -15,18 +15,18 @@ class Badge
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $Nom = null;
+    private ?string $nom = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $Prenom = null;
+    private ?string $prenom = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $Date = null;
+    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    private ?\DateTimeInterface $date = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $Classe = null;
+    #[ORM\Column(length: 100)]
+    private ?string $classe = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 50)]
     private ?string $etatTraitement = null;
 
     #[ORM\Column(length: 255)]
@@ -39,48 +39,48 @@ class Badge
 
     public function getNom(): ?string
     {
-        return $this->Nom;
+        return $this->nom;
     }
 
-    public function setNom(string $Nom): static
+    public function setNom(string $nom): static
     {
-        $this->Nom = $Nom;
+        $this->nom = $nom;
 
         return $this;
     }
 
     public function getPrenom(): ?string
     {
-        return $this->Prenom;
+        return $this->prenom;
     }
 
-    public function setPrenom(string $Prenom): static
+    public function setPrenom(string $prenom): static
     {
-        $this->Prenom = $Prenom;
+        $this->prenom = $prenom;
 
         return $this;
     }
 
     public function getDate(): ?\DateTimeInterface
     {
-        return $this->Date;
+        return $this->date;
     }
 
-    public function setDate(\DateTimeInterface $Date): static
+    public function setDate(\DateTimeInterface $date): static
     {
-        $this->Date = $Date;
+        $this->date = $date;
 
         return $this;
     }
 
     public function getClasse(): ?string
     {
-        return $this->Classe;
+        return $this->classe;
     }
 
-    public function setClasse(string $Classe): static
+    public function setClasse(string $classe): static
     {
-        $this->Classe = $Classe;
+        $this->classe = $classe;
 
         return $this;
     }

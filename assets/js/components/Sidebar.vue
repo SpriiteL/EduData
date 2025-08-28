@@ -34,7 +34,7 @@
               </li>
               <li class="nav-item">
                 <a href="/printer-stats" class="nav-link">
-                  <i class="fas fa-chart-bar nav-icon"></i>
+                  <i class="fas fa-print nav-icon"></i>
                   <p>Imprimante</p>
                 </a>
               </li>
@@ -57,6 +57,12 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
+                <a href="/gestion/user/admin" class="nav-link">
+                  <i class="fas fa-users nav-icon"></i>
+                  <p>Utilisateurs</p>
+                </a>
+              </li>
+              <li class="nav-item">
                 <a href="/logout" class="nav-link">
                   <i class="fas fa-right-from-bracket nav-icon"></i>
                   <p>Déconnexion</p>
@@ -64,7 +70,6 @@
               </li>
             </ul>
           </li>
-
         </ul>
       </nav>
     </div>

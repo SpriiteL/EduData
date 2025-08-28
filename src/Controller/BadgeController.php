@@ -71,74 +71,64 @@ class BadgeController extends AbstractController
     }
 
     #[Route('/badge/delete/{id}', name: 'badge_delete', methods: ['DELETE'])]
-     public function deleteBadge(int $id, EntityManagerInterface $entityManager): JsonResponse
-     {
-         // Récupérer le badge par son ID
-         $badge = $entityManager->getRepository(Badge::class)->find($id);
- 
-         if (!$badge) {
-             return new JsonResponse(['error' => 'Badge non trouvé'], 404);
-         }
- 
-         // Supprimer l'entité
-         $entityManager->remove($badge);
-         $entityManager->flush();
- 
-         return new JsonResponse(['success' => true]);
-     }
+    public function deleteBadge(int $id, EntityManagerInterface $entityManager): JsonResponse
+    {
+        // Récupérer le badge par son ID
+        $badge = $entityManager->getRepository(Badge::class)->find($id);
 
-<<<<<<< HEAD
+        if (!$badge) {
+            return new JsonResponse(['error' => 'Badge non trouvé'], 404);
+        }
+
+        // Supprimer l'entité
+        $entityManager->remove($badge);
+        $entityManager->flush();
+
+        return new JsonResponse(['success' => true]);
+    }
+
     #[Route('/badge/treated', name: 'badge_treated', methods: ['GET'])]
-=======
-     #[Route('/badge/treated', name: 'badge_treated', methods: ['GET'])]
->>>>>>> feature/frontend
-     public function getTreatedBadges(EntityManagerInterface $entityManager): JsonResponse
-     {
-         $badges = $entityManager->getRepository(Badge::class)->findBy(['etatTraitement' => 'Traitée']);
- 
-         $data = [];
-         foreach ($badges as $badge) {
-             $data[] = [
-                 'nom' => $badge->getNom(),
-                 'prenom' => $badge->getPrenom(),
-                 'classe' => $badge->getClasse(),
-             ];
-         }
- 
-         return new JsonResponse($data);
-     }
- 
-     #[Route('/public/badges', name: 'public_badges', methods: ['GET'])]
-     public function publicDisplay(): Response
-     {
-         return $this->render('badge/public_badges.html.twig');
-     }
+    public function getTreatedBadges(EntityManagerInterface $entityManager): JsonResponse
+    {
+        $badges = $entityManager->getRepository(Badge::class)->findBy(['etatTraitement' => 'Traitée']);
 
-<<<<<<< HEAD
+        $data = [];
+        foreach ($badges as $badge) {
+            $data[] = [
+                'nom' => $badge->getNom(),
+                'prenom' => $badge->getPrenom(),
+                'classe' => $badge->getClasse(),
+            ];
+        }
+
+        return new JsonResponse($data);
+    }
+
+    #[Route('/public/badges', name: 'public_badges', methods: ['GET'])]
+    public function publicDisplay(): Response
+    {
+        return $this->render('badge/public_badges.html.twig');
+    }
+
     #[Route('/badge/update/{id}', name: 'badge_update', methods: ['PUT'])]
-=======
-     #[Route('/badge/update/{id}', name: 'badge_update', methods: ['PUT'])]
->>>>>>> feature/frontend
-     public function updateBadge(int $id, Request $request, EntityManagerInterface $entityManager): JsonResponse
-     {
-         $badge = $entityManager->getRepository(Badge::class)->find($id);
- 
-         if (!$badge) {
-             return new JsonResponse(['error' => 'Badge non trouvé'], 404);
-         }
- 
-         $data = $request->request;
- 
-         $badge->setNom($data->get('nom'));
-         $badge->setPrenom($data->get('prenom'));
-         $badge->setDate(new \DateTime($data->get('dateTraitement')));
-         $badge->setClasse($data->get('classe'));
-         $badge->setEtatTraitement($data->get('etatTraitement'));
- 
-         $entityManager->flush();
- 
-         return new JsonResponse(['success' => true]);
-     }
+    public function updateBadge(int $id, Request $request, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $badge = $entityManager->getRepository(Badge::class)->find($id);
 
+        if (!$badge) {
+            return new JsonResponse(['error' => 'Badge non trouvé'], 404);
+        }
 
+        $data = $request->request;
+
+        $badge->setNom($data->get('nom'));
+        $badge->setPrenom($data->get('prenom'));
+        $badge->setDate(new \DateTime($data->get('dateTraitement')));
+        $badge->setClasse($data->get('classe'));
+        $badge->setEtatTraitement($data->get('etatTraitement'));
+
+        $entityManager->flush();
+
+        return new JsonResponse(['success' => true]);
+    }
 }
